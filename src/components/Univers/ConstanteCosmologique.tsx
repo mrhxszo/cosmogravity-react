@@ -2,19 +2,28 @@ import { useState, useEffect } from "react";
 import "../../Css/Simu-univers.css"
 import "../../Css/Simu_avertissement.css"
 import { Simulation_universe } from "@/ts/class/simulation/simulation_universe";
+import Plotly from "../Graphics/Plotly";
 //importing language using i18next
 import { useTranslation } from 'react-i18next';
+import Univers from "./Univers";
 
 
 interface Props {
-	universe: Simulation_universe,
+	Universe: Simulation_universe,
 	handleChange: Function
+	params: {
+		T0: number,
+		H0: number,
+		Omegam0: number,
+		omegaDE0: number
+	}
 }
 
 export default function ConstanteCosmologique(props: Props){
 
 	//language hook
 	const { t } = useTranslation();
+
 
 
     return(
@@ -56,21 +65,21 @@ export default function ConstanteCosmologique(props: Props){
 				<div className="inp">
 				<label>T<sub>0</sub> = </label>
 				{/* <!-- Onchange pour actuliser les paramètre envoyés par le formulaire a chaque changement --> */}
-				<input id="T0" type="text" onKeyDown={(event)=>props.handleChange(event)}></input>
+				<input id="T0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.T0}></input>
 				<label> K</label>
 			</div>
 			<div id="balise_H0" className="inp">
 				<label>&nbsp; &nbsp; H<sub>0</sub> = </label>
-				<input id="H0" type="text" size={10} onKeyDown={(event)=>props.handleChange(event)}></input>
+				<input id="H0" type="text" size={10} onChange={(event)=>props.handleChange(event)} value={props.params.H0}></input>
 				<label> km.s<sup>-1</sup>.Mpc<sup>-1</sup></label>
 			</div>
 			<div className="inp">
 				<label>Ω<sub>m0</sub> = </label>
-				<input id="omegam0" type="text" onKeyDown={(event)=>props.handleChange(event)}></input>
+				<input id="omegam0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.Omegam0}></input>
 			</div>
 			<div className="inp">
 				<label>Ω<sub>Λ0</sub> = </label>
-				<input id="omegaDE0" type="text" onKeyDown={(event)=>props.handleChange(event)}></input>
+				<input id="omegaDE0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omegaDE0}></input>
 			</div>
 		</div>
 		<div id="coche_sim">
@@ -88,11 +97,12 @@ export default function ConstanteCosmologique(props: Props){
 			{/* <!-- Valeurs par defaut --> */}
 			{/* <!-- <input className="myButton" id="valeurs_types" type="button" OnClick="valeurs_types()" value="Modèles Monofluide"></input> --> */}
 			<input className="myButton" id="monofluide" type="button" OnClick="monofluide()" value="Modèles Monofluides"></input>
-			<input id="trace" className="myButton" type="button" onClick="update_omegar0_simu();update_omegak0_simu();lance_calc();ga('send', 'event', 'button', 'click', 'Tracer graphique univers');" value="Tracer"></input>
+			<input id="trace" className="myButton" type="button" value="Tracer"></input>
 			<div id="gif" style={{ position:"relative", display: "inline-block", marginLeft: "13px"}}></div>
 		</div>
 	</div>
-	<canvas id="canvas_1" width="750px" style={{display:'none'}}></canvas>
+
+
 	{/* <!-- INFORMATIONS --> */}
 	<div id="tg_contains">
 		<p id="txt_sorties" style={{fontSize:'16px', textAlign :'center'}}></p>
@@ -132,7 +142,7 @@ export default function ConstanteCosmologique(props: Props){
 	</div>
 	<div id="test">
 		{/* <!-- GRAPHIQUE--> */}
-		<div id="graphique"></div>
+		<div id="graphique"><Plotly Simulation={props.Universe}></Plotly></div>
 		<div style={{display:'none'}} id="graphique_enr"></div>
 		{/* <!-- Canvas --> */}
 		<div id="modele">

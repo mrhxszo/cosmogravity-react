@@ -1,7 +1,7 @@
 import ConstanteCosmologique from './ConstanteCosmologique';
 import EnergieSombre from './EnergieSombre';
 import LinkContext from '../Header/LinkContext';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Simulation_universe } from "../../ts/class/simulation/simulation_universe";
 
 export default function Univers(){
@@ -19,6 +19,14 @@ export default function Univers(){
 		omegaDE0: 0.6911
 		 });
 
+	//useEffect for updating the class Simulation_universe
+	useEffect(() => {
+		Universe.temperature = params.T0;
+		Universe.hubble_cst = params.H0;
+		Universe.matter_parameter = params.Omegam0;
+		Universe.dark_energy.parameter_value = params.omegaDE0;
+	}, [params]);
+
     
 	//assign the user's input to the class Simulation_universe
 	function handleChange(event: any) {
@@ -27,18 +35,14 @@ export default function Univers(){
 			...prevState,
 			[id]: value
 		}));
-		Universe.temperature = params.T0;
-		Universe.hubble_cst = params.H0;
-		Universe.matter_parameter = params.Omegam0;
-		Universe.dark_energy.parameter_value = params.omegaDE0;
 
 	}
 
     return(
         <>
         
-        {linkClicked === "Standard" && <ConstanteCosmologique universe={Universe} handleChange={handleChange}></ConstanteCosmologique>}
-        {linkClicked === "Energie_Sombre" && <EnergieSombre universe={Universe} handleChange={handleChange}></EnergieSombre>}
+        {linkClicked === "Standard" && <ConstanteCosmologique Universe={Universe} handleChange={handleChange} params={params}></ConstanteCosmologique>}
+        {linkClicked === "Energie_Sombre" && <EnergieSombre Universe={Universe} handleChange={handleChange} params={params}></EnergieSombre>}
         </>
         
     );
