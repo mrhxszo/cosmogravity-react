@@ -24,7 +24,17 @@ export default function ConstanteCosmologique(props: Props){
 	//language hook
 	const { t } = useTranslation();
 
+	//useState for universe simulation calculation
+	const [aTau, setATau] = useState({ x: [0], y: [0] });
 
+	//useEffect to run the universe simulation calculation first time
+	useEffect(() => {
+		setATau(props.Universe.compute_scale_factor(0.0001, [0.01, 10]))
+	},[])
+	//handClick to do the universe calculation
+	function handleClick() {
+		setATau(props.Universe.compute_scale_factor(0.0001, [0.01, 10]))
+	}
 
     return(
 
@@ -97,7 +107,7 @@ export default function ConstanteCosmologique(props: Props){
 			{/* <!-- Valeurs par defaut --> */}
 			{/* <!-- <input className="myButton" id="valeurs_types" type="button" OnClick="valeurs_types()" value="Modèles Monofluide"></input> --> */}
 			<input className="myButton" id="monofluide" type="button" OnClick="monofluide()" value="Modèles Monofluides"></input>
-			<input id="trace" className="myButton" type="button" value="Tracer"></input>
+			<input id="trace" className="myButton" type="button" value="Tracer" onClick={handleClick}></input>
 			<div id="gif" style={{ position:"relative", display: "inline-block", marginLeft: "13px"}}></div>
 		</div>
 	</div>
@@ -142,7 +152,11 @@ export default function ConstanteCosmologique(props: Props){
 	</div>
 	<div id="test">
 		{/* <!-- GRAPHIQUE--> */}
-		<div id="graphique"><Plotly Simulation={props.Universe}></Plotly></div>
+		<div id="graphique">
+			<Plotly x = {aTau.x} y = {aTau.y}>
+
+			</Plotly>
+		</div>
 		<div style={{display:'none'}} id="graphique_enr"></div>
 		{/* <!-- Canvas --> */}
 		<div id="modele">
