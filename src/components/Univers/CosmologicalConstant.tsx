@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import "../../Css/Simu-univers.css"
 import "../../Css/Simu_avertissement.css"
 import { Simulation_universe } from "@/ts/class/simulation/simulation_universe";
-import Plotly from "../Graphics/Plotly";
+import PlotlyComponent from "../Graphics/PlotlyComponent";
+import YRange from "./SubComponents/YRange";
 //importing language using i18next
 import { useTranslation } from 'react-i18next';
-import Univers from "./Univers";
 
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
 	}
 }
 
-export default function ConstanteCosmologique(props: Props){
+export default function CosmologicalConstant(props: Props){
 
 	//language hook
 	const { t } = useTranslation();
@@ -27,14 +27,30 @@ export default function ConstanteCosmologique(props: Props){
 	//useState for universe simulation calculation
 	const [aTau, setATau] = useState({ x: [0], y: [0] });
 
+	//useState for y axis range
+	const [aRange, setYRange] = useState({ aMin: 0.1, aMax: 10 });
+	
 	//useEffect to run the universe simulation calculation first time
 	useEffect(() => {
-		setATau(props.Universe.compute_scale_factor(0.0001, [0.01, 10]))
-	},[])
+		const { aMin, aMax } = aRange; // extract aMin and aMax values
+		setATau(props.Universe.compute_scale_factor(0.0001, [aMin, aMax]))
+	},[aRange, props.Universe])
+
 	//handClick to do the universe calculation
 	function handleClick() {
-		setATau(props.Universe.compute_scale_factor(0.0001, [0.01, 10]))
+		setATau(props.Universe.compute_scale_factor(0.001, [aRange.aMin, aRange.aMax]))
 	}
+	
+	
+	// to handle y axis range obtained from YRange.tsx
+
+	const handleChild = (aminChild: number , amaxChild: number) =>{
+		setYRange({aMin: aminChild, aMax: amaxChild});
+	}
+
+
+
+	
 
     return(
 
@@ -117,13 +133,13 @@ export default function ConstanteCosmologique(props: Props){
 	<div id="tg_contains">
 		<p id="txt_sorties" style={{fontSize:'16px', textAlign :'center'}}></p>
 		<div>
-			&Omega;<sub>r0</sub> = <span id="resultat_omegar0"></span>
+			&Omega;<sub>r0</sub> = <span id="resultat_omegar0">{props.Universe.calcul_omega_r().toExponential(4)}</span>
 			<br/>
-			&Omega;<sub>k0</sub> = <span id="resultat_omegak0"  onChange="document.getElementById('Okcalc').value = this.value"></span>
+			&Omega;<sub>k0</sub> = <span id="resultat_omegak0"  >{props.Universe.calcul_omega_k().toExponential(4)}</span>
 			<br/>   
-			<span id="txt_tempsBB" style={{textDecoration: "underline"}}></span>
+			<span id="txt_tempsBB" style={{textDecoration: "underline"}}>{t('page_univers_general.tempsBigBang')}</span>
 			<br/>
-			<span id="resultat_ageunivers_ga"></span>
+			<span id="resultat_ageunivers_ga">{props.Universe.universe_age().toExponential(4)}</span>
 			(Ga)&nbsp;= <span id="resultat_ageunivers_s">1.09884e+3</span>(s)
 			<br/>
 			<i><span id="resultat_bigcrunch">Pas</span></i>
@@ -153,9 +169,11 @@ export default function ConstanteCosmologique(props: Props){
 	<div id="test">
 		{/* <!-- GRAPHIQUE--> */}
 		<div id="graphique">
-			<Plotly x = {aTau.x} y = {aTau.y}>
-
-			</Plotly>
+			<PlotlyComponent 
+			x = {{xData:aTau.x, xName:"t(Ga)"}} 
+			y = {{yData:aTau.y,yName:"a(t)"}} 
+			title={t("calculs_univers.titre")}
+			/>
 		</div>
 		<div style={{display:'none'}} id="graphique_enr"></div>
 		{/* <!-- Canvas --> */}
@@ -164,20 +182,7 @@ export default function ConstanteCosmologique(props: Props){
 		</div>
 	</div>
 	<div id="enregistrer">
-		<div>
-			<label> a<sub>min</sub> =  </label>
-			<input id="ami" type="text" value="0" onfocus="this.oldvalue = this.value;" onchange="
-				if ( this.value < 0 || this.value > Number(document.getElementById('ama').value)) {
-					this.value = this.oldvalue;
-				}
-			"></input>&nbsp;&nbsp;
-			<label> a<sub>max</sub> = </label>
-			<input id="ama" type="text" value="5" onfocus="this.oldvalue = this.value;" onchange="
-				if ( this.value < 0 || this.value < Number(document.getElementById('ami').value)) {
-					this.value = this.oldvalue;
-				}
-			"></input>&nbsp;&nbsp;
-		</div>
+		<YRange handleChild={handleChild}></YRange>
 		<span id="txt_enregistrerEn"></span>
 	"
 		<select id="format_enr">

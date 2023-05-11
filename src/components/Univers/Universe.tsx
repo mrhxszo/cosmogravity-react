@@ -1,5 +1,5 @@
-import ConstanteCosmologique from './ConstanteCosmologique';
-import EnergieSombre from './EnergieSombre';
+import CosmologicalConstant from './CosmologicalConstant';
+import DarkEnergy from './DarkEnergy';
 import LinkContext from '../Header/LinkContext';
 import { useState, useContext, useEffect } from 'react';
 import { Simulation_universe } from "../../ts/class/simulation/simulation_universe";
@@ -41,8 +41,8 @@ export default function Univers(){
     return(
         <>
         
-        {linkClicked === "Standard" && <ConstanteCosmologique Universe={Universe} handleChange={handleChange} params={params}></ConstanteCosmologique>}
-        {linkClicked === "Energie_Sombre" && <EnergieSombre Universe={Universe} handleChange={handleChange} params={params}></EnergieSombre>}
+        {linkClicked === "Standard" && <CosmologicalConstant Universe={Universe} handleChange={handleChange} params={params}></CosmologicalConstant>}
+        {linkClicked === "Energie_Sombre" && <DarkEnergy Universe={Universe} handleChange={handleChange} params={params}></DarkEnergy>}
         </>
         
     );

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LinkContext from "./components/Header/LinkContext";
 import Header from "./components/Header/Header";
 import Home from "./components/Home";
-import Univers from "./components/Univers/Univers";
+import Univers from "./components/Univers/Universe";
   
 
 function App() {

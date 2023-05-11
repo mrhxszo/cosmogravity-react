@@ -8,7 +8,6 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.25",
-    "@types/plotly.js": "2.12.18",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.1",
     "html-react-parser": "^3.0.16",
@@ -48,6 +47,7 @@
     ]
   },
   "devDependencies": {
+    "@types/plotly.js": "^2.12.18",
     "@types/react-plotly.js": "^2.6.0"
   }
 }
