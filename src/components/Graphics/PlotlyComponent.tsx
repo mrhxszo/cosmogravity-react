@@ -40,7 +40,7 @@ export default function PlotlyComponent(props : Props): JSX.Element {
                     showline: true,
                 },
                 title: props.title,
-                width: 1325 ,
+                width: 700 ,
                 height:500 ,
             }}
         />

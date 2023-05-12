@@ -4,6 +4,7 @@ import "../../Css/Simu_avertissement.css"
 import { Simulation_universe } from "@/ts/class/simulation/simulation_universe";
 import PlotlyComponent from "../Graphics/PlotlyComponent";
 import YRange from "./SubComponents/YRange";
+import Warning from "../Warning/Warning";
 //importing language using i18next
 import { useTranslation } from 'react-i18next';
 
@@ -29,12 +30,20 @@ export default function CosmologicalConstant(props: Props){
 
 	//useState for y axis range
 	const [aRange, setYRange] = useState({ aMin: 0.1, aMax: 10 });
+
+	//useState for select options for matter, lambda, radiation and dark energy
+	const [selectValue, setSelectValue] = useState("Matière, Lambda, RFC et Neutrinos");
+
+	//useState for isFlat
+	const [isFlat, setIsFlat] = useState(false);
+
 	
-	//useEffect to run the universe simulation calculation first time
+	//useEffect to run the universe simulation calculation in the first render and every time useState is updated
 	useEffect(() => {
 		const { aMin, aMax } = aRange; // extract aMin and aMax values
 		setATau(props.Universe.compute_scale_factor(0.0001, [aMin, aMax]))
-	},[aRange, props.Universe])
+	},[aRange, props.Universe, selectValue, isFlat]);
+
 
 	//handClick to do the universe calculation
 	function handleClick() {
@@ -49,41 +58,45 @@ export default function CosmologicalConstant(props: Props){
 	}
 
 
+	//handle the select options for matter, lambda, radiation and dark energy
+	function handleSelect(event: any) {
 
+		const { id, value } = event.target;
+		if(id === "liste"){
+
+			setSelectValue(value);
+			switch (value) {
+				case "Matière et Lambda":
+					props.Universe.has_neutrino = false;
+					props.Universe.has_cmb = false;
+					break;
+				case "Matière, Lambda et RFC":
+					props.Universe.has_neutrino = false;
+					props.Universe.has_cmb = true;
+					break;
+				default:
+					props.Universe.has_neutrino = true;
+					props.Universe.has_cmb = true;
+					break;
+			}
+		}
+
+		if(id === "univ_plat"){
+			setIsFlat(!isFlat);
+			props.Universe.is_flat = !isFlat;
+		}
+		
+	}
 	
 
     return(
 
     <>
-	{/* <!-- Boutons Calculs annexes et params --> */}
-	<div id="Boutons_top_right">
-		<input className="myButton" id="para" type="button" OnClick="param()" value="Constantes"></input>
-		{/* <!-- paramètre tracer --> */}
-		<input type="hidden" id="T0calc" name="T0_calc" value="2.7255" />
-		<input type="hidden" id="H0calc" name="H0_calc" value="67.74" />
-		<input type="hidden" id="Omcalc" name="Om_calc" value="0.3089" />
-		<input type="hidden" id="Olcalc" name="Ol_calc" value="0.6911" />
-		<input type="hidden" id="Orcalc" name="Or_calc" value="0" />
-		<input type="hidden" id="Okcalc" name="Ok_calc" value="0" />
-		{/* <!-- Paramètres pour le tracer --> */}
-		<input type="hidden" id="k_p" name="k_p" value="1.38064852e-23"></input>
-		<input type="hidden" id="h_p" name="h_p" value="6.62607004e-34"></input>
-		<input type="hidden" id="G_p" name="G_p" value="6.67385e-11"></input>
-		<input type="hidden" id="c_p" name="c_p" value="299792458"></input>
-		<input type="hidden" id="lambda_cosmo_const" value="1.1056e-52"></input>
-		<input type="hidden" id="typeannee" name="typeannee" value="Grégorienne" />
-		{/* <!-- Envoi --> */}
-		<input className="myButton" id="calc" type="button" onClick="updateValeursCanvas();update_omegar0_simu();ouvre_calc();" value="Calculs Annexes"></input>
-	</div><br/>
-	<p id="txt_titre" style={{ fontSize: '20px' , fontWeight:'bold' , textAlign:'center'}}></p>
-	<div id="Bloc_Textee">	  
-		<div id="univers">
-		<img onClick="avertissement_univers();" src="Images/warning.png" className="bouton_avertissement"/>
-		<span id="txt_avertissementuniv"></span>
-		<br/>
-		<span id="txt_avertissement_univers"></span>
-		</div>
-	</div>
+		{/* <!-- Titre  --> */}
+	<p id="txt_titre" style={{ fontSize: '20px' , fontWeight:'bold' , textAlign:'center'}} dangerouslySetInnerHTML={{ __html: t("page_univers.titre") || '' }}></p>
+
+	<Warning header={t("page_univers_general.simuavertissement")} text={t("page_univers_general.avertissement")} />
+
 	{/* <!-- Paramètres  --> */}
 	<div id="params">
 		<p id="txt_entrees" style={{fontSize: "16px", fontWeight: "bold", textAlign: "center"}}>{t("page_univers_general.entrees")}</p>
@@ -109,13 +122,13 @@ export default function CosmologicalConstant(props: Props){
 			</div>
 		</div>
 		<div id="coche_sim">
-			<span id="txt_univplat" dangerouslySetInnerHTML={{ __html: t("page_univers.univers_plat") || '' }}></span><input id="univ_plat" type="checkbox" name="univ_plat" onChange="updateUnivPlat();"></input>
+			<span id="txt_univplat" dangerouslySetInnerHTML={{ __html: t("page_univers.univers_plat") || '' }}></span><input id="univ_plat" type="checkbox" name="univ_plat" onChange={handleSelect}></input>
 		</div>
 		<div id="type_sim">
-			<select id="liste" onchange="update_omegar0_simu();">
+			<select id="liste" onChange={handleSelect} value={selectValue}>
 				<option id="txt_MLRFCN" value="Matière, Lambda, RFC et Neutrinos">{t('page_univers.matierelambdaRFCNeu')}</option>
 				<option id="txt_MLRFC" value="Matière, Lambda et RFC">{t('page_univers.matierelambdaRFC')}</option>
-				<option id="txt_ML" value="Matière et Lambda">{t('texte.page_univers.matierelambda')}</option>
+				<option id="txt_ML" value="Matière et Lambda">{t('page_univers.matierelambda')}</option>
 			</select>
 		</div>
 		{/* <!-- Bouton Tracer --> */}

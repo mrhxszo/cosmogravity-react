@@ -1,4 +1,6 @@
 import { Simulation_universe } from "../../ts/class/simulation/simulation_universe";
+import Warning from "../Warning/Warning";
+import { useTranslation } from "react-i18next";
 
 interface Props {
 	Universe: Simulation_universe,
@@ -12,43 +14,19 @@ interface Props {
 }
 
 export default function DarkEnergy (props: Props){
+
+
+	//translation hook
+	const { t } = useTranslation();
+
+	
     return(
 	<>
-					{/* <!-- ------------- -->
+		{/* <!-- Titre --> */}
+			<p id="txt_titre" style={{fontSize:'20px', fontWeight:"bold", textAlign: "center"}}>{}</p>
 
-			<!-- Boutons Calculs annexes et params --> */}
-			<div id="Boutons_top_right">
-				<input id="para" className="myButton" type="button" OnClick="param()" value="Constantes"></input>
-				{/* <!-- paramètre tracer --> */}
-				<input type="hidden" id="T0calc" name="T0_calc" value="2.7255" />
-				<input type="hidden" id="H0calc" name="H0_calc" value="67.74" />
-				<input type="hidden" id="Omcalc" name="Om_calc" value="0.3089" />
-				<input type="hidden" id="Olcalc" name="Ol_calc" value="0.6911" />
-				<input type="hidden" id="Orcalc" name="Or_calc" value="0" />
-				<input type="hidden" id="Okcalc" name="Ok_calc" value="0" />
-				<input type="hidden" id="EnergieSombre" name="EnergieSombre" value="true" />
-
-				{/* <!-- Paramètres pour le tracer --> */}
-				<input type="hidden" id="k_p" name="k_p" value="1.38064852e-23"></input>
-				<input type="hidden" id="h_p" name="h_p" value="6.62607004e-34"></input>
-				<input type="hidden" id="G_p" name="G_p" value="6.67385e-11"></input>
-				<input type="hidden" id="c_p" name="c_p" value="299792458"></input>
-				<input type="hidden" id="typeannee" name="typeannee" value="Grégorienne" />
-
-				{/* <!-- Envoi --> */}
-				<input className="myButton" id="calc" type="button" onclick="ouvre_calc_Noire()" value="Calculs Annexes"></input>
-
-			</div><br></br>
-			<p id="txt_titre" style={{fontSize:'20px', fontWeight:"bold", textAlign: "center"}}></p>
-
-			<div id="Bloc_Textee">	  
-				<div id="univers">
-					<img onclick="avertissement_univers();" src="Images/warning.png" className="bouton_avertissement"></img>
-					<span id="txt_avertissementuniv"></span>
-					<br/>
-					<span id="txt_avertissement_univers"></span>
-				</div>
-			</div>
+			{/* <!-- Avertissement --> */}
+			<Warning header={t("page_univers_general.simuavertissement")} text={t("page_univers_general.avertissement")} />
 
 			{/* <!-- Paramètres --> */}
 			<div id="params">
@@ -91,10 +69,10 @@ export default function DarkEnergy (props: Props){
 				</div>
 				<div id="type_sim">
 					<select id="liste" onChange="update_omegar0_simu_noir();">
-									<option id="txt_MLRFCN" value="Matière, Lambda, RFC et Neutrinos"></option>
-									<option id="txt_MLRFC" value="Matière, Lambda et RFC"></option>
-									<option id="txt_ML" value="Matière et Lambda"></option>
-								</select>
+						<option id="txt_MLRFCN" value="Matière, Lambda, RFC et Neutrinos"></option>
+						<option id="txt_MLRFC" value="Matière, Lambda et RFC"></option>
+						<option id="txt_ML" value="Matière et Lambda"></option>
+					</select>
 				</div>
 				<div id="trace_box">
 					<input className="myButton" id="monofluide" type="hidden" OnClick="monofluide_noire()" value="Modèles Monofluides"></input>
