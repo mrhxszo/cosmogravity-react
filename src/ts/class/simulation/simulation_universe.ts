@@ -91,6 +91,9 @@ export class Simulation_universe extends Simulation {
 	}
 
 	public set temperature(temperature: number) {
+		if (temperature === this._temperature) {
+			return;
+		}
 		this._temperature = temperature;
 		this.check_sum_omegas();
 	}
@@ -101,6 +104,9 @@ export class Simulation_universe extends Simulation {
 	}
 
 	public set hubble_cst(hubble_cst: number) {
+		if (hubble_cst === this._hubble_cst) {
+			return;
+		}
 		this._hubble_cst = (hubble_cst * 1e3) / (((AU * (180 * 3600)) / Math.PI) * 1e6);
 		this.check_sum_omegas();
 	}
@@ -111,9 +117,13 @@ export class Simulation_universe extends Simulation {
 	}
 
 	public set matter_parameter(matter_parameter: number) {
+		if (matter_parameter === this._matter_parameter) {
+			return;
+		}
 		this._matter_parameter = matter_parameter;
 		this.check_sum_omegas();
 	}
+	
 
 	// dark_energy
 	public get dark_energy() {
@@ -131,6 +141,9 @@ export class Simulation_universe extends Simulation {
 	}
 
 	public set has_cmb(has_cmb: boolean) {
+		if (has_cmb === this._has_cmb) {
+			return;
+		}
 		this._has_cmb = has_cmb;
 		this.check_sum_omegas();
 	}
@@ -141,6 +154,9 @@ export class Simulation_universe extends Simulation {
 	}
 
 	public set has_neutrino(has_neutrino: boolean) {
+		if (has_neutrino === this._has_neutrino) {
+			return;
+		}
 		this._has_neutrino = has_neutrino;
 		this.check_sum_omegas();
 	}
@@ -151,6 +167,9 @@ export class Simulation_universe extends Simulation {
 	}
 
 	public set is_flat(is_flat: boolean) {
+		if (is_flat === this._is_flat) {
+			return;
+		}
 		this._is_flat = is_flat;
 		this.check_sum_omegas();
 	}

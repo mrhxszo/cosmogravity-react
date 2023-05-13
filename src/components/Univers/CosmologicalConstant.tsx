@@ -15,7 +15,7 @@ interface Props {
 	params: {
 		T0: number,
 		H0: number,
-		Omegam0: number,
+		omegam0: number,
 		omegaDE0: number
 	}
 }
@@ -37,11 +37,27 @@ export default function CosmologicalConstant(props: Props){
 	//useState for isFlat
 	const [isFlat, setIsFlat] = useState(false);
 
+	//useState for handling outputs
+	const [output, setOutput] = useState({
+		//default values
+		omegaR0 : props.Universe.calcul_omega_r(),
+		omegaK0 : props.Universe.calcul_omega_k(),
+		ageUniverse : props.Universe.universe_age(),
+	});
+
 	
 	//useEffect to run the universe simulation calculation in the first render and every time useState is updated
 	useEffect(() => {
 		const { aMin, aMax } = aRange; // extract aMin and aMax values
 		setATau(props.Universe.compute_scale_factor(0.0001, [aMin, aMax]))
+		props.Universe.is_flat = isFlat;
+
+		//every time the universe simulation calculation is updated, the output is updated
+		setOutput({
+			omegaR0 : props.Universe.calcul_omega_r(),
+			omegaK0 : props.Universe.calcul_omega_k(),
+			ageUniverse : props.Universe.universe_age(),
+		});
 	},[aRange, props.Universe, selectValue, isFlat]);
 
 
@@ -88,14 +104,22 @@ export default function CosmologicalConstant(props: Props){
 		
 	}
 	
+	//update the output Values and update the display for the parameters
+	function updateOutput(event: any){
+		//update the display for the parameters
+		props.handleChange(event);
+
+		//update the output Values
+		setOutput({
+			omegaR0 : props.Universe.calcul_omega_r(),
+			omegaK0 : props.Universe.calcul_omega_k(),
+			ageUniverse : props.Universe.universe_age(),
+		});
+	}
 
     return(
 
     <>
-		{/* <!-- Titre  --> */}
-	<p id="txt_titre" style={{ fontSize: '20px' , fontWeight:'bold' , textAlign:'center'}} dangerouslySetInnerHTML={{ __html: t("page_univers.titre") || '' }}></p>
-
-	<Warning header={t("page_univers_general.simuavertissement")} text={t("page_univers_general.avertissement")} />
 
 	{/* <!-- Paramètres  --> */}
 	<div id="params">
@@ -104,21 +128,21 @@ export default function CosmologicalConstant(props: Props){
 				<div className="inp">
 				<label>T<sub>0</sub> = </label>
 				{/* <!-- Onchange pour actuliser les paramètre envoyés par le formulaire a chaque changement --> */}
-				<input id="T0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.T0}></input>
+				<input id="T0" type="text" onChange={(event)=> updateOutput(event)} value={props.params.T0}></input>
 				<label> K</label>
 			</div>
 			<div id="balise_H0" className="inp">
 				<label>&nbsp; &nbsp; H<sub>0</sub> = </label>
-				<input id="H0" type="text" size={10} onChange={(event)=>props.handleChange(event)} value={props.params.H0}></input>
+				<input id="H0" type="text" size={10} onChange={(event)=> updateOutput(event)} value={props.params.H0}></input>
 				<label> km.s<sup>-1</sup>.Mpc<sup>-1</sup></label>
 			</div>
 			<div className="inp">
 				<label>Ω<sub>m0</sub> = </label>
-				<input id="omegam0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.Omegam0}></input>
+				<input id="omegam0" type="text" onChange={(event)=> updateOutput(event)} value={props.params.omegam0}></input>
 			</div>
 			<div className="inp">
 				<label>Ω<sub>Λ0</sub> = </label>
-				<input id="omegaDE0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omegaDE0}></input>
+				<input id="omegaDE0" type="text" onChange={(event)=> updateOutput(event)} value={props.params.omegaDE0}></input>
 			</div>
 		</div>
 		<div id="coche_sim">
@@ -146,13 +170,13 @@ export default function CosmologicalConstant(props: Props){
 	<div id="tg_contains">
 		<p id="txt_sorties" style={{fontSize:'16px', textAlign :'center'}}></p>
 		<div>
-			&Omega;<sub>r0</sub> = <span id="resultat_omegar0">{props.Universe.calcul_omega_r().toExponential(4)}</span>
+			&Omega;<sub>r0</sub> = <output id="resultat_omegar0">{output.omegaR0.toExponential(4)}</output>
 			<br/>
-			&Omega;<sub>k0</sub> = <span id="resultat_omegak0"  >{props.Universe.calcul_omega_k().toExponential(4)}</span>
+			&Omega;<sub>k0</sub> = <output id="resultat_omegak0"  >{output.omegaK0.toExponential(4)}</output>
 			<br/>   
 			<span id="txt_tempsBB" style={{textDecoration: "underline"}}>{t('page_univers_general.tempsBigBang')}</span>
 			<br/>
-			<span id="resultat_ageunivers_ga">{props.Universe.universe_age().toExponential(4)}</span>
+			<output id="resultat_ageunivers_ga">{output.ageUniverse.toExponential(4)}</output>
 			(Ga)&nbsp;= <span id="resultat_ageunivers_s">1.09884e+3</span>(s)
 			<br/>
 			<i><span id="resultat_bigcrunch">Pas</span></i>

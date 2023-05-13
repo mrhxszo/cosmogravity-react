@@ -8,7 +8,7 @@ interface Props {
 	params: {
 		T0: number,
 		H0: number,
-		Omegam0: number,
+		omegam0: number,
 		omegaDE0: number
 	}
 }
@@ -19,14 +19,9 @@ export default function DarkEnergy (props: Props){
 	//translation hook
 	const { t } = useTranslation();
 
-	
+
     return(
 	<>
-		{/* <!-- Titre --> */}
-			<p id="txt_titre" style={{fontSize:'20px', fontWeight:"bold", textAlign: "center"}}>{}</p>
-
-			{/* <!-- Avertissement --> */}
-			<Warning header={t("page_univers_general.simuavertissement")} text={t("page_univers_general.avertissement")} />
 
 			{/* <!-- Paramètres --> */}
 			<div id="params">
