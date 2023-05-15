@@ -7,6 +7,7 @@ import YRange from "./SubComponents/YRange";
 import Warning from "../Warning/Warning";
 //importing language using i18next
 import { useTranslation } from 'react-i18next';
+import Canvas from "../Graphics/Canvas/Canvas";
 
 
 interface Props {
@@ -18,6 +19,13 @@ interface Props {
 		omegam0: number,
 		omegaDE0: number
 	}
+}
+
+enum TypesImages {
+	png = "png",
+	jpeg = "jpeg",
+	webp = "webp",
+	svg = "svg"
 }
 
 export default function CosmologicalConstant(props: Props){
@@ -37,14 +45,21 @@ export default function CosmologicalConstant(props: Props){
 	//useState for isFlat
 	const [isFlat, setIsFlat] = useState(false);
 
+	//define 1 gigaYear in seconds
+	const gigaYear = 3.1557 * 1e16;
+
 	//useState for handling outputs
 	const [output, setOutput] = useState({
 		//default values
 		omegaR0 : props.Universe.calcul_omega_r(),
 		omegaK0 : props.Universe.calcul_omega_k(),
-		ageUniverse : props.Universe.universe_age(),
+		ageUniverse : props.Universe.universe_age()
 	});
 
+
+
+	//useState for download button
+	const [downloadStatus, setDownload] = useState({download: false, type: TypesImages.png});
 	
 	//useEffect to run the universe simulation calculation in the first render and every time useState is updated
 	useEffect(() => {
@@ -56,7 +71,7 @@ export default function CosmologicalConstant(props: Props){
 		setOutput({
 			omegaR0 : props.Universe.calcul_omega_r(),
 			omegaK0 : props.Universe.calcul_omega_k(),
-			ageUniverse : props.Universe.universe_age(),
+			ageUniverse : props.Universe.universe_age()
 		});
 	},[aRange, props.Universe, selectValue, isFlat]);
 
@@ -117,6 +132,35 @@ export default function CosmologicalConstant(props: Props){
 		});
 	}
 
+	//handle the download button
+	function handleDownload(event: any){
+		const [id, value] = [event.target.id, event.target.value]
+
+		if(id === "button_enregistrer"){
+			setDownload((prevState) => ({download:true, type: prevState.type}));
+		}
+		else{
+			//cases for the different types of images
+			switch (value) {
+				case "png":
+					setDownload((prevState) => ({download: prevState.download, type: TypesImages.png}));
+					break;
+				case "jpeg":
+					setDownload((prevState) => ({download: prevState.download, type: TypesImages.jpeg}));
+					break;
+				case "webp":
+					setDownload((prevState) => ({download: prevState.download, type: TypesImages.webp}));
+					break;
+				case "svg":
+					setDownload((prevState) => ({download: prevState.download, type: TypesImages.svg}));
+					break;
+				default:
+					setDownload((prevState) => ({download: prevState.download, type: TypesImages.png}));
+					break;
+		}
+			
+	}};
+
     return(
 
     <>
@@ -155,6 +199,8 @@ export default function CosmologicalConstant(props: Props){
 				<option id="txt_ML" value="Matière et Lambda">{t('page_univers.matierelambda')}</option>
 			</select>
 		</div>
+
+
 		{/* <!-- Bouton Tracer --> */}
 		<div id="trace_box">
 			{/* <!-- Valeurs par defaut --> */}
@@ -176,8 +222,8 @@ export default function CosmologicalConstant(props: Props){
 			<br/>   
 			<span id="txt_tempsBB" style={{textDecoration: "underline"}}>{t('page_univers_general.tempsBigBang')}</span>
 			<br/>
-			<output id="resultat_ageunivers_ga">{output.ageUniverse.toExponential(4)}</output>
-			(Ga)&nbsp;= <span id="resultat_ageunivers_s">1.09884e+3</span>(s)
+			<output id="resultat_ageunivers_ga">{(output.ageUniverse/gigaYear).toExponential(4)}</output>
+			(Ga)&nbsp;= <span id="resultat_ageunivers_s">{output.ageUniverse.toExponential(4)}</span>(s)
 			<br/>
 			<i><span id="resultat_bigcrunch">Pas</span></i>
 			<br/>
@@ -199,40 +245,45 @@ export default function CosmologicalConstant(props: Props){
 				<td className="tg-rkjz" id="resultat_omegak0" onChange="document.getElementById('Okcalc').value = this.value">t</td>
 			</tr>
 			<tr>
-				<td className="tg-cgnp" colspan="2">Temps depuis le Big Bang</td>
+				<td className="tg-cgnp" colSpan={2}>Temps depuis le Big Bang</td>
 			</tr>
 		</table>
 	</div>
+
+
 	<div id="test">
 		{/* <!-- GRAPHIQUE--> */}
 		<div id="graphique">
 			<PlotlyComponent 
-			x = {{xData:aTau.x, xName:"t(Ga)"}} 
-			y = {{yData:aTau.y,yName:"a(t)"}} 
-			title={t("calculs_univers.titre")}
+			x = {{xData:[aTau.x], xName:"t(Ga)"}} 
+			y = {{yData:[aTau.y],yName:"a(t)"}} 
+			title={t("calculs_univers.titre").toString()}
+			downloadButton={
+				{changeDownload: setDownload,
+				isDownload: downloadStatus.download,
+				whatType: downloadStatus.type,					
+			}
+			}
 			/>
+			
 		</div>
 		<div style={{display:'none'}} id="graphique_enr"></div>
 		{/* <!-- Canvas --> */}
 		<div id="modele">
-			<canvas id="canvas" width="298" height="400"></canvas>
+			<Canvas></Canvas>
 		</div>
 	</div>
 	<div id="enregistrer">
 		<YRange handleChild={handleChild}></YRange>
 		<span id="txt_enregistrerEn"></span>
-	"
-		<select id="format_enr">
-			<option selected>png</option>
+		<select id="format_enr" onChange={handleDownload} defaultValue={"png"}>
+			<option >png</option>
 			<option>jpg</option>
 			<option>svg</option>
+			<option>webp</option>
 		</select>&nbsp;
-		<input className="myButton" id="button_enregistrer" type="button" OnClick="enre()" value="Enregistrer"></input>
+		<input className="myButton" id="button_enregistrer" type="button" onClick={handleDownload} value="Enregistrer"></input>
 	</div>
-	<a id="png" download="Graphique.png" style={{display:"none"}}></a>
-	<a id="jpg" download="Graphique.jpg" style={{display:"none"}}></a>
-	<a id="svg-1" download="Graphique.svg" style={{display:"none"}}></a>
-	<a id="ret" href="#nav" style={{display:"none"}}></a>
 
 
 
