@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
+//importing css
 import "../../Css/Simu-univers.css"
 import "../../Css/Simu_avertissement.css"
+//importing class
 import { Simulation_universe } from "@/ts/class/simulation/simulation_universe";
+//importing components
 import PlotlyComponent from "../Graphics/PlotlyComponent";
 import YRange from "./SubComponents/YRange";
-import Warning from "../Warning/Warning";
+import Canvas from "../Graphics/Canvas/Canvas";
+import Output from "./SubComponents/Output";
 //importing language using i18next
 import { useTranslation } from 'react-i18next';
-import Canvas from "../Graphics/Canvas/Canvas";
+
 
 
 interface Props {
@@ -44,9 +48,6 @@ export default function CosmologicalConstant(props: Props){
 
 	//useState for isFlat
 	const [isFlat, setIsFlat] = useState(false);
-
-	//define 1 gigaYear in seconds
-	const gigaYear = 3.1557 * 1e16;
 
 	//useState for handling outputs
 	const [output, setOutput] = useState({
@@ -213,45 +214,9 @@ export default function CosmologicalConstant(props: Props){
 
 
 	{/* <!-- INFORMATIONS --> */}
-	<div id="tg_contains">
-		<p id="txt_sorties" style={{fontSize:'16px', textAlign :'center'}}></p>
-		<div>
-			&Omega;<sub>r0</sub> = <output id="resultat_omegar0">{output.omegaR0.toExponential(4)}</output>
-			<br/>
-			&Omega;<sub>k0</sub> = <output id="resultat_omegak0"  >{output.omegaK0.toExponential(4)}</output>
-			<br/>   
-			<span id="txt_tempsBB" style={{textDecoration: "underline"}}>{t('page_univers_general.tempsBigBang')}</span>
-			<br/>
-			<output id="resultat_ageunivers_ga">{(output.ageUniverse/gigaYear).toExponential(4)}</output>
-			(Ga)&nbsp;= <span id="resultat_ageunivers_s">{output.ageUniverse.toExponential(4)}</span>(s)
-			<br/>
-			<i><span id="resultat_bigcrunch">Pas</span></i>
-			<br/>
-			<span id="txt_dureeeUniv" style={{textDecoration: 'underline'}}></span>
-			<br/>
-			<span id="resultat_dureeuniv">res</span>
-		</div>
-		<table className="tg" style={{display:'none'}}>
-			<tr>
-				<td className="tg-m3ec" style={{borderRight: '1px solid black'}} id="resultat_omegam0">Resultat</td>
-				<td className="tg-m3ec" id="resultat_omegar0">Resultat</td>
-			</tr>
-			<tr>
-				<td className="tg-cgnp" style={{borderRight: '1px solid black'}}>&Omega;<sub>&Lambda;0</sub></td>
-				<td className="tg-cgnp">&Omega;<sub>k0</sub></td>
-			</tr>
-			<tr>
-				<td className="tg-m3ec" style={{borderRight: '1px solid black'}} id="resultat_omegarlambda0" onChange="document.getElementById('Orcalc').value = this.value">Resultat</td>
-				<td className="tg-rkjz" id="resultat_omegak0" onChange="document.getElementById('Okcalc').value = this.value">t</td>
-			</tr>
-			<tr>
-				<td className="tg-cgnp" colSpan={2}>Temps depuis le Big Bang</td>
-			</tr>
-		</table>
-	</div>
+	<Output output={output} />
 
-
-	<div id="test">
+	<div id="test" style={{display:"flex",justifyContent:"space-evenly"}}>
 		{/* <!-- GRAPHIQUE--> */}
 		<div id="graphique">
 			<PlotlyComponent 
@@ -284,6 +249,7 @@ export default function CosmologicalConstant(props: Props){
 		</select>&nbsp;
 		<input className="myButton" id="button_enregistrer" type="button" onClick={handleDownload} value="Enregistrer"></input>
 	</div>
+
 
 
 

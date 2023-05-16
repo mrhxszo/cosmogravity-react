@@ -13,6 +13,11 @@ interface Props {
 	}
 }
 
+//to be done : 
+//add asymptote when big rip
+//make graph work
+//make adjunct calculation work etc
+
 export default function DarkEnergy (props: Props){
 
 

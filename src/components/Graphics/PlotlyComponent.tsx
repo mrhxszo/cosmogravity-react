@@ -1,49 +1,105 @@
-import { Simulation_universe } from "@/ts/class/simulation/simulation_universe";
-import { use } from "i18next";
 import Plotly from "react-plotly.js";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import {downloadImage, newPlot } from "plotly.js";
+
+enum TypesImages {
+	png = "png",
+	jpeg = "jpeg",
+	webp = "webp",
+	svg = "svg"
+}
 
 interface Props {
     x: {
-        xData:number[],
+        xData:number[][],
         xName:string,},
     y: {
-        yData:number[],
+        yData:number[][],
         yName:string,
     }
-    title: string,
+    title: string | undefined,
+    downloadButton: {
+        changeDownload: React.Dispatch<React.SetStateAction<{ download: boolean; type: TypesImages; }>>;
+        isDownload:boolean,
+        whatType:TypesImages,
+    }
 }
 
+
+
 export default function PlotlyComponent(props : Props): JSX.Element {
+
+
+//This part of code recieves data from props and based on how many data sets are there it creates data array for plotly
+let data : any = [];
+
+if(props.x.xData.length <= 1){
+    data.push({
+        x: props.x.xData[0],
+        y: props.y.yData[0],
+        mode: 'lines'
+    });
+}
+else{
+    props.x.xData.forEach(
+    (value, index) => {
+        data.push({
+            x: props.x.xData[index],
+            y: props.y.yData[index],
+            mode: 'lines'
+        });
+    });
+};
+
+const layout = {
+    xaxis: {
+        title: props.x.xName,
+        autorange: true,
+        titlefont:{family:"Time New Roman, sans-serif",size:16,color:"#111111"},
+    },
+    yaxis: {
+        rangemode:"tozero" as const,
+        title: props.y.yName,
+        autorange: true,
+        titlefont:{family:"Time New Roman, sans-serif",size:16,color:"#111111"},
+        showline: true,
+    },
+    title: props.title,
+    width: 700 ,
+    height:500 ,
+};
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+
+        if(props.downloadButton.isDownload){
+
+           
+            //This part of code is responsible for downloading image
+            newPlot('save',data,layout)
+            .then (async (gd) => {
+                await downloadImage(gd, {
+                    format: props.downloadButton.whatType,
+                    width: 700,
+                    height: 500,
+                    filename: "download"
+                });
+            })
+            //important: set the download button to false so there is no infinite download loop
+            props.downloadButton.changeDownload((prevState)=>({download:false, type:prevState.type}));
+      
+    };
+},[props.downloadButton]);
 
     return (
         <div>
         <Plotly
-            data={[
-            {
-                x: props.x.xData,
-                y: props.y.yData,
-                mode: 'lines'
-            },
-            ]}
-            layout={{
-                xaxis: {
-                    title: props.x.xName,
-                    autorange: true,
-                    titlefont:{family:"Time New Roman, sans-serif",size:16,color:"#111111"},
-                },
-                yaxis: {
-                    rangemode: 'tozero',
-                    title: props.y.yName,
-                    autorange: true,
-                    titlefont:{family:"Time New Roman, sans-serif",size:16,color:"#111111"},
-                    showline: true,
-                },
-                title: props.title,
-                width: 700 ,
-                height:500 ,
-            }}
+            data={data}
+            layout={layout}
         />
+        <div id="save" style={{display:"none"}}></div>
         </div>
     );
 }
