@@ -45,6 +45,7 @@ import {c,k,h,G, AU, parsec, k_parsec, M_parsec, ly}from "../../constants";
  * @method integral_distance
  * @method equa_diff_a
  * @method equa_diff_time
+ * @method check_singularity
  */
 export class Simulation_universe extends Simulation {
 	private _temperature: number;
@@ -503,7 +504,7 @@ export class Simulation_universe extends Simulation {
 			interval_a
 		);
 		for (let index = 0; index < result.x.length; index++) {
-			result.x[index] = (result.x[index] / this.hubble_cst + age) / (3600 * 24 * 365.2425);
+			result.x[index] = (result.x[index] / this.hubble_cst + age) / (3600 * 24 * 365.2425); //divison to convert time into year i think
 		}
 		return result;
 	}
@@ -788,5 +789,70 @@ export class Simulation_universe extends Simulation {
 	 */
 	protected equa_diff_time(Simu: Simulation_universe, z: number, t: number = 0): number {
 		return 1 / (this.hubble_cst * (1 + z) * Math.sqrt(Simu.F(z)));
+	}
+
+	/**
+	 * Checks if the model of the universe has singularity and if there is what kind of singularity is it
+	 * @returns object with 3 objects containing, boolean for each kind of singularity, and the time of the singularity
+	 * note : this function should check for all three kinds of singularity namely big crunch, big rip and big bang
+	 * where big rip depends on the value of the dark energy parameter w
+	 * */
+	public check_singularity(): { bigBang: {isBigBang:boolean, time?: number}, bigCrunch: {isBigCrunch:boolean, time?: number}, bigRip: {isBigRip:boolean, time?: number}} {
+
+		let { x, y } = this.compute_scale_factor(0.001, [0, 10]);
+		let scale_factor = y;
+		let time = x;
+		
+		// isolate the parts of arrays where scale factor approaches 0
+		let thresold = 0.1;
+		let isolatedScaleFactor: Array<{ scale_factor: number[], time: number[] }> = [];
+		let currentSection: { scale_factor: number[], time: number[] } | null = null;
+		
+		//search bigbang
+		scale_factor.forEach((element, index) => {
+		  if (element <= thresold) {
+			// If currentSection is null, create a new section
+			if (!currentSection) {
+			  currentSection = { scale_factor: [], time: [] };
+			}
+			// Add element to the current section
+			currentSection.scale_factor.push(element);
+			currentSection.time.push(time[index]);
+		  } else {
+			// If currentSection exists, push it to isolatedScaleFactor and reset currentSection
+			if (currentSection) {
+			  isolatedScaleFactor.push(currentSection);
+			  currentSection = null;
+			}
+		  }
+		});
+		
+		// Push the last section if it exists
+		if (currentSection) {
+		  isolatedScaleFactor.push(currentSection);
+		}
+
+		//isolate the time when scale factor = 1(present time) 
+		const index = scale_factor.findIndex((element) => Math.abs(element-1) < 0.01);
+		const presentTime = time[index];
+		console.log(presentTime);
+		//check for bigbang or bigcrunch
+		if (isolatedScaleFactor.length == 1) {
+			//console.log("bigbang detected");
+			return { bigBang: {isBigBang :true, time: presentTime}, bigCrunch: {isBigCrunch:false}, bigRip: {isBigRip:false} };
+		}
+		else if (isolatedScaleFactor.length >= 2) {
+			//console.log("bigcrunch detected");
+			return { bigBang: {isBigBang :true, time: presentTime}, bigCrunch: {isBigCrunch:true, time: isolatedScaleFactor[1].time[0]}, bigRip: {isBigRip:false} };
+		}
+
+
+	//to detect if there is big rip need to look at value of z, w_0 et w_1 (see univere theory)
+	//(to be written)if there is big rip then return { bigBang: false, bigCrunch: false, bigRip: true };
+
+	//if there is no singularity
+	return { bigBang: {isBigBang :false}, bigCrunch: {isBigCrunch:false}, bigRip: {isBigRip:false} };
+
+		
 	}
 }

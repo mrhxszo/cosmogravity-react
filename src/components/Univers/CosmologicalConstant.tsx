@@ -15,14 +15,19 @@ import { useTranslation } from 'react-i18next';
 
 
 interface Props {
-	Universe: Simulation_universe,
-	handleChange: Function
+	UniverseRef: React.RefObject<Simulation_universe>,
+	handleChange: Function,
 	params: {
 		T0: number,
 		H0: number,
 		omegam0: number,
 		omegaDE0: number
-	}
+	},
+	handleSelect: Function,
+	selectValue: {
+		value: string,
+		isFlat: boolean,
+	},
 }
 
 enum TypesImages {
@@ -33,6 +38,7 @@ enum TypesImages {
 }
 
 export default function CosmologicalConstant(props: Props){
+	const Universe = props.UniverseRef.current;
 
 	//language hook
 	const { t } = useTranslation();
@@ -43,21 +49,6 @@ export default function CosmologicalConstant(props: Props){
 	//useState for y axis range
 	const [aRange, setYRange] = useState({ aMin: 0.1, aMax: 10 });
 
-	//useState for select options for matter, lambda, radiation and dark energy
-	const [selectValue, setSelectValue] = useState("Matière, Lambda, RFC et Neutrinos");
-
-	//useState for isFlat
-	const [isFlat, setIsFlat] = useState(false);
-
-	//useState for handling outputs
-	const [output, setOutput] = useState({
-		//default values
-		omegaR0 : props.Universe.calcul_omega_r(),
-		omegaK0 : props.Universe.calcul_omega_k(),
-		ageUniverse : props.Universe.universe_age()
-	});
-
-
 
 	//useState for download button
 	const [downloadStatus, setDownload] = useState({download: false, type: TypesImages.png});
@@ -65,21 +56,17 @@ export default function CosmologicalConstant(props: Props){
 	//useEffect to run the universe simulation calculation in the first render and every time useState is updated
 	useEffect(() => {
 		const { aMin, aMax } = aRange; // extract aMin and aMax values
-		setATau(props.Universe.compute_scale_factor(0.0001, [aMin, aMax]))
-		props.Universe.is_flat = isFlat;
-
-		//every time the universe simulation calculation is updated, the output is updated
-		setOutput({
-			omegaR0 : props.Universe.calcul_omega_r(),
-			omegaK0 : props.Universe.calcul_omega_k(),
-			ageUniverse : props.Universe.universe_age()
-		});
-	},[aRange, props.Universe, selectValue, isFlat]);
+		if(Universe){
+			setATau(Universe.compute_scale_factor(0.001, [aMin, aMax]))
+		}
+		
+	},[aRange, Universe]);
 
 
 	//handClick to do the universe calculation
 	function handleClick() {
-		setATau(props.Universe.compute_scale_factor(0.001, [aRange.aMin, aRange.aMax]))
+		if(Universe){
+		setATau(Universe.compute_scale_factor(0.001, [aRange.aMin, aRange.aMax]));}
 	}
 	
 	
@@ -88,50 +75,7 @@ export default function CosmologicalConstant(props: Props){
 	const handleChild = (aminChild: number , amaxChild: number) =>{
 		setYRange({aMin: aminChild, aMax: amaxChild});
 	}
-
-
-	//handle the select options for matter, lambda, radiation and dark energy
-	function handleSelect(event: any) {
-
-		const { id, value } = event.target;
-		if(id === "liste"){
-
-			setSelectValue(value);
-			switch (value) {
-				case "Matière et Lambda":
-					props.Universe.has_neutrino = false;
-					props.Universe.has_cmb = false;
-					break;
-				case "Matière, Lambda et RFC":
-					props.Universe.has_neutrino = false;
-					props.Universe.has_cmb = true;
-					break;
-				default:
-					props.Universe.has_neutrino = true;
-					props.Universe.has_cmb = true;
-					break;
-			}
-		}
-
-		if(id === "univ_plat"){
-			setIsFlat(!isFlat);
-			props.Universe.is_flat = !isFlat;
-		}
-		
-	}
 	
-	//update the output Values and update the display for the parameters
-	function updateOutput(event: any){
-		//update the display for the parameters
-		props.handleChange(event);
-
-		//update the output Values
-		setOutput({
-			omegaR0 : props.Universe.calcul_omega_r(),
-			omegaK0 : props.Universe.calcul_omega_k(),
-			ageUniverse : props.Universe.universe_age(),
-		});
-	}
 
 	//handle the download button
 	function handleDownload(event: any){
@@ -173,28 +117,28 @@ export default function CosmologicalConstant(props: Props){
 				<div className="inp">
 				<label>T<sub>0</sub> = </label>
 				{/* <!-- Onchange pour actuliser les paramètre envoyés par le formulaire a chaque changement --> */}
-				<input id="T0" type="text" onChange={(event)=> updateOutput(event)} value={props.params.T0}></input>
+				<input id="T0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.T0}></input>
 				<label> K</label>
 			</div>
 			<div id="balise_H0" className="inp">
 				<label>&nbsp; &nbsp; H<sub>0</sub> = </label>
-				<input id="H0" type="text" size={10} onChange={(event)=> updateOutput(event)} value={props.params.H0}></input>
+				<input id="H0" type="text" size={10} onChange={(event)=>props.handleChange(event)} value={props.params.H0}></input>
 				<label> km.s<sup>-1</sup>.Mpc<sup>-1</sup></label>
 			</div>
 			<div className="inp">
 				<label>Ω<sub>m0</sub> = </label>
-				<input id="omegam0" type="text" onChange={(event)=> updateOutput(event)} value={props.params.omegam0}></input>
+				<input id="omegam0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omegam0}></input>
 			</div>
 			<div className="inp">
 				<label>Ω<sub>Λ0</sub> = </label>
-				<input id="omegaDE0" type="text" onChange={(event)=> updateOutput(event)} value={props.params.omegaDE0}></input>
+				<input id="omegaDE0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omegaDE0}></input>
 			</div>
 		</div>
 		<div id="coche_sim">
-			<span id="txt_univplat" dangerouslySetInnerHTML={{ __html: t("page_univers.univers_plat") || '' }}></span><input id="univ_plat" type="checkbox" name="univ_plat" onChange={handleSelect}></input>
+			<span id="txt_univplat" dangerouslySetInnerHTML={{ __html: t("page_univers.univers_plat") || '' }}></span><input id="univ_plat" type="checkbox" name="univ_plat" onChange={(event)=>props.handleSelect(event)}></input>
 		</div>
 		<div id="type_sim">
-			<select id="liste" onChange={handleSelect} value={selectValue}>
+			<select id="liste" onChange={(event)=>props.handleSelect(event)} value={props.selectValue.value}>
 				<option id="txt_MLRFCN" value="Matière, Lambda, RFC et Neutrinos">{t('page_univers.matierelambdaRFCNeu')}</option>
 				<option id="txt_MLRFC" value="Matière, Lambda et RFC">{t('page_univers.matierelambdaRFC')}</option>
 				<option id="txt_ML" value="Matière et Lambda">{t('page_univers.matierelambda')}</option>
@@ -214,13 +158,13 @@ export default function CosmologicalConstant(props: Props){
 
 
 	{/* <!-- INFORMATIONS --> */}
-	<Output output={output} />
+	<Output Universe={props.UniverseRef} params={props.params} selectValue={props.selectValue}/>
 
 	<div id="test" style={{display:"flex",justifyContent:"space-evenly"}}>
 		{/* <!-- GRAPHIQUE--> */}
 		<div id="graphique">
 			<PlotlyComponent 
-			x = {{xData:[aTau.x], xName:"t(Ga)"}} 
+			x = {{xData:[aTau.x.map(element => element/(1e9))], xName:"t(Ga)"}} //divide by 1e16 to convert in Gyears
 			y = {{yData:[aTau.y],yName:"a(t)"}} 
 			title={t("calculs_univers.titre").toString()}
 			downloadButton={
@@ -235,7 +179,7 @@ export default function CosmologicalConstant(props: Props){
 		<div style={{display:'none'}} id="graphique_enr"></div>
 		{/* <!-- Canvas --> */}
 		<div id="modele">
-			<Canvas></Canvas>
+			<Canvas universe={Universe}></Canvas>
 		</div>
 	</div>
 	<div id="enregistrer">
@@ -249,12 +193,6 @@ export default function CosmologicalConstant(props: Props){
 		</select>&nbsp;
 		<input className="myButton" id="button_enregistrer" type="button" onClick={handleDownload} value="Enregistrer"></input>
 	</div>
-
-
-
-
-
-
     </>
     );
 }

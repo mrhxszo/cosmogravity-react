@@ -2,7 +2,7 @@
 import {t} from "i18next"
 
 /*@ this function creates the canvas for interactive graph on bottom right corner of cosmological constant page*/
-export default function drawCanvas(canvas: HTMLCanvasElement) {
+export default function drawCanvas(canvas: HTMLCanvasElement, omegam0?: number, omegaDE0?:number, event?: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
     let context = canvas.getContext("2d");
     if (!context) return;
 
@@ -109,11 +109,10 @@ export default function drawCanvas(canvas: HTMLCanvasElement) {
 
     //This portion of the code writes the necessary text on the canvas
 
-    //Write nor big bang nor big crunch
-
     //context.save() and context.restore() 
     //provide a convenient way to temporarily change the context state without having to manually reset all the settings afterward.
 
+    //Write nor big bang nor big crunch
     context.font = "8pt Verdana";
     context.fillStyle = "blue";
     context.rotate(-.8);

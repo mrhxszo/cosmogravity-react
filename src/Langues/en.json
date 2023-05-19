@@ -59,7 +59,7 @@
 		"bouton_tracer":"Plot",
 		"bouton_enregistrer":"Save",
 		"bouton_constantes":"Constants",
-		"bouton_calculsAnnexes":"Adjunct computation",
+		"bouton_calculsAnnexes":"Adjunct computations",
 		"enregistrerEn":"",
 		"entrees":"Inputs",
 		"sorties":"Outputs",
@@ -166,9 +166,9 @@
 	},
 
 	"calculs_univers":{
-		"tempsdepuisBC":"Time since Crunch = ",
-		"tempsavtBC":"Time before Big Crunch = ",
-		"temps_avt_BR": "Time before Big Rip = ",
+		"tempsdepuisBC":"Time since Crunch",
+		"tempsavtBC":"Time before Big Crunch",
+		"temps_avt_BR": "Time before Big Rip",
 		"calculBC":"Big Crunch &agrave; calculate.",
 		"pasBC":"No Big Crunch",
 		"pasBB":"No Big Bang",

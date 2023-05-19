@@ -27,8 +27,13 @@ export default function Univers(){
 		T0: 2.7255, 
 		H0: 67.74, 
 		omegam0: Universe.matter_parameter, 
-		omegaDE0: Universe.dark_energy.parameter_value
+		omegaDE0: Universe.dark_energy.parameter_value,
 		 });
+	
+	//useState for select options for matter, lambda, radiation and dark energy and for isFlat
+	const [selectValue, setSelectValue] = useState({value:"Matière, Lambda, RFC et Neutrinos", isFlat: false});
+	
+
 
 	//useEffect for updating the class Simulation_universe
 	useEffect(() => {
@@ -36,7 +41,7 @@ export default function Univers(){
 		Universe.hubble_cst = params.H0;
 		Universe.matter_parameter = params.omegam0;
 		Universe.dark_energy.parameter_value = params.omegaDE0;
-	}, [params]);
+	}, [params,selectValue]);
 
     
 	//assign the user's input to the class Simulation_universe
@@ -49,11 +54,43 @@ export default function Univers(){
 
 	}
 
+	//handle the select options for matter, lambda, radiation and dark energy
+	function handleSelect(event: any) {
+
+		const { id, value } = event.target;
+		if(id === "liste" && Universe){
+
+			setSelectValue((prevState)=>{return {...prevState, value: value}});
+			switch (value) {
+				case "Matière et Lambda":
+					Universe.has_neutrino = false;
+					Universe.has_cmb = false;
+					break;
+				case "Matière, Lambda et RFC":
+					Universe.has_neutrino = false;
+					Universe.has_cmb = true;
+					break;
+				default:
+					Universe.has_neutrino = true;
+					Universe.has_cmb = true;
+					break;
+			}
+		}
+
+		if(id === "univ_plat" && Universe){
+			setSelectValue((prevState)=>{
+				return {...prevState, isFlat: !selectValue.isFlat};
+			});
+			Universe.is_flat = !selectValue.isFlat;
+		}
+		
+	}
+
 	return (
 		<>
 		  {/* Boutons Calculs annexes et params */}
 		  <div id="Boutons_top_right">
-			<input className="myButton" id="para" type="button" onClick={() => param()} value="Constantes" />
+			<input className="myButton" id="para" type="button" onClick={() => param()} value={t("page_univers_general.bouton_constantes")||""} />
 			{/* paramètre tracer */}
 			<input type="hidden" id="T0calc" name="T0_calc" value="2.7255" />
 			<input type="hidden" id="H0calc" name="H0_calc" value="67.74" />
@@ -86,9 +123,11 @@ export default function Univers(){
 					<Warning header={t("page_univers_general.simuavertissement")} text={t("page_univers_general.avertissement")} />
 
 				  <CosmologicalConstant
-					Universe={Universe}
+					UniverseRef={UniverseRef}
 					handleChange={handleChange}
 					params={params}
+					handleSelect={handleSelect}
+					selectValue = {selectValue}
 				  />
 				  </>
 				);
@@ -101,9 +140,11 @@ export default function Univers(){
 
 					<Warning header={t("page_univers_general.simuavertissement")} text={t("page_univers_general.avertissement")} />
 				  <DarkEnergy
-					Universe={Universe}
+					UniverseRef={UniverseRef}
 					handleChange={handleChange}
 					params={params}
+					handleSelect={handleSelect}
+					selectValue = {selectValue}
 				  />
 				  </>
 
@@ -118,9 +159,11 @@ export default function Univers(){
 					<Warning header={t("page_univers_general.simuavertissement")} text={t("page_univers_general.avertissement")} />
 
 				  <CosmologicalConstant
-					Universe={Universe}
+					UniverseRef={UniverseRef}
 					handleChange={handleChange}
 					params={params}
+					handleSelect={handleSelect}
+					selectValue = {selectValue}
 				  />
 				  </>
 				);

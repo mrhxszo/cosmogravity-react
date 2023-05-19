@@ -37,7 +37,8 @@ if(props.x.xData.length <= 1){
     data.push({
         x: props.x.xData[0],
         y: props.y.yData[0],
-        mode: 'lines'
+        mode: 'lines',
+        type: 'scatter',
     });
 }
 else{
@@ -46,7 +47,9 @@ else{
         data.push({
             x: props.x.xData[index],
             y: props.y.yData[index],
-            mode: 'lines'
+            mode: 'lines',
+            type: 'scatter',
+
         });
     });
 };
@@ -60,13 +63,13 @@ const layout = {
     yaxis: {
         rangemode:"tozero" as const,
         title: props.y.yName,
-        autorange: true,
+        autorange: true,    
         titlefont:{family:"Time New Roman, sans-serif",size:16,color:"#111111"},
         showline: true,
     },
     title: props.title,
-    width: 700 ,
-    height:500 ,
+    width: 900 ,
+    height:600 ,
 };
 
 
@@ -82,8 +85,8 @@ const layout = {
             .then (async (gd) => {
                 await downloadImage(gd, {
                     format: props.downloadButton.whatType,
-                    width: 700,
-                    height: 500,
+                    width: 800,
+                    height: 600,
                     filename: "download"
                 });
             })
