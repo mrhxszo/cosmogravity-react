@@ -103,23 +103,6 @@ export default function Output(props:Props){
                 (Ga)&nbsp;= <span id="resultat_ageunivers_s">{output.checkSingularity.bigCrunch.time ? (output.ageUniverse*3.154*1e7).toExponential(4): <span>&infin;</span>}</span>(s)
                 <br/>
             </div>
-            <table className="tg" style={{display:'none'}}>
-                <tr>
-                    <td className="tg-m3ec" style={{borderRight: '1px solid black'}} id="resultat_omegam0">Resultat</td>
-                    <td className="tg-m3ec" id="resultat_omegar0">Resultat</td>
-                </tr>
-                <tr>
-                    <td className="tg-cgnp" style={{borderRight: '1px solid black'}}>&Omega;<sub>&Lambda;0</sub></td>
-                    <td className="tg-cgnp">&Omega;<sub>k0</sub></td>
-                </tr>
-                <tr>
-                    <td className="tg-m3ec" style={{borderRight: '1px solid black'}} id="resultat_omegarlambda0" onChange="document.getElementById('Orcalc').value = this.value">Resultat</td>
-                    <td className="tg-rkjz" id="resultat_omegak0" onChange="document.getElementById('Okcalc').value = this.value">t</td>
-                </tr>
-                <tr>
-                    <td className="tg-cgnp" colSpan={2}>Temps depuis le Big Bang</td>
-                </tr>
-            </table>
         </div>
 </>
     )

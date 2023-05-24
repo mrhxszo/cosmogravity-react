@@ -2,15 +2,21 @@ import { Simulation_universe } from "../../ts/class/simulation/simulation_univer
 import Warning from "../Warning/Warning";
 import { useTranslation } from "react-i18next";
 
+
 interface Props {
-	Universe: Simulation_universe,
-	handleChange: Function
+	UniverseRef: React.RefObject<Simulation_universe>,
+	handleChange: Function,
 	params: {
 		T0: number,
 		H0: number,
 		omegam0: number,
 		omegaDE0: number
-	}
+	},
+	handleSelect: Function,
+	selectValue: {
+		value: string,
+		isFlat: boolean,
+	},
 }
 
 //to be done : 

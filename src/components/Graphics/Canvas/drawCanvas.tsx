@@ -2,7 +2,7 @@
 import {t} from "i18next"
 
 /*@ this function creates the canvas for interactive graph on bottom right corner of cosmological constant page*/
-export default function drawCanvas(canvas: HTMLCanvasElement, omegam0?: number, omegaDE0?:number, event?: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
+export function drawCanvas(canvas: HTMLCanvasElement, omegam0?: number, omegaDE0?:number, event?: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
     let context = canvas.getContext("2d");
     if (!context) return;
 
@@ -251,4 +251,54 @@ export default function drawCanvas(canvas: HTMLCanvasElement, omegam0?: number, 
     context.restore();
     context.save();
     context.closePath();
+}
+
+/*
+*This function takes the x and y coordinates of the mouse and returns the corresponding transformed coordinates
+@param x: x coordinate of the mouse
+@param y: y coordinate of the mouse
+@return: the transformed x and y coordinates
+*/
+
+export const transformDistance = { 
+  
+      CanvasToOmega :(x:number , y: number) => {
+
+        //this following distance is calculated by subtracting x and y coordinates of the extremes of canvas
+      const xextreme1 = 53;
+      const xextreme2 = 283;
+      const distanceX = xextreme2 - xextreme1;
+
+      const yextreme1 = 29;
+      const yextreme2 = 354;
+      const distanceY = yextreme2 - yextreme1;
+
+      //transform the diatance like the graduation marks in the figure
+      let transformDistanceX = ((x- xextreme1) / distanceX) * 3;//3 because x axis is divided in 3 parts
+
+      let transformDistanceY = (-(y- yextreme2) / distanceY) * 5 - 1.5;//9 because one graduation is divided to 2 parts and there are 5 parts, except the last one which is smaller and counts as only one part
+    //minus because counting starts from top to bottom contrary yo bottom to top in canvas
+
+      return {x: transformDistanceX, y: transformDistanceY}
+    },
+    OmegaToCanvas: (OmegaM: number, OmegaLambda: number) => {
+      
+      //check if OmegaM and OmegaLambda are in the range of the figure
+      if (!(OmegaM <= 0 || OmegaM >= 3 || OmegaLambda <= -1.5 || OmegaLambda >= 3)) {
+        
+      }
+    }
+
+
+}
+
+
+export function updatePoint(canvas: HTMLCanvasElement, x: number, y: number) {
+  let ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+  drawCanvas(canvas);
+  ctx.beginPath();
+  ctx.arc(x, y, 3, 0, 2 * Math.PI);
+  ctx.stroke();
 }

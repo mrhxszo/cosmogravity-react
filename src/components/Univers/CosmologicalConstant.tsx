@@ -179,7 +179,8 @@ export default function CosmologicalConstant(props: Props){
 		<div style={{display:'none'}} id="graphique_enr"></div>
 		{/* <!-- Canvas --> */}
 		<div id="modele">
-			<Canvas universe={Universe}></Canvas>
+			{Universe? <Canvas universe={Universe} /> : null}
+			
 		</div>
 	</div>
 	<div id="enregistrer">

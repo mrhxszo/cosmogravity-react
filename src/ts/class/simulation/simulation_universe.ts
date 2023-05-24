@@ -808,7 +808,7 @@ export class Simulation_universe extends Simulation {
 		let isolatedScaleFactor: Array<{ scale_factor: number[], time: number[] }> = [];
 		let currentSection: { scale_factor: number[], time: number[] } | null = null;
 		
-		//search bigbang
+		//search bigbang and bigcrunch
 		scale_factor.forEach((element, index) => {
 		  if (element <= thresold) {
 			// If currentSection is null, create a new section
@@ -835,7 +835,7 @@ export class Simulation_universe extends Simulation {
 		//isolate the time when scale factor = 1(present time) 
 		const index = scale_factor.findIndex((element) => Math.abs(element-1) < 0.01);
 		const presentTime = time[index];
-		console.log(presentTime);
+
 		//check for bigbang or bigcrunch
 		if (isolatedScaleFactor.length == 1) {
 			//console.log("bigbang detected");
