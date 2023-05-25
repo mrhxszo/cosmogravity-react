@@ -45,12 +45,21 @@ export default function Univers(){
 
     
 	//assign the user's input to the class Simulation_universe
-	function handleChange(event: any) {
-		const { id, value } = event.target;
-		setParams(prevState => ({
-			...prevState,
-			[id]: value
-		}));
+	function handleChange(event?: any) {
+		if(event){
+			const { id, value } = event.target;
+			setParams(prevState => ({
+				...prevState,
+				[id]: value
+			}));
+		}
+		else{
+			setParams(prevState => ({
+				...prevState,
+				omegam0: Universe.matter_parameter,
+				omegaDE0: Universe.dark_energy.parameter_value,
+			}));
+		}
 
 	}
 
@@ -128,6 +137,7 @@ export default function Univers(){
 					params={params}
 					handleSelect={handleSelect}
 					selectValue = {selectValue}
+					setParams={setParams}
 				  />
 				  </>
 				);
@@ -164,6 +174,7 @@ export default function Univers(){
 					params={params}
 					handleSelect={handleSelect}
 					selectValue = {selectValue}
+					setParams={setParams}
 				  />
 				  </>
 				);
