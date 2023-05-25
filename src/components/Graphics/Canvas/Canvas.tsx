@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { drawCanvas, transformDistance, updatePoint } from "./drawCanvas";
 import { Simulation_universe } from "@/ts/class/simulation/simulation_universe";
 import { useTranslation } from 'react-i18next';
+import ConstantsAdjunct from "@/components/Univers/AdjunctComputations/AdjuctButton";
 
 interface Props {
   UniverseRef: React.RefObject<Simulation_universe>,

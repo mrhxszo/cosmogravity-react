@@ -7,6 +7,7 @@ import Warning from '../Warning/Warning';
 
 //importing language using i18next
 import { useTranslation } from 'react-i18next';
+import ConstantsAdjunct from './AdjunctComputations/AdjuctButton';
 
 export default function Univers(){
 
@@ -100,7 +101,7 @@ export default function Univers(){
 		  <div id="Boutons_top_right">
 			<input className="myButton" id="para" type="button" onClick={() => param()} value={t("page_univers_general.bouton_constantes")||""} />
 			{/* change the calculs Annexe based on which link is clicked */}
-			<input className="myButton" id="calc" type="button" onClick={() => ouvre_calc_Noire()} value="Calculs Annexes" />
+			<ConstantsAdjunct/>
 			<p id="txt_titre" style={{ fontSize: '20px', fontWeight: "bold", textAlign: "center" }}></p>
 		  </div><br />
 
