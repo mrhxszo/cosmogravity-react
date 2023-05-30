@@ -28,6 +28,7 @@ interface Props {
 		value: string,
 		isFlat: boolean,
 	},
+	setParams: React.Dispatch<React.SetStateAction<{  T0: number, H0: number, omegam0: number, omegaDE0: number }>>,
 }
 
 enum TypesImages {
@@ -179,7 +180,12 @@ export default function CosmologicalConstant(props: Props){
 		<div style={{display:'none'}} id="graphique_enr"></div>
 		{/* <!-- Canvas --> */}
 		<div id="modele">
-			<Canvas universe={Universe}></Canvas>
+			{Universe? <Canvas UniverseRef={props.UniverseRef} 
+			handleClick={handleClick} 
+			handleChange={props.handleChange}
+			params={props.params}
+			/> : null}
+			
 		</div>
 	</div>
 	<div id="enregistrer">

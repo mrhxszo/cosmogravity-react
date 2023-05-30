@@ -12,7 +12,7 @@ export default function Warning(props: { header: string; text: string }): JSX.El
   }
 
   return (
-    <div id="Bloc_Textee">
+    <div id="Bloc_Textee" style={{width:'100%'}}>
       <div id="univers" onClick={handleClick}>
         <img src={warnImage} className="bouton_avertissement" />
         <span id="txt_avertissementuniv">{props.header}</span>

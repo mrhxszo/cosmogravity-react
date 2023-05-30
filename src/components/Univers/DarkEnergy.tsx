@@ -11,6 +11,7 @@ import Output from "./SubComponents/Output";
 //importing language using i18next
 import { useTranslation } from "react-i18next";
 
+
 interface Props {
 	UniverseRef: React.RefObject<Simulation_universe>,
 	handleChange: Function
