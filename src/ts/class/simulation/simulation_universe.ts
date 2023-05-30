@@ -833,7 +833,7 @@ export class Simulation_universe extends Simulation {
 		}
 
 		//isolate the time when scale factor = 1(present time) 
-		const index = scale_factor.findIndex((element) => Math.abs(element-1) < 0.01);
+		const index = scale_factor.findIndex((element) => Math.abs(element-1) < 0.001);
 		const presentTime = time[index];
 		console.log(presentTime);
 		//check for bigbang or bigcrunch

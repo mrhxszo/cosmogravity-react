@@ -8,7 +8,9 @@ interface Props{
 		T0: number,
 		H0: number,
 		omegam0: number,
-		omegaDE0: number
+		omegaDE0: number,
+        omega0: number,
+        omega1:number
 	},
     selectValue: {
         value: string,
