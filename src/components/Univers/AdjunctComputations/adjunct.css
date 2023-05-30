@@ -8,11 +8,21 @@
     width: 95%;
 }
 
+.icons{
+    font-size: 40px;
+}
+.icons:hover{
+    color: #5b1b11;
+    cursor: pointer;
+}
+
+
 #box1 {
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    width: 50%;
 }
 
 #box2 {

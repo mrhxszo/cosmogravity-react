@@ -1,31 +1,87 @@
+//language
 import {t} from "i18next"
+import { useState } from "react";
 
-export default function ConstantsAdjunct() {
+import { AiFillCloseCircle } from "react-icons/ai";
+import { IoRefreshCircleSharp } from "react-icons/io5";
+//importing class
+import { Simulation_universe } from "@/ts/class/simulation/simulation_universe";
+
+interface Props {
+  handleClick: Function,
+  UniverseRef: React.RefObject<Simulation_universe>,
+	params: {
+		T0: number,
+		H0: number,
+		omegam0: number,
+		omegaDE0: number
+	},
+  handleSelect: Function,
+}
+
+//if the values of constants recieved from params is to be changed then need to add a useState for that search "Les paramètres cosmologiques :" (26/05/2023)
+
+
+export default function ConstantsAdjunct(props: Props) {
+
+  let Universe = props.UniverseRef.current;
+  
+  const [z, setZ] = useState({ z1: 0, z2: 0 });
+
+  //to store the result of the calculation when the button is clicked
+  const [result, setResult] = useState({dm1: 0, dm2 : 0});
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { id, value } = e.target;
+    setZ({ ...z, [id]: value });
+  }
+
+  function handleClick() {
+    if (Universe) {
+      setResult( {
+        dm1: Universe.metric_distance(Number(z.z1)),
+        dm2: Universe.metric_distance(Number(z.z2))
+      });
+    }};
+
+
+
     return (
         <>
             <div style={{"position":"absolute",
-            "width":"90%",
+            "width":"95%",
             "height":"fit-content",
             "backgroundColor":"antiquewhite",
             "boxShadow":"-4px -2px 16px 0px black",
-            "top":"20%",
+            "top":"12%",
             "left":"2%",
             "zIndex":"1000",
             "borderRadius":"2%",
             }}>  
                
+            <div style={{"textAlign":"center",
+                          "height":"5%",
+                          "backgroundColor":"#a73f2d",
+                          "position":"relative",
+                          "top":"1%",
+                          "marginTop":"0%",
+                          "padding":"1%",
+                          "color":"white",
+                          "borderRadius":"1%",
+                          "display":"flex",
+                          "justifyContent":"space-between"}}>
 
-            <h2 id="txt_titre" style={{"textAlign":"center",
-                                        "height":"5%",
-                                        "backgroundColor":"#a73f2d",
-                                        "position":"relative",
-                                        "top":"1%",
-                                        "marginTop":"0%",
-                                        "padding":"1%",
-                                        "color":"white",
-                                        "borderRadius":"1%"}}>
-            {t('page_univers_general.bouton_calculsAnnexes')}</h2>
+                <h2 id="txt_titre">
+                {t('page_univers_general.bouton_calculsAnnexes')}</h2>
 
+              <div>
+                  <IoRefreshCircleSharp className="icons" />
+                  <AiFillCloseCircle className="icons" onClick={() => props.handleClick()}/>
+                                     
+              </div>
+              
+            </div>
+            
 
     <div id="TOUT">
         {/* Parametres de Calcul */}
@@ -36,11 +92,11 @@ export default function ConstantsAdjunct() {
               <br />
               <div className="desact_retour">
                 <label htmlFor="z1">z<sub>1</sub> =</label>
-                <input id="z1" defaultValue={0} maxLength={13} type="text" />
+                <input id="z1" defaultValue={0} maxLength={13} type="text" onChange={handleChange} />
               </div>
               <div className="desact_retour">
                 <label htmlFor="z2">z<sub>2</sub> =</label>
-                <input id="z2" defaultValue={0} maxLength={13} type="text" />
+                <input id="z2" defaultValue={0} maxLength={13} type="text" onChange={handleChange}/>
               </div>
               <br />
               {/* Ie pour calculs de Eclairement */}
@@ -52,7 +108,7 @@ export default function ConstantsAdjunct() {
                   </sup></span></div>
               {/* Bouton calcul */}
               <div id="plus" style={{padding: '10px'}}>
-                <input id="bcalc_ord" type="button" onclick="lance_calc(0);ga('send', 'event', 'button', 'click', 'Calcul Annexe normal');" defaultValue="Calcul" />
+                <input id="bcalc_ord" type="button" onClick={handleClick} defaultValue="Calcul" />
                 <span style={{display: 'none', color: 'blue'}} id="resul_tps">Le calcul a duré : 53 millisecondes !</span>
                 <div id="gif" style={{position: 'relative', display: 'inline-block', marginLeft: '13px'}} />
               </div>
@@ -122,41 +178,25 @@ export default function ConstantsAdjunct() {
           </div>
           <div id="box1">
             {/* Paramètres généraux */}
-            <div className="containstwofollowing border" style={{display: 'flex'}}>
+            <div className="containstwofollowing border" style={{display: 'flex', justifyContent: "space-evenly"}}>
               <div className="generalParameter">
                 <span id="txt_parametres" style={{fontWeight: 'bold'}}>Les paramètres cosmologiques :</span>
                 <div>
                   <label htmlFor="T0_annexes">T<sub>0</sub> =</label>
-                  <output id="T0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" type="text">2.7255</output><span style={{fontSize: 'smaller'}}>  K</span>
+                  <output id="T0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" type="text">{props.params.T0}</output><span style={{fontSize: 'smaller'}}>  K</span>
                 </div>
                 <span id="txt_parametres" style={{fontWeight: 'bold'}} />
                 <div>
-                  <label htmlFor="T0_annexes">T<sub>0</sub> =</label>
-                  <output id="T0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" type="text"> </output><span style={{fontSize: 'smaller'}}>  K</span>
-                </div>
-                <div>
                   <label htmlFor="H0_annexes">H<sub>0</sub> =</label>
-                  <output id="H0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" type="text">67.74</output><span style={{fontSize: 'smaller'}}>  km.s<sup>-1</sup>.Mpc<sup>-1</sup></span>
-                </div>
-                <div>
-                  <label htmlFor="H0_annexes">H<sub>0</sub> =</label>
-                  <output id="H0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" type="text" /><span style={{fontSize: 'smaller'}}>  km.s<sup>-1</sup>.Mpc<sup>-1</sup></span>
+                  <output id="H0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" type="text">{props.params.H0}</output><span style={{fontSize: 'smaller'}}>  km.s<sup>-1</sup>.Mpc<sup>-1</sup></span>
                 </div>
                 <div>
                   <label htmlFor="omegam0_annexes">Ω<sub>m<sub>0</sub></sub> =</label>
-                  <output id="omegam0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" value="0.6" type="text">3.0890e-1</output>
-                </div>
-                <div>
-                  <label htmlFor="omegam0_annexes">Ω<sub>m<sub>0</sub></sub> =</label>
-                  <output id="omegam0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" value="0.6" type="text" />
+                  <output id="omegam0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" value="0.6" type="text">{props.params.omegam0}</output>
                 </div>
                 <div>
                   <label htmlFor="omegalambda0_annexes">Ω<sub>Λ0</sub> =</label>
-                  <output id="omegalambda0_annexes" style={{color: 'blue'}} onchange="update_omegak0_calc();" value="0.5" type="text">6.9110e-1</output>
-                </div>
-                <div>
-                  <label htmlFor="omegalambda0_annexes">Ω<sub>Λ0</sub> =</label>
-                  <output id="omegalambda0_annexes" style={{color: 'blue'}} onchange="update_omegak0_calc();" value="0.5" type="text" />
+                  <output id="omegalambda0_annexes" style={{color: 'blue'}} onchange="update_omegak0_calc();" value="0.5" type="text">{props.params.omegaDE0}</output>
                 </div>
                 <div>
                   <div>
@@ -177,25 +217,25 @@ export default function ConstantsAdjunct() {
                 <br />
                 <div>
                   <label htmlFor="resultat_omegar0_annexes">Ω<sub>r0</sub> =</label>
-                  <span id="Orr" style={{color: 'blue'}}>9.0534e-5</span>
+                  <span id="Orr" style={{color: 'blue'}}>{Number(Universe?.calcul_omega_r().toPrecision(4)).toExponential()}</span>
                 </div>
                 <div>
                   <label htmlFor="resultat_omegak0_annexes">Ω<sub>k0</sub> =</label>
-                  <span id="resultat_omegak0_annexes" style={{color: 'blue'}}>-9.0534e-5</span>
+                  <span id="resultat_omegak0_annexes" style={{color: 'blue'}}>{Number(Universe?.calcul_omega_k().toPrecision(4)).toExponential()}</span>
                 </div>
                 <br />
                 <div>
                   <label htmlFor="rholambda">ρ<sub>Λ</sub> =</label>
-                  <span id="rholambda" style={{color: 'blue'}}>5.9571e-27</span><span style={{fontSize: 'smaller'}}> Kg.m<sup>-3</sup></span>
+                  <span id="rholambda" style={{color: 'blue'}}>{Universe?.calculate_energy_density().darkEnergy}</span><span style={{fontSize: 'smaller'}}> Kg.m<sup>-3</sup></span>
                   <span />
                 </div>
                 <div>
                   <label htmlFor="rhom">ρ<sub>m</sub> =</label>
-                  <span id="rhom" style={{color: 'blue'}}>2.6626e-27</span><span style={{fontSize: 'smaller'}}> Kg.m<sup>-3</sup></span>
+                  <span id="rhom" style={{color: 'blue'}}>{Universe?.calculate_energy_density().matter}</span><span style={{fontSize: 'smaller'}}> Kg.m<sup>-3</sup></span>
                 </div>
                 <div>
                   <label htmlFor="rhor">ρ<sub>r</sub> =</label>
-                  <span id="rhor" style={{color: 'blue'}}>4.6451e-31</span><span style={{fontSize: 'smaller'}}> Kg.m<sup>-3</sup></span>
+                  <span id="rhor" style={{color: 'blue'}}>{Universe?.calculate_energy_density().radiation}</span><span style={{fontSize: 'smaller'}}> Kg.m<sup>-3</sup></span>
                 </div>
               </div>
             </div>
@@ -204,7 +244,7 @@ export default function ConstantsAdjunct() {
             <div id="box3" className="border">
               <span id="txt_valeursZ1" style={{fontWeight: 'bold'}}>Les paramètres cosmologiques à z<sub>1</sub> et z<sub>2</sub>:</span>
               <br />
-              <div id="valeurs_en_Z">
+              <div id="valeurs_en_Z" style={{display:"flex"}}>
                 <div id="en_Z1">
                   <div>
                     <label htmlFor="Tz1">T<span style={{fontSize: 'smaller'}}>(z<sub>1</sub>)</span> =</label>
@@ -269,28 +309,28 @@ export default function ConstantsAdjunct() {
                   <div>
                     <label htmlFor="dm1">d<sub>m<sub>1</sub></sub> =</label>
                     <span id="show_dm1" style={{display: 'contents'}}>
-                      <span id="dm1" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> m </span> =
-                      <span id="dm1_pc" style={{color: 'blue'}}>0</span>
+                      <span id="dm1" style={{color: 'blue'}}>{result.dm1.toPrecision(4)}</span><span style={{fontSize: 'smaller'}}> m </span> =
+                      <span id="dm1_pc" style={{color: 'blue'}}>{(result.dm1*3.24078e-17).toPrecision(4)}{/* Convert to parsec*/}</span>
                       <span style={{fontSize: 'smaller'}}> pc </span>=
-                      <span id="dm1_lum" style={{color: 'blue'}}>0</span>
+                      <span id="dm1_lum" style={{color: 'blue'}}>{(result.dm1*1.057e-16).toPrecision(4)}{/* Convert to lightYears*/}</span>
                       <span style={{fontSize: 'smaller'}}> al </span>
                     </span>
                   </div>
                   <div>
                     <label htmlFor="dm2">d<sub>m<sub>2</sub></sub> =</label>
                     <span id="show_dm2" style={{display: 'contents'}}>
-                      <span id="dm2" style={{color: 'blue'}}>0</span> <span style={{fontSize: 'smaller'}}>m</span> =
-                      <span id="dm2_pc" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> pc</span> =
-                      <span id="dm2_lum" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> al</span>
+                      <span id="dm2" style={{color: 'blue'}}>{result.dm2.toPrecision(4)}</span> <span style={{fontSize: 'smaller'}}>m</span> =
+                      <span id="dm2_pc" style={{color: 'blue'}}>{(result.dm2*3.24078e-17).toPrecision(4)}{/* Convert to parsec*/}</span><span style={{fontSize: 'smaller'}}> pc</span> =
+                      <span id="dm2_lum" style={{color: 'blue'}}>{(result.dm2*1.057e-16).toPrecision(4)}{/* Convert to lightYears*/}</span><span style={{fontSize: 'smaller'}}> al</span>
                     </span>
                   </div>
                 </div>
                 <div>
                   <label htmlFor="dm">Δd<sub>m</sub> =</label>
                   <span id="show_dm" style={{display: 'contents'}}>
-                    <span id="dm" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> m </span>=
-                    <span id="dm_pc" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> pc </span>=
-                    <span id="dm_diff_lum" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> al</span>
+                    <span id="dm" style={{color: 'blue'}}>{(result.dm2-result.dm1).toPrecision(4)}</span><span style={{fontSize: 'smaller'}}> m </span>=
+                    <span id="dm_pc" style={{color: 'blue'}}>{((result.dm2-result.dm1)*3.24078e-17).toPrecision(4)}</span><span style={{fontSize: 'smaller'}}> pc </span>=
+                    <span id="dm_diff_lum" style={{color: 'blue'}}>{((result.dm2-result.dm1)*1.057e-16).toPrecision(4)}{/* Convert to lightYears*/}</span><span style={{fontSize: 'smaller'}}> al</span>
                   </span>
                 </div>
                 <div id="calcul_t">
@@ -495,15 +535,7 @@ export default function ConstantsAdjunct() {
             </div>
           </div>
         </div>
-        {/*Le bouton pour reset la page ... où part son nom?*/}
-          <input type="button" id="refresh_button" style={{bottom: '5%', left: '10%', position: 'relative'}} onclick="window.location.reload(false)" defaultValue="Refresh" />
-        
-        {/* Bouton retour */}
-        <span style={{bottom: '5%', left: '90%', position: 'relative'}}><input type="button" id="bouton_retour" defaultValue="Retour" onclick="retour_simu();" /></span>
         </div>
-
-      
-
     </div>
         
         </>);

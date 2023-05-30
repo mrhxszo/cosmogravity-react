@@ -46,6 +46,7 @@ import {c,k,h,G, AU, parsec, k_parsec, M_parsec, ly}from "../../constants";
  * @method equa_diff_a
  * @method equa_diff_time
  * @method check_singularity
+ * @method calculate_energy_density
  */
 export class Simulation_universe extends Simulation {
 	private _temperature: number;
@@ -832,27 +833,52 @@ export class Simulation_universe extends Simulation {
 		  isolatedScaleFactor.push(currentSection);
 		}
 
-		//isolate the time when scale factor = 1(present time) 
-		const index = scale_factor.findIndex((element) => Math.abs(element-1) < 0.01);
-		const presentTime = time[index];
+		if( this.hubble_cst > 0){
+			//isolate the time when scale factor = 1(present time) 
+			const index = scale_factor.findIndex((element) => Math.abs(element-1) < 0.01);
+			const presentTime = time[index];
 
-		//check for bigbang or bigcrunch
-		if (isolatedScaleFactor.length == 1) {
-			//console.log("bigbang detected");
-			return { bigBang: {isBigBang :true, time: presentTime}, bigCrunch: {isBigCrunch:false}, bigRip: {isBigRip:false} };
+			//check for bigbang or bigcrunch
+			if (isolatedScaleFactor.length == 1) {
+				//console.log("bigbang detected");
+				return { bigBang: {isBigBang :true, time: presentTime}, bigCrunch: {isBigCrunch:false}, bigRip: {isBigRip:false} };
+			}
+			else if (isolatedScaleFactor.length >= 2) {
+				//console.log("bigcrunch detected");
+				return { bigBang: {isBigBang :true, time: presentTime}, bigCrunch: {isBigCrunch:true, time: isolatedScaleFactor[1].time[0]}, bigRip: {isBigRip:false} };
+			}
 		}
-		else if (isolatedScaleFactor.length >= 2) {
-			//console.log("bigcrunch detected");
-			return { bigBang: {isBigBang :true, time: presentTime}, bigCrunch: {isBigCrunch:true, time: isolatedScaleFactor[1].time[0]}, bigRip: {isBigRip:false} };
-		}
 
 
-	//to detect if there is big rip need to look at value of z, w_0 et w_1 (see univere theory)
-	//(to be written)if there is big rip then return { bigBang: false, bigCrunch: false, bigRip: true };
+	//to detect if there is big rip need to look at value of z, w_0 et w_1 (see universe theory)
+	//(to be written)if there is big rip then return { bigBang: true, bigCrunch: false, bigRip: true };
 
 	//if there is no singularity
 	return { bigBang: {isBigBang :false}, bigCrunch: {isBigCrunch:false}, bigRip: {isBigRip:false} };
 
 		
 	}
+
+	/** This function is used to calculate the energy desities of the corresponding omegas
+	 * @returns object with 3 objects containing, energy density of matter, radiation and dark energy
+	 * */
+	public calculate_energy_density(): { matter: number, radiation: number, darkEnergy: number } {
+
+		// Calculate the constant sigma
+		let sigma = (2 * Math.pow(Math.PI, 5) * Math.pow(k, 4)) / (15 * Math.pow(h, 3) * Math.pow(c, 2));
+	  
+		// Calculate the critical density of the universe
+		let rhoC = (3 * this.hubble_cst ** 2) / (8 * Math.PI * G);
+	  
+		//for the formualas see the theory
+
+		let rhoM = Number((rhoC * this._matter_parameter).toPrecision(4));
+
+		let rhoR = Number(((4 * sigma * Math.pow(this.temperature, 4)) / (Math.pow(c, 3))).toPrecision(4));
+
+		let rhoDE = Number((rhoC * this._dark_energy.parameter_value).toPrecision(4));
+	  
+		return { matter: Number(rhoM.toExponential()), radiation: Number(rhoR.toExponential()), darkEnergy: Number(rhoDE.toExponential()) };
+	  }
+	  
 }
