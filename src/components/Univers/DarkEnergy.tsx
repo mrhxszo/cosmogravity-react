@@ -1,22 +1,33 @@
+import { useState, useEffect } from "react";
+//importing css
+import "../../Css/Simu-univers.css"
+import "../../Css/Simu_avertissement.css"
+//importing class
 import { Simulation_universe } from "../../ts/class/simulation/simulation_universe";
-import Warning from "../Warning/Warning";
+//importing components
+import PlotlyComponent from "../Graphics/PlotlyComponent";
+import YRange from "./SubComponents/YRange";
+import Output from "./SubComponents/Output";
+//importing language using i18next
 import { useTranslation } from "react-i18next";
 
 
 interface Props {
 	UniverseRef: React.RefObject<Simulation_universe>,
-	handleChange: Function,
+	handleChange: Function
 	params: {
 		T0: number,
 		H0: number,
 		omegam0: number,
-		omegaDE0: number
+		omegaDE0: number,
+		omega0: number,
+		omega1: number
 	},
 	handleSelect: Function,
 	selectValue: {
 		value: string,
 		isFlat: boolean,
-	},
+	}
 }
 
 //to be done : 
@@ -24,11 +35,81 @@ interface Props {
 //make graph work
 //make adjunct calculation work etc
 
-export default function DarkEnergy (props: Props){
+enum TypesImages {
+	png = "png",
+	jpeg = "jpeg",
+	webp = "webp",
+	svg = "svg"
+}
 
+export default function DarkEnergy (props: Props){
+	const Universe = props.UniverseRef.current;
 
 	//translation hook
 	const { t } = useTranslation();
+
+		//useState for universe simulation calculation
+		const [aTau, setATau] = useState({ x: [0], y: [0] });
+
+		//useState for y axis range
+		const [aRange, setYRange] = useState({ aMin: 0.1, aMax: 10 });
+	
+	
+		//useState for download button
+		const [downloadStatus, setDownload] = useState({download: false, type: TypesImages.png});
+		
+		//useEffect to run the universe simulation calculation in the first render and every time useState is updated
+		useEffect(() => {
+			const { aMin, aMax } = aRange; // extract aMin and aMax values
+			if(Universe){
+				setATau(Universe.compute_scale_factor(0.001, [aMin, aMax]))
+			}
+			
+		},[aRange, Universe]);
+	
+	
+		//handClick to do the universe calculation
+		function handleClick() {
+			if(Universe){
+			setATau(Universe.compute_scale_factor(0.001, [aRange.aMin, aRange.aMax]));}
+		}
+		
+		
+		// to handle y axis range obtained from YRange.tsx
+	
+		const handleChild = (aminChild: number , amaxChild: number) =>{
+			setYRange({aMin: aminChild, aMax: amaxChild});
+		}
+		
+	
+		//handle the download button
+		function handleDownload(event: any){
+			const [id, value] = [event.target.id, event.target.value]
+	
+			if(id === "button_enregistrer"){
+				setDownload((prevState) => ({download:true, type: prevState.type}));
+			}
+			else{
+				//cases for the different types of images
+				switch (value) {
+					case "png":
+						setDownload((prevState) => ({download: prevState.download, type: TypesImages.png}));
+						break;
+					case "jpeg":
+						setDownload((prevState) => ({download: prevState.download, type: TypesImages.jpeg}));
+						break;
+					case "webp":
+						setDownload((prevState) => ({download: prevState.download, type: TypesImages.webp}));
+						break;
+					case "svg":
+						setDownload((prevState) => ({download: prevState.download, type: TypesImages.svg}));
+						break;
+					default:
+						setDownload((prevState) => ({download: prevState.download, type: TypesImages.png}));
+						break;
+			}
+				
+		}};
 
 
     return(
@@ -37,155 +118,92 @@ export default function DarkEnergy (props: Props){
 			{/* <!-- Paramètres --> */}
 			<div id="params">
 				<div className="text-center">
-					<p id="txt_entrees" style={{fontSize:'16px',fontWeight:"bold", textAlign: "center"}}></p>
+					<p id="txt_entrees" style={{fontSize:'16px',fontWeight:"bold", textAlign: "center"}}>{t("page_univers_general.entrees")}</p>
 					<div className="inp">
 						<label>T<sub>0</sub> = </label>
 						{/* <!-- Onchange pour actuliser les paramètre envoyés par le formulaire a chaque changement --> */}
-						<input id="T0" type="text" value="2.7255" onChange="update_omegar0_simu_noir();document.getElementById('T0calc').value = this.value;"></input>
-						K
+						<input id="T0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.T0}></input>
+						<label>K</label>
 					</div>
-					
+
 					<div id="balise_H0" className="inp">
-						<label>&nbsp;&nbsp; H<sub>0</sub> = </label>
-						<input id="H0" type="text" value="67.74" size="10" onChange="update_omegar0_simu_noir();document.getElementById('H0calc').value = this.value;v"></input>
-						<label>km.s<sup>-1</sup>.Mpc<sup>-1</sup></label>
+						<label>&nbsp; &nbsp; H<sub>0</sub> = </label>
+						<input id="H0" type="text" size={10} onChange={(event)=>props.handleChange(event)} value={props.params.H0}></input>
+						<label> km.s<sup>-1</sup>.Mpc<sup>-1</sup></label>
 					</div>
 
 					<div className="inp">
 						<label>Ω<sub>m0</sub> = </label>
-						<input id="omegam0" type="text" value="0.3089" onChange="document.getElementById('Omcalc').value = this.value;
-						update_omegak0_simu_noir();document.getElementById('resultat_omegam0').innerHTML=this.value;"></input>
+						<input id="omegam0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omegam0}></input>
 					</div>
 
 					<div className="inp">
 						<label>Ω<sub>DE0</sub> = </label>
-						<input id="omegaDE0" type="text" value="0.6911" onChange="document.getElementById('Olcalc').value = this.value;update_omegak0_simu_noir();"></input>
+						<input id="omegaDE0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omegaDE0}></input>
 					</div>
 					<div className="inp">
 						<label>w<sub>0</sub> = </label>
-						<input id="omega0" type="text" value="-1"></input>
+						<input id="omega0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omega0}></input>
 						<div id="w-1">
 							<label>w<sub>1</sub> = </label>
-							<input id="omega1" type="text" value="0"></input>
+							<input id="omega1" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omega1}></input>
 						</div>
 					</div>
 				</div>
 				<div id="coche_sim">
-					<span id="txt_univplat"></span><input id="univ_plat" type="checkbox" name="univ_plat" onChange="updateUnivPlat_noir();"></input>
+					<span id="txt_univplat" dangerouslySetInnerHTML={{ __html: t("page_univers.univers_plat") || '' }}></span><input id="univ_plat" type="checkbox" name="univ_plat" onChange={(event)=>props.handleSelect(event)}></input>
 				</div>
 				<div id="type_sim">
-					<select id="liste" onChange="update_omegar0_simu_noir();">
-						<option id="txt_MLRFCN" value="Matière, Lambda, RFC et Neutrinos"></option>
-						<option id="txt_MLRFC" value="Matière, Lambda et RFC"></option>
-						<option id="txt_ML" value="Matière et Lambda"></option>
+					<select id="liste" onChange={(event)=>props.handleSelect(event)} value={props.selectValue.value}>
+						<option id="txt_MLRFCN" value="Matière, Lambda, RFC et Neutrinos">{t('page_univers_noire.matiereEsombreRFCNeu')}</option>
+						<option id="txt_MLRFC" value="Matière, Lambda et RFC">{t('page_univers_noire.matiereEsombreRFC')}</option>
+						<option id="txt_ML" value="Matière et Lambda">{t('page_univers_noire.matiereEsombre')}</option>
 					</select>
 				</div>
+
+
+				{/* <!-- Bouton Tracer --> */}
 				<div id="trace_box">
-					<input className="myButton" id="monofluide" type="hidden" OnClick="monofluide_noire()" value="Modèles Monofluides"></input>
-					<input id="trace" className="myButton" type="button" 
-					// onClick="update_omegar0_simu_noir();update_omegak0_simu_noir();Lancer_calc();ga('send', 'event', 'button', 'click', 'Tracer graphique univers Sombre');" 
-					value="Tracer"></input>
-					<div id="gif" style={{position:'relative',display: 'inline-block',marginLeft: "13px"}}></div>
+					{/* <!-- Valeurs par defaut --> */}
+					{/* <!-- <input className="myButton" id="valeurs_types" type="button" OnClick="valeurs_types()" value="Modèles Monofluide"></input> --> */}
+					<input id="trace" className="myButton" type="button" value="Tracer" onClick={handleClick}></input>
+					<div id="gif" style={{ position:"relative", display: "inline-block", marginLeft: "13px"}}></div>
 				</div>
 			</div>
-
-
-
-			<canvas id="canvas_1" style={{display : "none", width:"750px"}}></canvas>
 
 
 			{/* <!-- INFORMATIONS --> */}
-			<div id="tg-contains" style={{marginTop:"20px"}}>
-				<p id="txt_sorties" style={{fontSize:"16px", fontWeight:"bold" ,textAlign:"center"}}></p>
-				<center>
-					&Omega;<sub>r0</sub> = <span id="resultat_omegar0">0</span> <br></br>
-					&Omega;<sub>k0</sub> = <span id="resultat_omegak0" onChange="document.getElementById('Ok_calc').value = this.value"></span><br></br>
-					<span id="txt_tempsBB" style={{fontWeight:"bold", textDecoration: "underline"}}></span><br></br>
-					<span id="resultat_ageunivers_ga"></span>(Ga)&nbsp;= <span id="resultat_ageunivers_s">1.09884e+3</span>(s) <br></br>
-					<i><span id="resultat_bigcrunch">Pas</span></i> <br></br>
-					<span id="txt_dureeeUniv" style={{fontWeight:"bold", textDecoration: "underline"}}></span><br></br>
-					<span id="resultat_dureeuniv">res</span>
-				</center>
+			<Output Universe={props.UniverseRef} params={props.params} selectValue={props.selectValue}/>
 
-					<table className="tg" style={{display:"none"}}>
-						<tr>
-							<th className="tg-cgnp" style={{borderRight: "1px solid black"}}>&Omega;<sub>m0</sub></th>
-							<th className="tg-cgnp">&Omega;<sub>r0</sub></th>
-						</tr>
-						<tr>
-							<td className="tg-m3ec" style={{borderRight: "1px solid black"}} id="resultat_omegam0">Resultat</td>
-							<td className="tg-m3ec" id="resultat_omegar0">Resultat</td>
-						</tr>
-						<tr>
-							<td className="tg-cgnp" style={{borderRight: "1px solid black"}}>&Omega;<sub>DE0</sub></td>
-							<td className="tg-cgnp">&Omega;<sub>k0</sub></td>
-						</tr>
-						<tr>
-							<td className="tg-m3ec" style={{borderRight: "1px solid black"}} id="resultat_omegarlambda0" onChange="document.getElementById('Or_calc').value = this.value">Resultat</td>
-							<td className="tg-rkjz" id="resultat_omegak0" onChange="document.getElementById('Ok_calc').value = this.value">t</td>
-						</tr>
-						<tr>
-							<td className="tg-cgnp" colspan="2">Temps depuis le Big Bang</td>
-						</tr>
-						<tr>
-							<td className="tg-zfe1">(Ga)</td>
-							<td className="tg-i8gg">(s)</td>
-						</tr>
-						<tr style={{borderBottom:"1px solid black"}}>
-							<td className="tg-rkjz" style={{borderRight:"1px solid black"}} id="resultat_ageunivers_ga">res1</td>
-							<td className="tg-gzvi" id="resultat_ageunivers_s">res2</td>
-						</tr>
-						<tr>
-							<td className="tg-zkmu" colspan="2" id="resultat_bigcrunch">Big bang</td>
-						</tr>
-						<tr>
-							<td className="tg-btvk" colspan="2" id="titre_dureeuniv">Durée de l'univers</td>
-						</tr>
-						<tr>
-							<td className="tg-rkjz" colspan="2" id="resultat_dureeuniv">Res</td>
-						</tr>
-					</table>
-			</div>
-
+		<div id="test" style={{display:"flex",justifyContent:"space-evenly"}}>
 			{/* <!-- GRAPHIQUE--> */}
-			<div style={{marginTop: '100px'}}>
-				<div id="graphique_sombre">
-				</div>
+			<div id="graphique">
+				<PlotlyComponent 
+				x = {{xData:[aTau.x.map(element => element/(1e9))], xName:"t(Ga)"}} //divide by 1e16 to convert in Gyears
+				y = {{yData:[aTau.y],yName:"a(t)"}} 
+				title={t("calculs_univers.titre").toString()}
+				downloadButton={
+					{changeDownload: setDownload,
+					isDownload: downloadStatus.download,
+					whatType: downloadStatus.type,					
+				}
+				}
+				/>
+		
 			</div>
-			<div style={{display:"none"}} id="graphique_enr"></div>
-			{/* <!-- Sauvegarde graphique --> */}
-			<div id="enregistrer_sbr">
-		<div>
-			<label> a<sub>min</sub> =  </label>
-			<input id="ami" type="text" value="0" onfocus="this.oldvalue = this.value;" 
-			// onchange="if ( this.value < 0 || this.value > Number(document.getElementById('ama').value)) {
-			// 		this.value = this.oldvalue;
-			// 	}"
-				></input>&nbsp;&nbsp;
-			<label> a<sub>max</sub> = </label>
-			<input id="ama" type="text" value="5" onfocus="this.oldvalue = this.value;" 
-			// onchange="if ( this.value < 0 || this.value < Number(document.getElementById('ami').value)) {
-			// 		this.value = this.oldvalue;
-			// 	}"
-				></input>&nbsp;&nbsp;
+			<div style={{display:'none'}} id="graphique_enr"></div>
 		</div>
-		<span id="txt_enregistrerEn" style={{fontWeight:"bold"}} ></span>
-		<select id="format_enr">
-		<option selected>png</option>
-		<option>jpg</option>
-		<option>svg</option>
-		</select>&nbsp;
-		<input className="myButton" id="button_enregistrer" type="button" OnClick="enre()" value="Enregistrer"></input>
-		<a id="png" download="Graphique.png" style={{display:"none"}}></a>
-		<a id="jpg" download="Graphique.jpg" style={{display:"none"}}></a>
-		<a id="svg-1" download="Graphique.svg" style={{display:"none"}}></a>
-
-		<canvas id="Canv_enr" width="760px" height="500px" style={{display:"none"}}></canvas>
-		{/* <!-- Canvas --> */}
-		<div id="modele" style={{display:"none"}}>
-			<canvas id="canvas" width="298" height="400"></canvas>
+		<div id="enregistrer">
+			<YRange handleChild={handleChild}></YRange>
+			<span id="txt_enregistrerEn"></span>
+			<select id="format_enr" onChange={handleDownload} defaultValue={"png"}>
+				<option >png</option>
+				<option>jpg</option>
+				<option>svg</option>
+				<option>webp</option>
+			</select>&nbsp;
+			<input className="myButton" id="button_enregistrer" type="button" onClick={handleDownload} value="Enregistrer"></input>
 		</div>
-	</div>
 	</>
     );
 }

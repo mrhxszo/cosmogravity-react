@@ -29,6 +29,8 @@ export default function Univers(){
 		H0: 67.74, 
 		omegam0: Universe.matter_parameter, 
 		omegaDE0: Universe.dark_energy.parameter_value,
+		omega0: Universe.dark_energy.w_0,
+		omega1:Universe.dark_energy.w_1
 		 });
 	
 	//useState for select options for matter, lambda, radiation and dark energy and for isFlat
@@ -41,8 +43,12 @@ export default function Univers(){
 		Universe.hubble_cst = params.H0;
 		Universe.matter_parameter = params.omegam0;
 		Universe.dark_energy.parameter_value = params.omegaDE0;
+		Universe.dark_energy.w_0 = params.omega0;
+		Universe.dark_energy.w_1 = params.omega1;
+		console.log("w_0= ", Universe.dark_energy.w_0);
+		console.log("w_1= ", Universe.dark_energy.w_1);
 	}, [params,selectValue]);
-
+	
     
 	//assign the user's input to the class Simulation_universe
 	function handleChange(event?: any) {
