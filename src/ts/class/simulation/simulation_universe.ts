@@ -845,7 +845,7 @@ export class Simulation_universe extends Simulation {
 			}
 			else if (isolatedScaleFactor.length >= 2) {
 				//console.log("bigcrunch detected");
-				return { bigBang: {isBigBang :true, time: presentTime}, bigCrunch: {isBigCrunch:true, time: isolatedScaleFactor[1].time[0]}, bigRip: {isBigRip:false} };
+				return { bigBang: {isBigBang :true, time: presentTime}, bigCrunch: {isBigCrunch:true, time: isolatedScaleFactor[1].time[0]-presentTime}, bigRip: {isBigRip:false} };
 			}
 		}
 
