@@ -28,7 +28,6 @@ interface Props {
 		value: string,
 		isFlat: boolean,
 	},
-	setParams: React.Dispatch<React.SetStateAction<{  T0: number, H0: number, omegam0: number, omegaDE0: number }>>,
 }
 
 enum TypesImages {
@@ -48,7 +47,7 @@ export default function CosmologicalConstant(props: Props){
 	const [aTau, setATau] = useState({ x: [0], y: [0] });
 
 	//useState for y axis range
-	const [aRange, setYRange] = useState({ aMin: 0.1, aMax: 10 });
+	const [aRange, setaRange] = useState({ aMin: 0.1, aMax: 10 });
 
 
 	//useState for download button
@@ -74,7 +73,7 @@ export default function CosmologicalConstant(props: Props){
 	// to handle y axis range obtained from YRange.tsx
 
 	const handleChild = (aminChild: number , amaxChild: number) =>{
-		setYRange({aMin: aminChild, aMax: amaxChild});
+		setaRange({aMin: aminChild, aMax: amaxChild});
 	}
 	
 

@@ -2,11 +2,15 @@
 import {t} from "i18next"
 import { useState } from "react";
 
+//icons and tools
 import { AiFillCloseCircle } from "react-icons/ai";
 import { IoRefreshCircleSharp } from "react-icons/io5";
+import "react-tooltip/dist/react-tooltip.css";
+import { Tooltip as ReactTooltip } from "react-tooltip";
+
 //importing class
 import { Simulation_universe } from "@/ts/class/simulation/simulation_universe";
-
+import { parsec, ly, k_parsec } from "../../../ts/constants";
 interface Props {
   handleClick: Function,
   UniverseRef: React.RefObject<Simulation_universe>,
@@ -17,6 +21,10 @@ interface Props {
 		omegaDE0: number
 	},
   handleSelect: Function,
+  selectValue: {
+    value: string,
+    isFlat: boolean,
+  },
 }
 
 //if the values of constants recieved from params is to be changed then need to add a useState for that search "Les paramètres cosmologiques :" (26/05/2023)
@@ -26,23 +34,157 @@ export default function ConstantsAdjunct(props: Props) {
 
   let Universe = props.UniverseRef.current;
   
-  const [z, setZ] = useState({ z1: 0, z2: 0 });
+  const [z, setZ] = useState({ z1:{value:0, bool:false}, z2:{value:0, bool:false}, i_e: 0 }); //the bool is added for the check box while measuring diametre and apparent diametre
+
+  //to store the value of the Inputs in inverse Boxes 
+  const [inv, setInv ] = useState({dmInv:0, tRecpetionInv:0, tEmissionInv:0})
 
   //to store the result of the calculation when the button is clicked
-  const [result, setResult] = useState({dm1: 0, dm2 : 0});
+  const [result, setResult] = useState({
 
+                                        //Cosmological constants dependent on z1 and z2
+                                        Tz1: 0, Tz2: 0, Hz1: 0, Hz2: 0, 
+                                        omega_m_z1: 0, omega_m_z2: 0, omega_DE_z1: 0, omega_DE_z2: 0, 
+                                        omega_r_z1 : 0, omega_r_z2 : 0,
+                                        omega_k_z1 : 0, omega_k_z2 : 0,
+
+                                        //Geometrytemission
+                                        dm1: 0, dm2 : 0,//distance metric
+                                        temission: 0, treception: 0,
+                                        dz1: 0, dz2: 0,//redshift
+
+ 
+                                        //photometry
+                                        Le: 0, dl1: 0, dl2: 0,
+                                        add1 : 0, add2 : 0,
+                                        Ee1: 0, Ee2: 0,
+
+                                        //diameter and apparent diameter
+                                        dmetre:0 , dKpc:0, phi: 0,
+
+                                        //inverse calculation
+                                        zInv: 0, z1Inv:0, z2Inv:0, 
+                                      });
+
+
+  //to extract the value of z1 and z2
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { id, value } = e.target;
-    setZ({ ...z, [id]: value });
-  }
+    
+    const { id, value } = e.target; // Extract the id and value from the event target
 
-  function handleClick() {
+    //for z1 and z2
+    if(e.target.type === "checkbox"){
+      const { id, checked } = e.target;
+      setZ((prevZ) => ({
+        ...prevZ,
+        [id as keyof typeof prevZ]: { ...prevZ[id as keyof typeof prevZ as "z1" | "z2"], bool: checked },
+      }));
+      return;
+    }
+
+    //for inverse calculation
+    else if (e.currentTarget.parentNode) {
+      const parentId = e.currentTarget.parentNode.id;
+  
+      if (parentId === "inverse") {
+        setInv((prevInv) => ({
+          ...prevInv,
+          [id]: value,
+        }));
+      }
+    }
+    else {
+        
+      setZ((prevZ) => ({
+        ...prevZ,
+        [id as keyof typeof prevZ]: { ...prevZ[id as keyof typeof prevZ as "z1" | "z2"], value: Number(value) },
+      }));    
+    }
+
+  }
+                                      
+                                      
+                                      
+
+  function handleClick(event: React.MouseEvent<HTMLInputElement, MouseEvent>) {
+    
+    //Calculate phi for given diameter
+    let phi: number = result.phi;
+
+    if (event.currentTarget.id === "kpc-phi") {
+      phi = z.z1.bool //see which checkbox user has clicked
+        ? Universe?.apparent_diameter(Number(z.z1.value), (result.dKpc * k_parsec)) || 0
+        : Universe?.apparent_diameter(Number(z.z2.value), (result.dKpc * k_parsec)) || 0;
+    } else if (event.currentTarget.id === "metre-phi") {
+      phi = z.z1.bool
+        ? Universe?.apparent_diameter( Number(z.z1.value), result.dmetre) || 0
+        : Universe?.apparent_diameter(Number(z.z2.value), result.dmetre) || 0;
+    }
+
+    //Calculate the two diameter for given phi
+    let dmetre: number = result.dmetre;
+    let dKpc: number = result.dKpc;
+  
+    if (event.currentTarget.id === "Diametres") {
+      dmetre = z.z1.bool //see which checkbox user has clicked
+        ? Universe?.apparent_diameter(Number(z.z1.value), 0, result.phi) || 0
+        : Universe?.apparent_diameter(Number(z.z2.value), 0, result.phi) || 0;
+      
+      dKpc = dmetre / k_parsec;
+      } 
+    
+
     if (Universe) {
-      setResult( {
-        dm1: Universe.metric_distance(Number(z.z1)),
-        dm2: Universe.metric_distance(Number(z.z2))
+      setResult((prevState) => {
+        if (Universe) {
+          return {
+            ...prevState,
+            // constants dependent on z
+            Tz1: Universe.compute_temp_and_hubble(Number(z.z1.value)).temparature,
+            Tz2: Universe.compute_temp_and_hubble(Number(z.z2.value)).temparature,
+            Hz1: Universe.compute_temp_and_hubble(Number(z.z1.value)).hubble_cst,
+            Hz2: Universe.compute_temp_and_hubble(Number(z.z2.value)).hubble_cst,
+            omega_m_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_matter[0],
+            omega_m_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_matter[0],
+            omega_DE_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_de[0],
+            omega_DE_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_de[0],
+            omega_r_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_rad[0],
+            omega_r_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_rad[0],
+            omega_k_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_courbure[0],
+            omega_k_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_courbure[0],
+  
+            // Geometry
+            dm1: Universe.metric_distance(Number(z.z1.value)),
+            dm2: Universe.metric_distance(Number(z.z2.value)),
+            temission: Universe.emission_age(Number(z.z1.value)),
+            treception: Universe.emission_age(Number(z.z2.value)),
+            dz1: Universe.dz(Number(z.z1.value)),
+            dz2: Universe.dz(Number(z.z2.value)),
+  
+            // Photometry
+            Le: Universe.luminosity(Number(z.i_e)),
+            dl1: Universe.luminosity_distance(Number(z.z1.value)),
+            dl2: Universe.luminosity_distance(Number(z.z2.value)),
+            add1: Universe.angular_diameter_distance(Number(z.z1.value)),
+            add2: Universe.angular_diameter_distance(Number(z.z2.value)),
+            Ee1: Universe.brightness(Number(z.z1.value), result.Le),
+            Ee2: Universe.brightness(Number(z.z2.value), result.Le),
+  
+            // Diameter and apparent diameter
+            dmetre: dmetre,
+            dKpc: dKpc,
+            phi: phi,
+
+            //Inverse Calculation
+            zInv: Universe.metric_distance_inverse(Number(inv.dmInv)),
+            z1Inv: Universe.emission_age_inverse(Number(inv.tEmissionInv)*365*24*60*60),//convert year to second
+            z2Inv: Universe.emission_age_inverse(Number(inv.tRecpetionInv)*365*24*60*60),
+          };
+        }
+        return prevState;
       });
-    }};
+    }
+  };
 
 
 
@@ -75,9 +217,12 @@ export default function ConstantsAdjunct(props: Props) {
                 {t('page_univers_general.bouton_calculsAnnexes')}</h2>
 
               <div>
-                  <IoRefreshCircleSharp className="icons" />
-                  <AiFillCloseCircle className="icons" onClick={() => props.handleClick()}/>
-                                     
+                  <IoRefreshCircleSharp className="icons" data-tooltip-id="refresh" data-tooltip-content={t("page_univers_calculs.bouton_rafraichir") || ""}/>
+                  <AiFillCloseCircle className="icons"  onClick={() => props.handleClick()} data-tooltip-id="close" data-tooltip-content={t("page_univers_calculs.bouton_fermer") || ""}/>
+                  
+                  {/* add tootip to specify what above buttons do*/}
+                  <ReactTooltip id="refresh" place="bottom" />
+                  <ReactTooltip id="close" place="bottom" />
               </div>
               
             </div>
@@ -103,76 +248,80 @@ export default function ConstantsAdjunct(props: Props) {
               <span id="txt_valeurs_Intensite" style={{fontWeight: 'bold'}}>Valeur de l'Intensite pour des resultats de photométrie (E<sub>e</sub>,L<sub>e</sub>):</span>
               <div>
                 <label htmlFor="input_intensite">I<sub>e</sub> =</label>
-                <input id="i_e" defaultValue={0} maxLength={13} type="text" />
+                <input id="i_e" defaultValue={0} maxLength={13} type="text" onChange={handleChange} />
                 <span style={{fontSize: 'smaller'}}>W.sr<sup>-1
                   </sup></span></div>
               {/* Bouton calcul */}
               <div id="plus" style={{padding: '10px'}}>
-                <input id="bcalc_ord" type="button" onClick={handleClick} defaultValue="Calcul" />
+                <input id="bcalc_ord" type="button" onClick={(event)=>handleClick(event)} defaultValue="Calcul" />
                 <span style={{display: 'none', color: 'blue'}} id="resul_tps">Le calcul a duré : 53 millisecondes !</span>
                 <div id="gif" style={{position: 'relative', display: 'inline-block', marginLeft: '13px'}} />
               </div>
             </div>
+
+
             {/* Calcul des Diametres */}
             <div id="Calcul_Diam" className="border">
               <p style={{fontSize: 'smaller'}} id="txt_infoCalculs">Les 2 entrées suivantes utilisent soit z<sub>1</sub> soit z<sub>2</sub> après calcul,</p>
               <div>
                 <label htmlFor="z1">z<sub>1</sub></label>
-                <input type="checkbox" name="z" id="z1_checkbox" onchange="onlyOne(this)" />
+                <input type="checkbox" name="z" id="z1" onChange={handleChange} />
                 <label htmlFor="z2">z<sub>2</sub></label>
-                <input type="checkbox" name="z" id="z2_checkbox" onchange="onlyOne(this)" />
+                <input type="checkbox" name="z" id="z2" onChange={handleChange} />
               </div>
               <br />
               <div className="desact_retour">
                 <label htmlFor="diametre">D =</label>
-                <input id="diametre" maxLength={17} type="text" /><span style={{fontSize: 'smaller'}}> (m)</span>
-                <input style={{marginLeft: '15px'}} type="button" defaultValue="--> Φ" onclick="calcultheta();" />
+                <input id="diametre" maxLength={17} type="text" value={result.dmetre} onChange={(event) => setResult((prevState) => ({ ...prevState, dmetre: Number(event.target.value) }))} /><span style={{fontSize: 'smaller'}}> (m)</span>
+                <input style={{marginLeft: '15px'}} type="button" defaultValue="&rarr; &Phi;" id="metre-phi" onClick={(event)=> handleClick(event)} />
               </div>
               <br />
               <div className="desact_retour">
                 <label htmlFor="diametrekpc">D =</label>
-                <input id="diametrekpc" maxLength={17} type="text" /><span style={{fontSize: 'smaller'}}> (kpc)</span>
-                <input style={{marginLeft: '15px'}} type="button" defaultValue="--> Φ" onclick="calculthetakpc();" />
+                <input id="diametrekpc" maxLength={17} type="text" value={result.dKpc} onChange={(event) => setResult((prevState) => ({ ...prevState, dKpc: Number(event.target.value) }))}/><span style={{fontSize: 'smaller'}}> (kpc)</span>
+                <input style={{marginLeft: '15px'}} type="button" defaultValue="&rarr; &Phi;" id="kpc-phi" onClick={(event)=>handleClick(event)} />
               </div>
               <br />
               <div className="desact_retour">
-                <input style={{marginRight: '15px'}} type="button" defaultValue="D <--" onclick="calculD();calcul1Dkpc();" />
+                <input style={{marginRight: '15px'}} type="button" defaultValue="D &larr;" id="Diametres" onClick={(event)=>handleClick(event)}/>
                 <label htmlFor="theta"><span style={{fontSize: 'smaller'}}>Φ</span> =</label>
-                <input id="theta" maxLength={17} type="text" /> <span id="secondeArc">(Seconde d'arc)</span>
+                <input id="theta" maxLength={17} type="text" value={result.phi} onChange={(event) => setResult((prevState) => ({ ...prevState, phi: Number(event.target.value) }))}/> <span id="secondeArc">(Seconde d'arc)</span>
               </div>
             </div>
             <br />
+
+
             {/* Calculs Inverses */}
             <div id="Calculs_Inverse" className="border">
               <div>
                 <span id="calculInverse" style={{fontWeight: 'bold', fontSize: '18px'}}>Calculs inverses</span>
               </div>
               <br />
-              <div className="desact_retour">
-                <label htmlFor="dm_racine_dm">d<sub>m</sub> =</label>
-                <input id="dm_racine_dm" defaultValue={0} maxLength={26} type="text" /><span style={{fontSize: 'smaller'}}> (m)</span>
-                <label htmlFor="z_racine_dm">z =</label>
-                <span id="z_racine_dm" style={{color: 'blue'}} />
+              <div className="desact_retour" id="inverse">
+                <label htmlFor="dmInv">d<sub>m</sub> =</label>
+                <input id="dmInv" defaultValue={0} value={inv.dmInv} maxLength={26} type="text" onChange={handleChange}/><span style={{fontSize: 'smaller'}}> (m)</span>
+                <label htmlFor="z_racine_dm">z = </label>
+                <span id="z_racine_dm" style={{color: 'blue'}} >{result.zInv.toExponential(4)}</span>
                 {/*= <span id="dm1_pc" style="color:blue"></span> pc*/}
               </div>
               <br />
-              <div className="desact_retour">
+              <div className="desact_retour" id="inverse">
                 <span id="temission">t<sub>émission</sub> =</span>
-                <label htmlFor="t_racine_em" />
-                <input id="t_racine_em" defaultValue={0} maxLength={26} type="text" /> <span id="annee1" style={{fontSize: 'smaller'}}>(a)</span>
+                <label htmlFor="tEmissionInv" />
+                <input id="tEmissionInv" defaultValue={0} maxLength={26} type="text" onChange={handleChange}/> <span id="annee1" style={{fontSize: 'smaller'}}>(a)</span>
                 <label htmlFor="z_racine_t_em"> z<sub>1</sub> =</label>
-                <span id="z_racine_t_em" style={{color: 'blue'}} />
+                <span id="z_racine_t_em" style={{color: 'blue'}} >{result.z1Inv.toExponential(4)}</span>
               </div>
               <br />
-              <div className="desact_retour">
+              <div className="desact_retour" id="inverse">
                 <span id="treception">t<sub>réception</sub> =</span>
-                <label htmlFor="t_racine_rec" />
-                <input id="t_racine_rec" defaultValue={0} maxLength={26} type="text" /> <span id="annee2" style={{fontSize: 'smaller'}}>(a)</span>
+                <label htmlFor="tRecpetionInv" />
+                <input id="tRecpetionInv" defaultValue={0} maxLength={26} type="text" onChange={handleChange}/> <span id="annee2" style={{fontSize: 'smaller'}}>(a)</span>
                 <label htmlFor="z_racine_t_rec"> z<sub>2</sub>=</label>
-                <span id="z_racine_t_rec" style={{color: 'blue'}} />
+                <span id="z_racine_t_rec" style={{color: 'blue'}}>{result.z2Inv.toExponential(4)}</span>
               </div>
               <div style={{padding: '10px'}} id="plus">
-                <input id="boutonCalculInverse" type="button" onclick="inverse();ga('send', 'event', 'button', 'click', 'Calcul Annexe Inverse');" defaultValue="Calcul" />
+                <input id="boutonCalculInverse" type="button" onClick={handleClick} defaultValue="Calcul" />
               </div>
             </div>
           </div>
@@ -200,15 +349,11 @@ export default function ConstantsAdjunct(props: Props) {
                 </div>
                 <div>
                   <div>
-                    <select id="resultat_omegar0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();">
-                      <option id="txt_MLRFCN" value="Matière, Lambda, RFC et Neutrinos" selected="selected">Matière, Lambda, RFC et Neutrinos</option>
-                      <option id="txt_MLRFC" value="Matière, Lambda et RFC">Matière, Lambda et RFC</option>
-                      <option id="txt_ML" value="Matière et Lambda">Matière et Lambda</option>
-                    </select>
+                      <span>{t("page_univers_calculs.modele")}: {props.selectValue.value}</span>
                   </div>
                   <div>
-                    <span id="txt_univplat">Univers Plat (Ω<sub>k0</sub> = 0)</span>
-                    <input id="univ_plat" type="checkbox" name="univ_plat" onchange="updateUnivPlat_calc();" />
+                    <span id="txt_univplat" dangerouslySetInnerHTML={{ __html: t("page_univers.univers_plat") || '' }}></span>
+                    <input id="univ_plat" type="checkbox" name="univ_plat" onchange="updateUnivPlat_calc();" checked={props.selectValue.isFlat} disabled/>
                   </div>
                 </div>
               </div>
@@ -248,54 +393,54 @@ export default function ConstantsAdjunct(props: Props) {
                 <div id="en_Z1">
                   <div>
                     <label htmlFor="Tz1">T<span style={{fontSize: 'smaller'}}>(z<sub>1</sub>)</span> =</label>
-                    <span id="Tz1" style={{color: 'blue'}}>2.72e+0</span> <span id="Tz1_unit" style={{display: 'contents'}}><span style={{fontSize: 'smaller'}}> K </span></span>
+                    <span id="Tz1" style={{color: 'blue'}}>{result.Tz1.toExponential(4)}</span> <span id="Tz1_unit" style={{display: 'contents'}}><span style={{fontSize: 'smaller'}}> K </span></span>
                   </div>
                   <div>
                     <label htmlFor="Hz1">H<span style={{fontSize: 'smaller'}}>(z<sub>1</sub>)</span> =</label>
-                    <span id="Hz1" style={{color: 'blue'}}>6.77e+1</span> <span id="Hz1_unit" style={{display: 'contents'}}> <span style={{fontSize: 'smaller'}}>km.s<sup>-1</sup>.Mpc<sup>-1</sup></span></span>
+                    <span id="Hz1" style={{color: 'blue'}}>{result.Hz1.toExponential(4)}</span> <span id="Hz1_unit" style={{display: 'contents'}}> <span style={{fontSize: 'smaller'}}>km.s<sup>-1</sup>.Mpc<sup>-1</sup></span></span>
                   </div>
                   <div>
                     <label htmlFor="Omz1">Ω<sub>m</sub><span style={{fontSize: 'smaller'}}>(z<sub>1</sub>)</span> =</label>
-                    <span id="Omz1" style={{color: 'blue'}}>3.08e-1</span>
+                    <span id="Omz1" style={{color: 'blue'}}>{result.omega_m_z1.toExponential(4)}</span>
                   </div>
                   <div>
                     <label htmlFor="Olz1">Ω<sub>Λ</sub><span style={{fontSize: 'smaller'}}>(z<sub>1</sub>)</span> =</label>
-                    <span id="Olz1" style={{color: 'blue'}}>6.91e-1</span>
+                    <span id="Olz1" style={{color: 'blue'}}>{result.omega_DE_z1.toExponential(4)}</span>
                   </div>
                   <div>
                     <label htmlFor="Orz1">Ω<sub>r</sub><span style={{fontSize: 'smaller'}}>(z<sub>1</sub>)</span> =</label>
-                    <span id="Orz1" style={{color: 'blue'}}>9.05e-5</span>
+                    <span id="Orz1" style={{color: 'blue'}}>{result.omega_r_z1.toExponential(4)}</span>
                   </div>
                   <div>
                     <label htmlFor="Okz1">Ω<sub>k</sub><span style={{fontSize: 'smaller'}}>(z<sub>1</sub>)</span> =</label>
-                    <span id="Okz1" style={{color: 'blue'}}>-9.05e-5</span>
+                    <span id="Okz1" style={{color: 'blue'}}>{result.omega_k_z1.toExponential(4)}</span>
                   </div>
                   <input style={{marginTop: '10px', marginLeft: '10px'}} type="button" onclick="transfert_simu(0);" id="ts-1" defaultValue="Tracer" />
                 </div>
                 <div id="en_Z2">
                   <div>
                     <label htmlFor="Tz2">T<span style={{fontSize: 'smaller'}}>(z<sub>2</sub>)</span> =</label>
-                    <span id="Tz2" style={{color: 'blue'}}>2.72e+0</span> <span id="Tz2_unit" style={{display: 'contents'}}><span style={{fontSize: 'smaller'}}> K </span></span>
+                    <span id="Tz2" style={{color: 'blue'}}>{result.Tz2.toExponential(4)}</span> <span id="Tz2_unit" style={{display: 'contents'}}><span style={{fontSize: 'smaller'}}> K </span></span>
                   </div>
                   <div>
                     <label htmlFor="Hz2">H<span style={{fontSize: 'smaller'}}>(z<sub>2</sub>)</span> =</label>
-                    <span id="Hz2" style={{color: 'blue'}}>6.70e+1</span> <span id="Hz2_unit" style={{display: 'contents'}}> <span style={{fontSize: 'smaller'}}>km.s<sup>-1</sup>.Mpc<sup>-1</sup></span></span>
+                    <span id="Hz2" style={{color: 'blue'}}>{result.Hz2.toExponential(4)}</span> <span id="Hz2_unit" style={{display: 'contents'}}> <span style={{fontSize: 'smaller'}}>km.s<sup>-1</sup>.Mpc<sup>-1</sup></span></span>
                   </div>
                   <div>
                     <label htmlFor="Omz2">Ω<sub>m</sub><span style={{fontSize: 'smaller'}}>(z<sub>2</sub>)</span> =</label>
-                    <span id="Omz2" style={{color: 'blue'}}>3.08e-1</span>
+                    <span id="Omz2" style={{color: 'blue'}}>{result.omega_DE_z2.toExponential(4)}</span>
                   </div>
                   <div>
                     <label htmlFor="Olz2">Ω<sub>Λ</sub><span style={{fontSize: 'smaller'}}>(z<sub>2</sub>)</span> =</label>
-                    <span id="Olz2" style={{color: 'blue'}}>6.91e-1</span>
+                    <span id="Olz2" style={{color: 'blue'}}>{result.omega_m_z2.toExponential(4)}</span>
                   </div>
                   <div>
                     <label htmlFor="Orz2">Ω<sub>r</sub><span style={{fontSize: 'smaller'}}>(z<sub>2</sub>)</span> =</label>
-                    <span id="Orz2" style={{color: 'blue'}}>9.05e-5</span>
+                    <span id="Orz2" style={{color: 'blue'}}>{result.omega_r_z2.toExponential(4)}</span>
                   </div>
                   <div>
                     <label htmlFor="Okz2">Ω<sub>k</sub><span style={{fontSize: 'smaller'}}>(z<sub>2</sub>)</span> =</label>
-                    <span id="Okz2" style={{color: 'blue'}}>-9.05e-5</span>
+                    <span id="Okz2" style={{color: 'blue'}}>{result.omega_k_z2.toExponential(4)}</span>
                   </div>
                   <input style={{marginTop: '10px', marginLeft: '10px'}} type="button" onclick="transfert_simu(1);" id="ts-2" defaultValue="Tracer" />
                 </div>
@@ -310,9 +455,9 @@ export default function ConstantsAdjunct(props: Props) {
                     <label htmlFor="dm1">d<sub>m<sub>1</sub></sub> =</label>
                     <span id="show_dm1" style={{display: 'contents'}}>
                       <span id="dm1" style={{color: 'blue'}}>{result.dm1.toPrecision(4)}</span><span style={{fontSize: 'smaller'}}> m </span> =
-                      <span id="dm1_pc" style={{color: 'blue'}}>{(result.dm1*3.24078e-17).toPrecision(4)}{/* Convert to parsec*/}</span>
+                      <span id="dm1_pc" style={{color: 'blue'}}>{(result.dm1/parsec).toPrecision(4)}{/* Convert to parsec*/}</span>
                       <span style={{fontSize: 'smaller'}}> pc </span>=
-                      <span id="dm1_lum" style={{color: 'blue'}}>{(result.dm1*1.057e-16).toPrecision(4)}{/* Convert to lightYears*/}</span>
+                      <span id="dm1_lum" style={{color: 'blue'}}>{(result.dm1/ly).toPrecision(4)}{/* Convert to lightYears*/}</span>
                       <span style={{fontSize: 'smaller'}}> al </span>
                     </span>
                   </div>
@@ -320,8 +465,8 @@ export default function ConstantsAdjunct(props: Props) {
                     <label htmlFor="dm2">d<sub>m<sub>2</sub></sub> =</label>
                     <span id="show_dm2" style={{display: 'contents'}}>
                       <span id="dm2" style={{color: 'blue'}}>{result.dm2.toPrecision(4)}</span> <span style={{fontSize: 'smaller'}}>m</span> =
-                      <span id="dm2_pc" style={{color: 'blue'}}>{(result.dm2*3.24078e-17).toPrecision(4)}{/* Convert to parsec*/}</span><span style={{fontSize: 'smaller'}}> pc</span> =
-                      <span id="dm2_lum" style={{color: 'blue'}}>{(result.dm2*1.057e-16).toPrecision(4)}{/* Convert to lightYears*/}</span><span style={{fontSize: 'smaller'}}> al</span>
+                      <span id="dm2_pc" style={{color: 'blue'}}>{(result.dm2/parsec).toPrecision(4)}{/* Convert to parsec*/}</span><span style={{fontSize: 'smaller'}}> pc</span> =
+                      <span id="dm2_lum" style={{color: 'blue'}}>{(result.dm2/ly).toPrecision(4)}{/* Convert to lightYears*/}</span><span style={{fontSize: 'smaller'}}> al</span>
                     </span>
                   </div>
                 </div>
@@ -329,24 +474,24 @@ export default function ConstantsAdjunct(props: Props) {
                   <label htmlFor="dm">Δd<sub>m</sub> =</label>
                   <span id="show_dm" style={{display: 'contents'}}>
                     <span id="dm" style={{color: 'blue'}}>{(result.dm2-result.dm1).toPrecision(4)}</span><span style={{fontSize: 'smaller'}}> m </span>=
-                    <span id="dm_pc" style={{color: 'blue'}}>{((result.dm2-result.dm1)*3.24078e-17).toPrecision(4)}</span><span style={{fontSize: 'smaller'}}> pc </span>=
-                    <span id="dm_diff_lum" style={{color: 'blue'}}>{((result.dm2-result.dm1)*1.057e-16).toPrecision(4)}{/* Convert to lightYears*/}</span><span style={{fontSize: 'smaller'}}> al</span>
+                    <span id="dm_pc" style={{color: 'blue'}}>{((result.dm2-result.dm1)/parsec).toPrecision(4)}</span><span style={{fontSize: 'smaller'}}> pc </span>=
+                    <span id="dm_diff_lum" style={{color: 'blue'}}>{((result.dm2-result.dm1)/ly).toPrecision(4)}{/* Convert to lightYears*/}</span><span style={{fontSize: 'smaller'}}> al</span>
                   </span>
                 </div>
                 <div id="calcul_t">
                   <div>
                     <label htmlFor="tempsEmission">t<sub>1</sub>=</label>
                     <span id="show_temi" style={{display: 'contents'}}>
-                      <span id="tempsEmission" style={{color: 'blue'}}>1.3798e+10</span><span style={{fontSize: 'smaller'}}> a</span> =
-                      <span id="tempsEmission_sec" style={{color: 'blue'}}>4.3542e+17</span><span style={{fontSize: 'smaller'}}> s </span>
+                      <span id="tempsEmission" style={{color: 'blue'}}>{(result.temission/3.17098e7).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> a</span> ={/* Convert to year*/}
+                      <span id="tempsEmission_sec" style={{color: 'blue'}}>{result.temission.toExponential(4)}</span><span style={{fontSize: 'smaller'}}> s </span>
                     </span>
                     <span id="tempsEmission_alert" style={{color: 'red'}} />
                   </div>
                   <div>
                     <label htmlFor="tempsReception">t<sub>2</sub>=</label>
                     <span id="show_trecep" style={{display: 'contents'}}>
-                      <span id="tempsReception" style={{color: 'blue'}}>1.3798e+10</span><span style={{fontSize: 'smaller'}}> a </span>=
-                      <span id="tempsReception_sec" style={{color: 'blue'}}>4.3542e+17</span><span style={{fontSize: 'smaller'}}> s</span>
+                      <span id="tempsReception" style={{color: 'blue'}}>{(result.treception/3.17098e7).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> a </span>=
+                      <span id="tempsReception_sec" style={{color: 'blue'}}>{result.treception.toExponential(4)}</span><span style={{fontSize: 'smaller'}}> s</span>
                     </span>
                     <span id="tempsReception_alert" style={{color: 'red'}} />
                   </div>
@@ -354,31 +499,34 @@ export default function ConstantsAdjunct(props: Props) {
                 <div>
                   <label htmlFor="agebetween">Δt =</label>
                   <span id="show_dt" style={{display: 'contents'}}>
-                    <span id="agebetween" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> a</span> =
-                    <span id="agebetween_sec" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> s</span>
+                    <span id="agebetween" style={{color: 'blue'}}>{((result.treception-result.temission)/3.17098e8).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> a</span> =
+                    <span id="agebetween_sec" style={{color: 'blue'}}>{(result.treception-result.temission).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> s</span>
                   </span>
                 </div>
                 <div id="calcul_dz">
                   <div>
+                    {/* 348 calcu.js */}
                     <label htmlFor="dz1">d<sub>z<sub>1</sub></sub>/dt<sub>0</sub> =</label>
                     <span id="show_dz1" style={{display: 'contents'}}>
-                      <span id="dz1" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> a<sup>-1</sup></span>
+                      <span id="dz1" style={{color: 'blue'}}>{result.dz1.toExponential(4)}</span><span style={{fontSize: 'smaller'}}> a<sup>-1</sup></span>
                     </span>
                   </div>
                   <div>
                     <label htmlFor="dz2">d<sub>z<sub>2</sub></sub>/dt<sub>0</sub> =</label>
                     <span id="show_dz2" style={{display: 'contents'}}>
-                      <span id="dz2" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> a<sup>-1</sup></span>
+                      <span id="dz2" style={{color: 'blue'}}>{result.dz2.toExponential(4)}</span><span style={{fontSize: 'smaller'}}> a<sup>-1</sup></span>
                     </span>
                   </div>
                 </div>
               </div>
+
+              {/* Resultats Photometrie */}
               <div id="photo_box" className="border">
                 <span id="txt_photometrie" style={{fontWeight: 'bold'}}>Photométrie:</span>
                 <div>
                   <label htmlFor="L_e">L<sub>e</sub> =</label>
                   <span id="show_L_e" style={{display: 'contents'}}>
-                    <span id="L_e" style={{color: 'blue'}}>0</span>
+                    <span id="L_e" style={{color: 'blue'}}>{result.Le.toExponential(4)}</span>
                     <span style={{fontSize: 'smaller'}}> W.m<sup>-2</sup>.sr<sup>-1</sup></span>
                   </span>
                 </div>
@@ -386,53 +534,50 @@ export default function ConstantsAdjunct(props: Props) {
                   <div>
                     <label htmlFor="dl">d<sub>L<sub>1</sub></sub> =</label>
                     <span id="show_dl" style={{display: 'contents'}}>
-                      <span id="dl" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> m = </span>
-                      <span id="dl_pc" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> pc = </span>
-                      <span id="dl_lum" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> al </span>
+                      <span id="dl" style={{color: 'blue'}}>{result.dl1.toExponential(4)}</span><span style={{fontSize: 'smaller'}}> m = </span>
+                      <span id="dl_pc" style={{color: 'blue'}}>{(result.dl1/parsec).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> pc = </span>
+                      <span id="dl_lum" style={{color: 'blue'}}>{(result.dl1/ly).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> al </span>
                     </span>
                   </div>
                   <div>
                     <label htmlFor="dl2">d<sub>L<sub>2</sub></sub> =</label>
                     <span id="show_dl_2" style={{display: 'contents'}}>
-                      <span id="dl_2" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> m = </span>
-                      <span id="dl2_pc" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> pc = </span>
-                      <span id="dl2_lum" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> al </span>
+                      <span id="dl_2" style={{color: 'blue'}}>{result.dl2.toExponential(4)}</span><span style={{fontSize: 'smaller'}}> m = </span>
+                      <span id="dl2_pc" style={{color: 'blue'}}>{(result.dl2/parsec).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> pc = </span>
+                      <span id="dl2_lum" style={{color: 'blue'}}>{(result.dl2/ly).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> al </span>
                     </span>
                   </div>
                 </div>
-                {/* Resultats Photometrie */}
                 <div id="calcul_da">
                   <div>
                     <label htmlFor="dda">d<sub>a<sub>1</sub></sub> =</label>
                     <span id="show_da" style={{display: 'contents'}}>
-                      <span id="dda" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> m = </span>
-                      <span id="dda_pc" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> pc = </span>
-                      <span id="dda_lum" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> al </span>
+                      <span id="dda" style={{color: 'blue'}}>{result.add1.toExponential(4)}</span><span style={{fontSize: 'smaller'}}> m = </span>
+                      <span id="dda_pc" style={{color: 'blue'}}>{(result.add1/parsec).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> pc = </span>
+                      <span id="dda_lum" style={{color: 'blue'}}>{(result.add1/ly).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> al </span>
                     </span>
                   </div>
                   <div>
                     <label htmlFor="dda2">d<sub>a<sub>2</sub></sub> =</label>
                     <span id="show_da_2" style={{display: 'contents'}}>
-                      <span id="dda_2" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> m = </span>
-                      <span id="dda2_pc" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> pc = </span>
-                      <span id="dda2_lum" style={{color: 'blue'}}>0</span><span style={{fontSize: 'smaller'}}> al </span>
+                      <span id="dda_2" style={{color: 'blue'}}>{result.add2.toExponential(4)}</span><span style={{fontSize: 'smaller'}}> m = </span>
+                      <span id="dda2_pc" style={{color: 'blue'}}>{(result.add2/parsec).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> pc = </span>
+                      <span id="dda2_lum" style={{color: 'blue'}}>{(result.add2/ly).toExponential(4)}</span><span style={{fontSize: 'smaller'}}> al </span>
                     </span>
                   </div>
                 </div>
                 <div id="calcul_E">
                   <div>
                     <label htmlFor="E_e">E<sub>e<sub>1</sub></sub> =</label>
-                    <span id="show_E_e" style={{display: 'none'}}>
-                      <span id="E_e" style={{color: 'blue'}} />
+                    <span id="show_E_e" style={{color: 'blue'}}>{result.Ee1.toExponential(4)}</span>
                       <span style={{fontSize: 'smaller'}}> W.m<sup>-2</sup></span>
-                    </span>
+                    
                   </div>
                   <div>
                     <label htmlFor="E_e2">E<sub>e<sub>2</sub></sub> =</label>
-                    <span id="show_E_e_2" style={{display: 'none'}}>
-                      <span id="E_e_2" style={{color: 'blue'}} />
-                      <span style={{fontSize: 'smaller'}}> W.m<sup>-2</sup></span>
-                    </span>
+                    <span id="show_E_e_2" style={{color: 'blue'}}>{result.Ee1.toExponential(4)}</span>
+                      <span style={{fontSize: 'smaller'}}>  W.m<sup>-2</sup></span>
+                    
                   </div>
                 </div>
               </div>

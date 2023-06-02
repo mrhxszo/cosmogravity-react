@@ -29,25 +29,34 @@ import {c,k,h,G, AU, parsec, k_parsec, M_parsec, ly}from "../../constants";
  * @method Y
  * @method dY
  * @method F
+ * @method E //ND
  * @method compute_scale_factor
  * @method compute_omegas
+ * @method compute_temp_and_hubble //ND
  * @method time
  * @method universe_age
+ * @method emission_age
+ * @method emission_age_inverse //ND
  * @method duration
  * @method metric_distance
+ * @method metric_distance_inverse //ND
  * @method luminosity
  * @method luminosity_distance
  * @method light_distance
- * @method angular_diameter_distance
+ * @method angular_diameter_distance //ND reWritten
  * @method brightness
  * @method apparent_diameter
  * @method integral_duration_substituated
  * @method integral_distance
  * @method equa_diff_a
  * @method equa_diff_time
- * @method check_singularity
- * @method calculate_energy_density
+ * @method check_singularity //ND
+ * @method calculate_energy_density //ND
+ * @method dz //ND
  */
+
+
+
 export class Simulation_universe extends Simulation {
 	private _temperature: number;
 	private _hubble_cst: number;
@@ -480,6 +489,22 @@ export class Simulation_universe extends Simulation {
 	}
 
 	/**
+	 * E function
+	 * see Theory about cosmology
+	 * @param x variable
+	 * @returns value of E(x)
+	 **/
+	protected E(x: number): number {
+		let Omegar = this.calcul_omega_r();
+		let omegam0 = this.matter_parameter;
+		let omegalambda0 = this.dark_energy.parameter_value;
+
+		return (Number(Omegar) * Math.pow((1 + x), 4) + omegam0 * Math.pow((1 + x), 3)
+		+ (1 - Number(omegam0) - Number(Omegar) - Number(omegalambda0)) * Math.pow((1 + x), 2)
+		+ Number(omegalambda0));
+	}
+
+	/**
 	 * compute the scale factor of the universe as function of time
 	 * @param step Computation step
 	 * @param interval_a Array containing a_min et a_max value
@@ -510,6 +535,7 @@ export class Simulation_universe extends Simulation {
 		return result;
 	}
 
+
 	/**
 	 * Computing the 4 density parameters given an array of cosmologic shift value
 	 * @param z_array array containing z points where to compute the omegas
@@ -535,6 +561,17 @@ export class Simulation_universe extends Simulation {
 			omega_de: omega_de,
 			omega_courbure: omega_courbure
 		};
+	}
+
+		/**
+	 * Computing the temperature given an array of cosmologic shift value
+	 * @param z array containing z points where to compute the omegas
+	 */
+	public compute_temp_and_hubble(z: number){
+		let temp = this._temperature * (1 + z);
+		let hubble = this._hubble_cst * Math.pow(this.E(z), 0.5);
+		
+		return { temparature : temp, hubble_cst : hubble };
 	}
 
 	/**
@@ -579,8 +616,12 @@ export class Simulation_universe extends Simulation {
 	}
 
 	/**
-	 * name
+	 * Calculate the age of the universe at a given cosmological redshift `z`.
+	 * 
+	 * @param z The cosmological redshift.
+	 * @returns The age of the universe.
 	 */
+
 	public emission_age(z: number) {
 		let infimum = z / (1 + z);
 		let age: number;
@@ -589,6 +630,39 @@ export class Simulation_universe extends Simulation {
 			this.hubble_cst;
 		return age;
 	}
+
+		/**
+	 * Calculate the cosmological redshift `z` from the given age of the universe.
+	 * Newton's method is used to find the root of the function `emission_age(z) - age`.
+	 * @param age The age of the universe.
+	 * @returns The cosmological redshift `z`.
+	 */
+	public emission_age_inverse(age: number): number {
+		const tolerance = 1e-5; // Tolerance for convergence
+		let z = 1; // Initial guess for z
+
+		// Perform iterations until convergence or maximum iterations reached
+		for (let i = 0; i < 800; i++) {
+			const ageDiff = this.emission_age(z) - age;
+
+			// Calculate the derivative of the age of the universe at the guessed z value
+			const deltaZ = 0.0001; // Small deltaZ value for derivative calculation
+			const ageDerivative = (this.emission_age(z + deltaZ) - this.emission_age(z)) / deltaZ;
+
+			// Update z using Newton's method
+			const deltaZNewton = ageDiff / ageDerivative;
+			z -= deltaZNewton;
+
+			// Check for convergence
+			if (Math.abs(deltaZNewton) < tolerance) {
+			break;
+			}
+		}
+
+		return z;
+  }
+
+
 
 	/**
 	 * Compute the cosmologic duration between two cosmologics shift z
@@ -630,6 +704,33 @@ export class Simulation_universe extends Simulation {
 		distance *= this.constants.c / this.hubble_cst;
 		return distance;
 	}
+
+	/**
+	 * compute z from a given metric distance by using newton's method for root finding
+	 * newton's method is used because there is no simple way to invert the function
+	 * @param distance distance metric in SI unit
+	 * @returns z cosmologic shift 
+	 */
+	public metric_distance_inverse(distance: number): number{
+		const tolerance = 1e-4; // The desired tolerance for convergence
+		const maxIterations = 500; // The maximum number of iterations
+		let z = 0; // Initial guess for the redshift
+
+		for (let i = 0; i < maxIterations; i++) {
+			const computedDistance = this.metric_distance(z);
+			const derivative = (this.metric_distance(z + 1e-6) - computedDistance) / 1e-6;
+			const delta = (computedDistance - distance) / derivative;
+
+			z -= delta;
+
+			if (Math.abs(delta) < tolerance) {
+			return z; // Found the redshift within the desired tolerance
+			}
+		}
+
+			return z; // Failed to converge
+	}
+		
 
 	/**
 	 * Compute the luminosity distance
@@ -710,8 +811,9 @@ export class Simulation_universe extends Simulation {
 	 * @param z Cosmologic shift
 	 * @param distance_metric optionnal parameters for optimisation (permit you to pass an already calculated distances for optimisation)
 	 * @returns The apparent diameter
+	 * Note : if you want to calculate phi then z and D_e(z, D_e) is enough as argumets but if you want to calculate Diameter your second argument should be 0 (z, 0, phi)
 	 */
-	public apparent_diameter(D_e: number, z: number, distance_metric?: number) {
+	public apparent_diameter( z: number, D_e?: number, phi?: number, distance_metric?: number,) {
 		let distance: number;
 		if (distance_metric === undefined) {
 			distance = this.metric_distance(z);
@@ -719,7 +821,14 @@ export class Simulation_universe extends Simulation {
 			distance = distance_metric;
 		}
 
-		return (D_e * (1 + z)) / distance;
+		// return (D_e * (1 + z)) / distance; // formula in the theory dosen't give same result as the website formula
+		if(phi === undefined && D_e !== undefined){
+		return 	(206265 * D_e / this.angular_diameter_distance(z, distance_metric));// formula from the website
+		}
+
+		else if(D_e === 0 && phi !== undefined){
+			return phi / 206265 * this.angular_diameter_distance(z, distance_metric);
+		}
 	}
 
 	/**
@@ -880,5 +989,13 @@ export class Simulation_universe extends Simulation {
 	  
 		return { matter: Number(rhoM.toExponential()), radiation: Number(rhoR.toExponential()), darkEnergy: Number(rhoDE.toExponential()) };
 	  }
+
+	/**takes a value of z and returns dz/dt0
+	 * @param z value of z
+	 * @returns dz/dt0 in years
+	 * */
+	public dz(z: number): number {
+		return ((1 + z) * this.hubble_cst - this.compute_temp_and_hubble(z).hubble_cst)*31557600; //convert to seconds to years because dz/dt0 is shown in years in interface
+	}
 	  
 }

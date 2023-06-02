@@ -34,7 +34,7 @@ export default function Univers(){
 		 });
 	
 	//useState for select options for matter, lambda, radiation and dark energy and for isFlat
-	const [selectValue, setSelectValue] = useState({value:"Matière, Lambda, RFC et Neutrinos", isFlat: false});
+	const [selectValue, setSelectValue] = useState({value:t("page_univers_calculs.matierelambdaRFCNeu"), isFlat: false});
 	
 
 	//useEffect for updating the class Simulation_universe
@@ -45,8 +45,6 @@ export default function Univers(){
 		Universe.dark_energy.parameter_value = params.omegaDE0;
 		Universe.dark_energy.w_0 = params.omega0;
 		Universe.dark_energy.w_1 = params.omega1;
-		console.log("w_0= ", Universe.dark_energy.w_0);
-		console.log("w_1= ", Universe.dark_energy.w_1);
 	}, [params,selectValue]);
 	
     
@@ -107,7 +105,7 @@ export default function Univers(){
 		  <div id="Boutons_top_right">
 			<input className="myButton" id="para" type="button" onClick={() => param()} value={t("page_univers_general.bouton_constantes")||""} />
 			{/* change the calculs Annexe based on which link is clicked */}
-			<AdjunctButton UniverseRef={UniverseRef} params={params} handleSelect={handleSelect}/>
+			<AdjunctButton UniverseRef={UniverseRef} params={params} handleSelect={handleSelect} selectValue={selectValue}/>
 			<p id="txt_titre" style={{ fontSize: '20px', fontWeight: "bold", textAlign: "center" }}></p>
 		  </div><br />
 
@@ -128,7 +126,6 @@ export default function Univers(){
 					params={params}
 					handleSelect={handleSelect}
 					selectValue = {selectValue}
-					setParams={setParams}
 				  />
 				  </>
 				);
@@ -163,7 +160,6 @@ export default function Univers(){
 					params={params}
 					handleSelect={handleSelect}
 					selectValue = {selectValue}
-					setParams={setParams}
 				  />
 				  </>
 				);

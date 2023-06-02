@@ -15,6 +15,10 @@ interface Props {
           omegaDE0: number
       },
     handleSelect: Function,
+    selectValue: {
+            value: string,
+            isFlat: boolean,
+    }
   }
 
 export default function AdjunctButton(props: Props){
@@ -34,7 +38,7 @@ export default function AdjunctButton(props: Props){
         <>
         <input className="myButton" id="calc" type="button" onClick={handleClick} value={t("page_univers_general.bouton_calculsAnnexes") || "" } />
 
-        {linkClicked === "Standard" && buttonClicked ? <ConstantAdjunct handleClick={handleClick} UniverseRef={props.UniverseRef} params={props.params} handleSelect={props.handleSelect}/> : null}
+        {linkClicked === "Standard" && buttonClicked ? <ConstantAdjunct handleClick={handleClick} UniverseRef={props.UniverseRef} params={props.params} handleSelect={props.handleSelect} selectValue={props.selectValue}/> : null}
         </>
     )
 }
