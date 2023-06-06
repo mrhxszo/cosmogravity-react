@@ -1,3 +1,6 @@
+//components
+import GraphGenerator from "./GraphGenerator";
+
 //language
 import {t} from "i18next"
 import { useState } from "react";
@@ -93,13 +96,12 @@ export default function ConstantsAdjunct(props: Props) {
         }));
       }
     }
-    else {
+    
         
       setZ((prevZ) => ({
         ...prevZ,
         [id as keyof typeof prevZ]: { ...prevZ[id as keyof typeof prevZ as "z1" | "z2"], value: Number(value) },
       }));    
-    }
 
   }
                                       
@@ -131,59 +133,61 @@ export default function ConstantsAdjunct(props: Props) {
         : Universe?.apparent_diameter(Number(z.z2.value), 0, result.phi) || 0;
       
       dKpc = dmetre / k_parsec;
-      } 
+      }
+      
+      // console.log("dm1", Universe?.metric_distance(Number(1)));
+      // console.log("dm2", Universe?.metric_distance(Number(z.z2.value)));
+      if (Universe) {
+        setResult((prevState) => {
+          if (Universe) {
+            return {
+              ...prevState,
+              // constants dependent on z
+              Tz1: Universe.compute_temp_and_hubble(Number(z.z1.value)).temparature,
+              Tz2: Universe.compute_temp_and_hubble(Number(z.z2.value)).temparature,
+              Hz1: Universe.compute_temp_and_hubble(Number(z.z1.value)).hubble_cst,
+              Hz2: Universe.compute_temp_and_hubble(Number(z.z2.value)).hubble_cst,
+              omega_m_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_matter[0],
+              omega_m_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_matter[0],
+              omega_DE_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_de[0],
+              omega_DE_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_de[0],
+              omega_r_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_rad[0],
+              omega_r_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_rad[0],
+              omega_k_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_courbure[0],
+              omega_k_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_courbure[0],
     
-
-    if (Universe) {
-      setResult((prevState) => {
-        if (Universe) {
-          return {
-            ...prevState,
-            // constants dependent on z
-            Tz1: Universe.compute_temp_and_hubble(Number(z.z1.value)).temparature,
-            Tz2: Universe.compute_temp_and_hubble(Number(z.z2.value)).temparature,
-            Hz1: Universe.compute_temp_and_hubble(Number(z.z1.value)).hubble_cst,
-            Hz2: Universe.compute_temp_and_hubble(Number(z.z2.value)).hubble_cst,
-            omega_m_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_matter[0],
-            omega_m_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_matter[0],
-            omega_DE_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_de[0],
-            omega_DE_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_de[0],
-            omega_r_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_rad[0],
-            omega_r_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_rad[0],
-            omega_k_z1: Universe.compute_omegas([Number(z.z1.value)]).omega_courbure[0],
-            omega_k_z2: Universe.compute_omegas([Number(z.z2.value)]).omega_courbure[0],
+              // Geometry
+              dm1: Universe.metric_distance(Number(z.z1.value)),
+              dm2: Universe.metric_distance(Number(z.z2.value)),
+              temission: Universe.emission_age(Number(z.z1.value)),
+              treception: Universe.emission_age(Number(z.z2.value)),
+              dz1: Universe.dz(Number(z.z1.value)),
+              dz2: Universe.dz(Number(z.z2.value)),
+    
+              // Photometry
+              Le: Universe.luminosity(Number(z.i_e)),
+              dl1: Universe.luminosity_distance(Number(z.z1.value)),
+              dl2: Universe.luminosity_distance(Number(z.z2.value)),
+              add1: Universe.angular_diameter_distance(Number(z.z1.value)),
+              add2: Universe.angular_diameter_distance(Number(z.z2.value)),
+              Ee1: Universe.brightness(Number(z.z1.value), result.Le),
+              Ee2: Universe.brightness(Number(z.z2.value), result.Le),
+    
+              // Diameter and apparent diameter
+              dmetre: dmetre,
+              dKpc: dKpc,
+              phi: phi,
   
-            // Geometry
-            dm1: Universe.metric_distance(Number(z.z1.value)),
-            dm2: Universe.metric_distance(Number(z.z2.value)),
-            temission: Universe.emission_age(Number(z.z1.value)),
-            treception: Universe.emission_age(Number(z.z2.value)),
-            dz1: Universe.dz(Number(z.z1.value)),
-            dz2: Universe.dz(Number(z.z2.value)),
-  
-            // Photometry
-            Le: Universe.luminosity(Number(z.i_e)),
-            dl1: Universe.luminosity_distance(Number(z.z1.value)),
-            dl2: Universe.luminosity_distance(Number(z.z2.value)),
-            add1: Universe.angular_diameter_distance(Number(z.z1.value)),
-            add2: Universe.angular_diameter_distance(Number(z.z2.value)),
-            Ee1: Universe.brightness(Number(z.z1.value), result.Le),
-            Ee2: Universe.brightness(Number(z.z2.value), result.Le),
-  
-            // Diameter and apparent diameter
-            dmetre: dmetre,
-            dKpc: dKpc,
-            phi: phi,
-
-            //Inverse Calculation
-            zInv: Universe.metric_distance_inverse(Number(inv.dmInv)),
-            z1Inv: Universe.emission_age_inverse(Number(inv.tEmissionInv)*365*24*60*60),//convert year to second
-            z2Inv: Universe.emission_age_inverse(Number(inv.tRecpetionInv)*365*24*60*60),
-          };
-        }
-        return prevState;
-      });
-    }
+              //Inverse Calculation
+              zInv: Universe.metric_distance_inverse(Number(inv.dmInv)),
+              z1Inv: Universe.emission_age_inverse(Number(inv.tEmissionInv)*365*24*60*60),//User Input is in seconds so convert year to second
+              z2Inv: Universe.emission_age_inverse(Number(inv.tRecpetionInv)*365*24*60*60),
+            };
+          }
+          return prevState;
+        });
+      }
+    
   };
 
 
@@ -262,6 +266,9 @@ export default function ConstantsAdjunct(props: Props) {
 
             {/* Calcul des Diametres */}
             <div id="Calcul_Diam" className="border">
+            <div>
+                <span id="calculInverse" style={{fontWeight: 'bold', fontSize: '18px'}}>Calculs des Diamétres</span>
+              </div>
               <p style={{fontSize: 'smaller'}} id="txt_infoCalculs">Les 2 entrées suivantes utilisent soit z<sub>1</sub> soit z<sub>2</sub> après calcul,</p>
               <div>
                 <label htmlFor="z1">z<sub>1</sub></label>
@@ -332,20 +339,20 @@ export default function ConstantsAdjunct(props: Props) {
                 <span id="txt_parametres" style={{fontWeight: 'bold'}}>Les paramètres cosmologiques :</span>
                 <div>
                   <label htmlFor="T0_annexes">T<sub>0</sub> =</label>
-                  <output id="T0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" type="text">{props.params.T0}</output><span style={{fontSize: 'smaller'}}>  K</span>
+                  <output id="T0_annexes" style={{color: 'blue'}} >{props.params.T0}</output><span style={{fontSize: 'smaller'}}>  K</span>
                 </div>
                 <span id="txt_parametres" style={{fontWeight: 'bold'}} />
                 <div>
                   <label htmlFor="H0_annexes">H<sub>0</sub> =</label>
-                  <output id="H0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" type="text">{props.params.H0}</output><span style={{fontSize: 'smaller'}}>  km.s<sup>-1</sup>.Mpc<sup>-1</sup></span>
+                  <output id="H0_annexes" style={{color: 'blue'}} >{props.params.H0}</output><span style={{fontSize: 'smaller'}}>  km.s<sup>-1</sup>.Mpc<sup>-1</sup></span>
                 </div>
                 <div>
                   <label htmlFor="omegam0_annexes">Ω<sub>m<sub>0</sub></sub> =</label>
-                  <output id="omegam0_annexes" style={{color: 'blue'}} onchange="update_omegar0_calc();" value="0.6" type="text">{props.params.omegam0}</output>
+                  <output id="omegam0_annexes" style={{color: 'blue'}} >{props.params.omegam0}</output>
                 </div>
                 <div>
                   <label htmlFor="omegalambda0_annexes">Ω<sub>Λ0</sub> =</label>
-                  <output id="omegalambda0_annexes" style={{color: 'blue'}} onchange="update_omegak0_calc();" value="0.5" type="text">{props.params.omegaDE0}</output>
+                  <output id="omegalambda0_annexes" style={{color: 'blue'}} >{props.params.omegaDE0}</output>
                 </div>
                 <div>
                   <div>
@@ -353,7 +360,7 @@ export default function ConstantsAdjunct(props: Props) {
                   </div>
                   <div>
                     <span id="txt_univplat" dangerouslySetInnerHTML={{ __html: t("page_univers.univers_plat") || '' }}></span>
-                    <input id="univ_plat" type="checkbox" name="univ_plat" onchange="updateUnivPlat_calc();" checked={props.selectValue.isFlat} disabled/>
+                    <input id="univ_plat" type="checkbox" name="univ_plat"  checked={props.selectValue.isFlat} disabled/>
                   </div>
                 </div>
               </div>
@@ -587,99 +594,7 @@ export default function ConstantsAdjunct(props: Props) {
         </div>
         {/* z1 et z2 pour le calcul de dm et t2,t1 */}
         <br />
-        <div className="border">
-          {/* Generateur des graphiques */}
-          <div>
-            <span id="txt_generateur_graphiques" style={{fontWeight: 'bold'}}>Génerateur des Graphiques (z<sub>max</sub> et z<sub>min</sub> &gt;-1):</span>
-          </div>
-          <div id="graph_gen_box">
-            <div>
-              <div style={{padding: '10px 20px 10px 0'}}>
-                <label htmlFor="zmin">
-                  <span id="txt_zmin">z<sub>min</sub></span>
-                </label>
-                <input id="zmin" type="text" defaultValue={0} />
-              </div>
-              <div style={{padding: '10px 20px 10px 0'}}>
-                <label htmlFor="zmax">
-                  <span id="txt_zmax">z<sub>max</sub></span>
-                </label>
-                <input id="zmax" type="text" defaultValue={25} />
-              </div>
-              <div style={{padding: '10px 20px 10px 0'}}>
-                <label htmlFor="pas_pour_z">
-                  <span id="txt_pas">Pas :</span>
-                </label>
-                <input id="pas_pour_z" type="text" defaultValue={300} />
-              </div>
-            </div>
-            {/* bouton pour tracer graphes en fonction de z */}
-            <div>
-              <div style={{padding: '10px'}}>
-                <label htmlFor="boutonGraphe_distances">
-                  <span id="txt_graphe_d">Tracer d<sub>i</sub>(z)</span>
-                </label>
-                <input id="boutonGraphe_distances" type="button" onclick="lance_calc(1);" defaultValue="Tracer" />
-              </div>  				
-              <div style={{padding: '10px'}}>
-                <label htmlFor="boutonGraphe_omega">
-                  <span id="txt_graphe_omega">Tracer Ω<sub>i</sub>(z)</span>
-                </label>
-                <input id="boutonGraphe_omega" type="button" onclick="lance_calc(2);" defaultValue="Tracer" />
-              </div>
-              <div style={{padding: '10px'}}>
-                <label htmlFor="boutonGraphe_t">
-                  <span id="txt_graphe_t">Tracer t(z)</span>
-                </label>
-                <input id="boutonGraphe_t" type="button" onclick="lance_calc(3);" defaultValue="Tracer" />
-              </div>
-            </div>
-            {/* bouton pour tracer graphes en fonction de t */}
-            <div>
-              <div style={{padding: '10px'}}>
-                <label htmlFor="boutonGraphe_distances_t">
-                  <span id="txt_graphe_d_t">Tracer d<sub>i</sub>(t)</span>
-                </label>
-                <input id="boutonGraphe_distances_t" type="button" onclick="lance_calc(4);" defaultValue="Tracer" />
-              </div>  
-              <div style={{padding: '10px'}}>
-                <label htmlFor="boutonGraphe_omega_t">
-                  <span id="txt_graphe_omega_t">Tracer Ω<sub>i</sub>(t)</span>
-                </label>
-                <input id="boutonGraphe_omega_t" type="button" onclick="lance_calc(5);" defaultValue="Tracer" />
-              </div>
-              <div style={{padding: '10px'}}>
-                <label htmlFor="boutonGraphe_z_t">
-                  <span id="txt_graphe_z_t">Tracer z(t)</span> {/*S Ici pour mettre le string devant le button*/}
-                </label>
-                <input id="boutonGraphe_z_t" type="button" onclick="lance_calc(6);" defaultValue="Tracer" /> {/*La value des autres boutons est donc changer autre part? ... Pourquoi ne pas directement mettre le bon nom? :( )*/}
-              </div>
-            </div>
-            {/* bouton forme checkbox pour tracer les graphes en echelle log de d et omega*/}
-            <div>
-              <div style={{padding: '10px 13px'}}>
-                <label htmlFor="d_checkbox">
-                  <span id="txt_echelle_log_d">Échelle log</span>
-                </label>
-                <input type="checkbox" name="d_checkbox" id="d_checkbox" defaultValue="Calcul" />
-              </div>
-              <div style={{padding: '15px'}}>
-                <label htmlFor="omega_checkbox">
-                  <span id="txt_echelle_log_omega">Échelle log</span>
-                </label>
-                <input type="checkbox" name="omega_checkbox" id="omega_checkbox" defaultValue="Calcul" />
-              </div>
-              {/* bouton forme checkbox pour tracer les graphes en echelle log de t*/}
-              {/*S C'est le bouton en vis-à-vis de t(z) Tracer et z(t) Tracer*/}
-              <div style={{padding: '12px 15px'}}>
-                <label htmlFor="t_checkbox">
-                  <span id="txt_echelle_log_t">Échelle log</span>
-                </label>
-                <input type="checkbox" name="t_checkbox" id="t_checkbox" defaultValue="Calcul" />
-              </div>
-            </div>
-          </div>
-        </div>
+            <GraphGenerator Universe={Universe}/>
         </div>
     </div>
         

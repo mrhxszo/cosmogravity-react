@@ -43,7 +43,7 @@ import {c,k,h,G, AU, parsec, k_parsec, M_parsec, ly}from "../../constants";
  * @method luminosity
  * @method luminosity_distance
  * @method light_distance
- * @method angular_diameter_distance //ND reWritten
+ * @method angular_diameter_distance //ND rewritten
  * @method brightness
  * @method apparent_diameter
  * @method integral_duration_substituated
@@ -454,8 +454,7 @@ export class Simulation_universe extends Simulation {
 		return Math.exp(
 			-3 *
 			(this.dark_energy.w_0 + this.dark_energy.w_1 + 1) *
-			Math.log(x) -
-			3 * this.dark_energy.w_1 * (1 - x)
+			Math.log(x) - (3 * this.dark_energy.w_1 * (1 - x))
 		);
 	}
 
@@ -581,13 +580,13 @@ export class Simulation_universe extends Simulation {
 	 * @param zmax
 	 * @returns
 	 */
-	public time(n: number, zmin: number, zmax: number) {
+	public time(n: number, zmin: number, zmax: number): {x: number[], y: number[]} {
 		let step: number = (zmax - zmin) / n;
 		let time_zmin: number;
 		try {
 			time_zmin = this.duration(0, zmin);
 		} catch (e) {
-			return e;
+			return {x: [], y: []};
 		}
 
 		return this.runge_kutta_universe_1(
@@ -702,6 +701,7 @@ export class Simulation_universe extends Simulation {
 				Math.sqrt(Math.abs(curvature));
 		}
 		distance *= this.constants.c / this.hubble_cst;
+		console.log(distance);//////////////////////////
 		return distance;
 	}
 
@@ -898,7 +898,7 @@ export class Simulation_universe extends Simulation {
 	 * Note: t is not used but has to be defined for this method to be accepted in the runge_kutta_equation_order1 method of simulation class
 	 */
 	protected equa_diff_time(Simu: Simulation_universe, z: number, t: number = 0): number {
-		return 1 / (this.hubble_cst * (1 + z) * Math.sqrt(Simu.F(z)));
+		return 1 / (Simu.hubble_cst * (1 + z) * Math.sqrt(Simu.F(z)));
 	}
 
 	/**

@@ -164,7 +164,7 @@ export default function CosmologicalConstant(props: Props){
 		{/* <!-- GRAPHIQUE--> */}
 		<div id="graphique">
 			<PlotlyComponent 
-			x = {{xData:[aTau.x.map(element => element/(1e9))], xName:"t(Ga)"}} //divide by 1e16 to convert in Gyears
+			x = {{xData:aTau.x.map(element => element/(1e9)), xName:"t(Ga)"}} //divide by 1e16 to convert in Gyears
 			y = {{yData:[aTau.y],yName:"a(t)"}} 
 			title={t("calculs_univers.titre").toString()}
 			downloadButton={

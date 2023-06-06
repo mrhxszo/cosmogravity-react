@@ -1,5 +1,6 @@
 import { Mobile } from "./simulation objects/mobile";
 import { Simulation_trajectory } from "./simulation_trajectory";
+import { c, k, h, G, AU, parsec, k_parsec, M_parsec, ly } from "../../constants";
 
 /** 
  * @class Schwarzschild 
@@ -202,7 +203,7 @@ export class Schwarzschild extends Simulation_trajectory
     public mobile_trajectory(mobile: Mobile, step: number, reference_frame: "A" | "DO"): number[]
     {
         let dtau = step;
-        let tau: number;
+        let tau: number = 0;
         let radius = this.central_body.radius;
         let is_photon = mobile.is_photon;
         let r = mobile.r;
@@ -277,6 +278,8 @@ export class Schwarzschild extends Simulation_trajectory
                 );
             }
         }
+
+        return [tau, r, U_r];
     }
 
 

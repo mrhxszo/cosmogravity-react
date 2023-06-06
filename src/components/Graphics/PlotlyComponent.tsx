@@ -11,14 +11,14 @@ enum TypesImages {
 
 interface Props {
     x: {
-        xData:number[][],
+        xData:number[],
         xName:string,},
     y: {
         yData:number[][],
         yName:string,
     }
     title: string | undefined,
-    downloadButton: {
+    downloadButton?: {
         changeDownload: React.Dispatch<React.SetStateAction<{ download: boolean; type: TypesImages; }>>;
         isDownload:boolean,
         whatType:TypesImages,
@@ -33,19 +33,19 @@ export default function PlotlyComponent(props : Props): JSX.Element {
 //This part of code recieves data from props and based on how many data sets are there it creates data array for plotly
 let data : any = [];
 
-if(props.x.xData.length <= 1){
+if(props.y.yData.length <= 1){
     data.push({
-        x: props.x.xData[0],
+        x: props.x.xData,
         y: props.y.yData[0],
         mode: 'lines',
         type: 'scatter',
     });
 }
 else{
-    props.x.xData.forEach(
+    props.y.yData.forEach(
     (value, index) => {
         data.push({
-            x: props.x.xData[index],
+            x: props.x.xData,
             y: props.y.yData[index],
             mode: 'lines',
             type: 'scatter',
@@ -77,14 +77,14 @@ const layout = {
 
     useEffect(() => {
 
-        if(props.downloadButton.isDownload){
+        if(props.downloadButton?.isDownload){
 
            
             //This part of code is responsible for downloading image
             newPlot('save',data,layout)
             .then (async (gd) => {
                 await downloadImage(gd, {
-                    format: props.downloadButton.whatType,
+                    format: props.downloadButton?.whatType || TypesImages.png,
                     width: 800,
                     height: 600,
                     filename: "download"
