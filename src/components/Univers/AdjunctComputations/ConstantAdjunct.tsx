@@ -69,6 +69,8 @@ export default function ConstantsAdjunct(props: Props) {
                                         zInv: 0, z1Inv:0, z2Inv:0, 
                                       });
 
+  //store the default value of the states to reload the page
+  const [defaultState, setDefaultState] = useState({z:z, inv:inv, result:result});
 
   //to extract the value of z1 and z2
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -135,8 +137,7 @@ export default function ConstantsAdjunct(props: Props) {
       dKpc = dmetre / k_parsec;
       }
       
-      // console.log("dm1", Universe?.metric_distance(Number(1)));
-      // console.log("dm2", Universe?.metric_distance(Number(z.z2.value)));
+
       if (Universe) {
         setResult((prevState) => {
           if (Universe) {
@@ -191,6 +192,14 @@ export default function ConstantsAdjunct(props: Props) {
   };
 
 
+  function handleDefaultState(){
+    setZ(defaultState.z);
+    setInv(defaultState.inv);
+    setResult(defaultState.result);
+
+  }
+
+
 
     return (
         <>
@@ -221,7 +230,7 @@ export default function ConstantsAdjunct(props: Props) {
                 {t('page_univers_general.bouton_calculsAnnexes')}</h2>
 
               <div>
-                  <IoRefreshCircleSharp className="icons" data-tooltip-id="refresh" data-tooltip-content={t("page_univers_calculs.bouton_rafraichir") || ""}/>
+                  <IoRefreshCircleSharp className="icons" data-tooltip-id="refresh" data-tooltip-content={t("page_univers_calculs.bouton_rafraichir") || ""} onClick={handleDefaultState}/>
                   <AiFillCloseCircle className="icons"  onClick={() => props.handleClick()} data-tooltip-id="close" data-tooltip-content={t("page_univers_calculs.bouton_fermer") || ""}/>
                   
                   {/* add tootip to specify what above buttons do*/}

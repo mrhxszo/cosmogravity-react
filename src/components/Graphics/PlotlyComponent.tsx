@@ -1,6 +1,7 @@
 import Plotly from "react-plotly.js";
 import { useState, useEffect, useRef } from "react";
-import {downloadImage, newPlot } from "plotly.js";
+import {AxisType, downloadImage, newPlot } from "plotly.js";
+import { type } from "os";
 
 enum TypesImages {
 	png = "png",
@@ -12,10 +13,13 @@ enum TypesImages {
 interface Props {
     x: {
         xData:number[],
-        xName:string,},
+        xName:string,
+        type?:AxisType,
+    },
     y: {
         yData:number[][],
         yName:string,
+        name?:string[],
     }
     title: string | undefined,
     downloadButton?: {
@@ -49,7 +53,7 @@ else{
             y: props.y.yData[index],
             mode: 'lines',
             type: 'scatter',
-
+            name: props.y.name ? props.y.name[index] : undefined,
         });
     });
 };
@@ -59,6 +63,7 @@ const layout = {
         title: props.x.xName,
         autorange: true,
         titlefont:{family:"Time New Roman, sans-serif",size:16,color:"#111111"},
+        type: props.x.type,
     },
     yaxis: {
         rangemode:"tozero" as const,

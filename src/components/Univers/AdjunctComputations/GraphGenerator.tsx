@@ -2,10 +2,12 @@
 import PlotlyComponent from "../../Graphics/PlotlyComponent";
 import { Simulation_universe } from "@/ts/class/simulation/simulation_universe";
 import { useState } from "react";
-
+import { c } from "../../../ts/constants";
 interface Props {
     Universe : Simulation_universe
 }
+
+
 
 export default function GraphGenerator(props: Props){
 
@@ -14,6 +16,9 @@ export default function GraphGenerator(props: Props){
 
     //useState for graphs
     const [ graphs, setGraphs] =  useState<React.ReactNode[]>([]);
+
+    //useState to keep track if the logarithic scales are checked
+    const [log, setLog] = useState({logDistance: false, logOmega: false, logZ: false})
     
     function handleClickZ(event: React.MouseEvent<HTMLInputElement>){
         let zGraph = Array<number>();
@@ -21,36 +26,69 @@ export default function GraphGenerator(props: Props){
         for(let i = z.zmin; i <= z.zmax; i += step){
             zGraph.push(i);
         }
+        let time = zGraph.map((element) => props.Universe.emission_age(element));
 
         if(event.currentTarget.id === "distances"){
           let dm = zGraph.map((element) => props.Universe.metric_distance(element));
-          let test : number[] = [10, 20, 30, 40, 50, 60 ]
+          let da = zGraph.map((element) => props.Universe.angular_diameter_distance(element));
+          let dl = zGraph.map((element) => props.Universe.emission_age(element)*c);
+          let dLT = dm.map((element, index) => element*(1+zGraph[index]));
 
-          setGraphs((prevState) =>[...prevState, <PlotlyComponent 
-            x = {{xData:zGraph, xName:"z"}}
-            y = {{yData:[dm,test],yName:"dm"}} 
-            title="dm, dLT etc fonction de z"
-            />]);
+          setGraphs((prevState) =>[<PlotlyComponent 
+            x = {{xData:zGraph, xName:"z", type: log.logDistance ? "log" : "linear"}}
+            y = {{yData:[dm,da,dl,dLT],yName:"dm", name:["dm","da","dl","dLT"]}}
+            title="dm, da, dl, dLT fonction de z"
+            />,...prevState]);
         }
 
         else if(event.currentTarget.id === "omegas"){
           let omegas = props.Universe.compute_omegas(zGraph);
           let {omega_matter, omega_rad, omega_de, omega_courbure} = omegas
           setGraphs((prevState) =>[<PlotlyComponent 
-            x = {{xData:zGraph, xName:"z"}}
-            y = {{yData:[omega_matter, omega_rad, omega_de, omega_courbure],yName:"Ω"}} 
-            title="Omegas en fonction de z"
+            x = {{xData:zGraph, xName:"z", type: log.logOmega ? "log" : "linear"}}
+            y = {{yData:[omega_matter, omega_rad, omega_de, omega_courbure],yName:"Ω", name:["Ωm","Ωr","ΩΛ","Ωk"]}} 
+            title="Les Omegas en fonction de z"
             />, ...prevState]);
         }
         else if(event.currentTarget.id === "temps"){
-          let time = zGraph.map((element) => props.Universe.emission_age(element));
+
           setGraphs((prevState) =>[<PlotlyComponent
-            x = {{xData:zGraph, xName:"z"}}
+            x = {{xData:zGraph, xName:"z", type: log.logZ ? "log" : "linear"}}
             y = {{yData:[time],yName:"t"}} 
             title="temps en fonction de z"
             />, ...prevState], );
 
         }
+        else if(event.currentTarget.id === "distances_t"){
+          let dm = zGraph.map((element) => props.Universe.metric_distance(element));
+          let da = zGraph.map((element) => props.Universe.angular_diameter_distance(element));
+          let dl = zGraph.map((element) => props.Universe.emission_age(element)*c);
+          let dLT = dm.map((element, index) => element*(1+zGraph[index]));
+
+          setGraphs((prevState) =>[ <PlotlyComponent 
+            x = {{xData:time, xName:"t", type: log.logDistance ? "log" : "linear"}}
+            y = {{yData:[dm,da,dl,dLT],yName:"dm", name:["dm","da","dl","dLT"]}}
+            title="dm, da, dl, dLT fonction de t"
+            /> , ...prevState]);
+        }
+        else if(event.currentTarget.id === "omegas_t"){
+          let omegas = props.Universe.compute_omegas(zGraph);
+          let {omega_matter, omega_rad, omega_de, omega_courbure} = omegas
+          setGraphs((prevState) =>[<PlotlyComponent 
+            x = {{xData:time, xName:"t", type: log.logOmega? "log" : "linear"}}
+            y = {{yData:[omega_matter, omega_rad, omega_de, omega_courbure],yName:"Ω", name:["Ωm","Ωr","ΩΛ","Ωk"]}} 
+            title="Omegas en fonction de z"
+            />, ...prevState]);
+        }
+        else if(event.currentTarget.id === "z_t"){
+          setGraphs((prevState) =>[<PlotlyComponent
+            x = {{xData:time, xName:"t", type: log.logZ ? "log" : "linear"}}
+            y = {{yData:[zGraph],yName:"z"}} 
+            title="z en fonction de t"
+            />, ...prevState], );
+        }
+
+
         
         
     }
@@ -111,22 +149,22 @@ export default function GraphGenerator(props: Props){
             {/* bouton pour tracer graphes en fonction de t */}
             <div>
               <div style={{padding: '10px'}}>
-                <label htmlFor="boutonGraphe_distances_t">
+                <label htmlFor="distances_t">
                   <span id="txt_graphe_d_t">Tracer d<sub>i</sub>(t)</span>
                 </label>
-                <input id="boutonGraphe_distances_t" type="button" onClick="lance_calc(4);" defaultValue="Tracer" />
+                <input id="distances_t" type="button" onClick={handleClickZ} defaultValue="Tracer" />
               </div>  
               <div style={{padding: '10px'}}>
-                <label htmlFor="boutonGraphe_omega_t">
+                <label htmlFor="omegas_t">
                   <span id="txt_graphe_omega_t">Tracer Ω<sub>i</sub>(t)</span>
                 </label>
-                <input id="boutonGraphe_omega_t" type="button" onclick="lance_calc(5);" defaultValue="Tracer" />
+                <input id="omegas_t" type="button" onClick={handleClickZ} defaultValue="Tracer" />
               </div>
               <div style={{padding: '10px'}}>
-                <label htmlFor="boutonGraphe_z_t">
+                <label htmlFor="z_t">
                   <span id="txt_graphe_z_t">Tracer z(t)</span> {/*S Ici pour mettre le string devant le button*/}
                 </label>
-                <input id="boutonGraphe_z_t" type="button" onclick="lance_calc(6);" defaultValue="Tracer" /> {/*La value des autres boutons est donc changer autre part? ... Pourquoi ne pas directement mettre le bon nom? :( )*/}
+                <input id="z_t" type="button" onClick={handleClickZ} defaultValue="Tracer" /> {/*La value des autres boutons est donc changer autre part? ... Pourquoi ne pas directement mettre le bon nom? :( )*/}
               </div>
             </div>
             {/* bouton forme checkbox pour tracer les graphes en echelle log de d et omega*/}
@@ -135,13 +173,14 @@ export default function GraphGenerator(props: Props){
                 <label htmlFor="d_checkbox">
                   <span id="txt_echelle_log_d">Échelle log</span>
                 </label>
-                <input type="checkbox" name="d_checkbox" id="d_checkbox" defaultValue="Calcul" />
+                <input type="checkbox" name="d_checkbox" id="d_checkbox" onClick={() => setLog((prevState) => ({ ...prevState, logDistance: !prevState.logDistance }))} />
               </div>
               <div style={{padding: '15px'}}>
                 <label htmlFor="omega_checkbox">
                   <span id="txt_echelle_log_omega">Échelle log</span>
                 </label>
-                <input type="checkbox" name="omega_checkbox" id="omega_checkbox" defaultValue="Calcul" />
+                <input type="checkbox" name="omega_checkbox" id="omega_checkbox" onClick={() => setLog((prevState) => ({ ...prevState, logOmega: !prevState.logOmega }))}
+ />
               </div>
               {/* bouton forme checkbox pour tracer les graphes en echelle log de t*/}
               {/*S C'est le bouton en vis-à-vis de t(z) Tracer et z(t) Tracer*/}
@@ -149,7 +188,7 @@ export default function GraphGenerator(props: Props){
                 <label htmlFor="t_checkbox">
                   <span id="txt_echelle_log_t">Échelle log</span>
                 </label>
-                <input type="checkbox" name="t_checkbox" id="t_checkbox" defaultValue="Calcul" />
+                <input type="checkbox" name="t_checkbox" id="t_checkbox" onClick={() => setLog((prevState) => ({ ...prevState, logZ: !prevState.logZ }))} />
               </div>
             </div>
           </div>

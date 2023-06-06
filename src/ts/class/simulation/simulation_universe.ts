@@ -29,30 +29,30 @@ import {c,k,h,G, AU, parsec, k_parsec, M_parsec, ly}from "../../constants";
  * @method Y
  * @method dY
  * @method F
- * @method E //ND
+ * @method E //2023
  * @method compute_scale_factor
  * @method compute_omegas
- * @method compute_temp_and_hubble //ND
+ * @method compute_temp_and_hubble //2023
  * @method time
  * @method universe_age
  * @method emission_age
- * @method emission_age_inverse //ND
+ * @method emission_age_inverse //2023
  * @method duration
  * @method metric_distance
- * @method metric_distance_inverse //ND
+ * @method metric_distance_inverse //2023
  * @method luminosity
  * @method luminosity_distance
  * @method light_distance
- * @method angular_diameter_distance //ND rewritten
+ * @method angular_diameter_distance //2023 rewritten
  * @method brightness
  * @method apparent_diameter
  * @method integral_duration_substituated
  * @method integral_distance
  * @method equa_diff_a
  * @method equa_diff_time
- * @method check_singularity //ND
- * @method calculate_energy_density //ND
- * @method dz //ND
+ * @method check_singularity //2023
+ * @method calculate_energy_density //2023
+ * @method dz //2023
  */
 
 
@@ -701,7 +701,6 @@ export class Simulation_universe extends Simulation {
 				Math.sqrt(Math.abs(curvature));
 		}
 		distance *= this.constants.c / this.hubble_cst;
-		console.log(distance);//////////////////////////
 		return distance;
 	}
 
