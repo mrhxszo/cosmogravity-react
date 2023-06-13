@@ -332,7 +332,7 @@ export class Simulation_universe extends Simulation {
 		let dy: number[];
 	
 
-	if ( interval[0] === 0 && interval[1] >= 1 ) {
+	if ( interval[0] === 0 && interval[1] > 1 ) {
 		// Init parameter
 		x = [x_0];
 		y = [y_0];
@@ -386,24 +386,27 @@ export class Simulation_universe extends Simulation {
 			// if big bang model then we can use emission_age method to calulate the t at initial condition
 			if(bigBang.isBigBang){
 
+
 				let dy1_0 : number = Math.sqrt(-(this.calcul_omega_r() / Math.pow(aMax, 2)) + (this.matter_parameter / aMax)
 									+ this.dark_energy.parameter_value + this.calcul_omega_k());
   
 				let tMax  = this.emission_age(aMax);
 
+				x = [tMax];
+				y = [aMax];
+				dy = [dy1_0];
 				//runge kutta starting at amin
-				x= [tMax];
-				y= [aMax];
-				dy= [dy1_0];
-				console.log(dy1_0)
-				
+				if (aMax <= 1) {
+					x = [1];
+					y = [1];
+					dy = [1];
 
-				// Computation loops
+					// Computation loops
 				// Computing with a positive step, i increments the array
 				let i = 0;
 				let result_runge_kutta: number[];
 
-				while (aMin <= y[0] && y[0] <= aMax) {
+				while (aMin <= y[0] && y[0] <= 1) {
 					result_runge_kutta = this.runge_kutta_equation_order2(
 						this,
 						-step,
@@ -412,11 +415,19 @@ export class Simulation_universe extends Simulation {
 						dy[0],
 						funct
 					);
-					x.unshift(result_runge_kutta[0]);
-					y.unshift(result_runge_kutta[1]);
-					dy.unshift(result_runge_kutta[2]);
-					i++;
+						x.unshift(result_runge_kutta[0]);
+						y.unshift(result_runge_kutta[1]);
+						dy.unshift(result_runge_kutta[2]);
+						i++;
 				}
+
+				y = y.filter((value) => value <= aMax);
+				x = x.slice(0, y.length);
+				dy = dy.slice(0, y.length);
+
+
+				}
+				
 
 			}
 			//if not big bang model we fix amin to 0 and if amax is less than 1 we fix it to 5
