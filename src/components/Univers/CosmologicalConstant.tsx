@@ -57,8 +57,12 @@ export default function CosmologicalConstant(props: Props){
 	useEffect(() => {
 		const { aMin, aMax } = aRange; // extract aMin and aMax values
 		if(Universe){
-			setATau(Universe.compute_scale_factor(0.001, [aMin, aMax]))
+			Universe.dark_energy.w_0 = -1;
+			Universe.dark_energy.w_1 = 0;
+			setATau(Universe.compute_scale_factor(0.001, [Number(aRange.aMin), Number(aRange.aMax)]));
 		}
+
+
 		
 	},[aRange, Universe]);
 
@@ -66,7 +70,7 @@ export default function CosmologicalConstant(props: Props){
 	//handClick to do the universe calculation
 	function handleClick() {
 		if(Universe){
-		setATau(Universe.compute_scale_factor(0.001, [aRange.aMin, aRange.aMax]));}
+		setATau(Universe.compute_scale_factor(0.001, [Number(aRange.aMin), Number(aRange.aMax)]));}
 	}
 	
 	
@@ -105,6 +109,7 @@ export default function CosmologicalConstant(props: Props){
 		}
 			
 	}};
+	console.log(Universe?.compute_scale_factor(0.001, [Number(aRange.aMin), Number(aRange.aMax)]));
 
     return(
 
@@ -164,7 +169,7 @@ export default function CosmologicalConstant(props: Props){
 		{/* <!-- GRAPHIQUE--> */}
 		<div id="graphique">
 			<PlotlyComponent 
-			x = {{xData:aTau.x.map(element => element/(1e9)), xName:"t(Ga)"}} //divide by 1e16 to convert in Gyears
+			x = {{xData:aTau.x.map(element => element/(1e9)), xName:"t(Ga)"}} //divide by 1e9 to convert in Gyears
 			y = {{yData:[aTau.y],yName:"a(t)"}} 
 			title={t("calculs_univers.titre").toString()}
 			downloadButton={

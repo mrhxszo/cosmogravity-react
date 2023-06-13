@@ -5,6 +5,9 @@ Classes :
 			class Simulation_trajectory
 				class Kerr
 				class Schwarzschild
+		directory Simulation objects
+			class mobile
+			class central_body
 	
 	directory graphics :
 		class Graphic

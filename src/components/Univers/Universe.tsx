@@ -8,6 +8,7 @@ import Warning from '../Warning/Warning';
 //importing language using i18next
 import { useTranslation } from 'react-i18next';
 import AdjunctButton from './AdjunctComputations/AdjuctButton';
+import { use } from 'i18next';
 
 export default function Univers(){
 
@@ -39,13 +40,22 @@ export default function Univers(){
 
 	//useEffect for updating the class Simulation_universe
 	useEffect(() => {
-		Universe.temperature = params.T0;
-		Universe.hubble_cst = params.H0;
-		Universe.matter_parameter = params.omegam0;
-		Universe.dark_energy.parameter_value = params.omegaDE0;
-		Universe.dark_energy.w_0 = params.omega0;
-		Universe.dark_energy.w_1 = params.omega1;
-	}, [params,selectValue]);
+
+		Universe.temperature = Number(params.T0);
+		Universe.hubble_cst = Number(params.H0);
+		Universe.matter_parameter = Number(params.omegam0);
+		Universe.dark_energy.parameter_value = Number(params.omegaDE0);
+		Universe.dark_energy.w_0 = Number(params.omega0);
+		Universe.dark_energy.w_1 = Number(params.omega1);
+	}, [params,selectValue, UniverseRef]);
+
+	useEffect(() => {
+		setParams(prevState => ({
+			...prevState,
+			omega0: Universe.dark_energy.w_0,
+			omega1: Universe.dark_energy.w_1
+		}));
+	}, [linkClicked]);
 	
     
 	//assign the user's input to the class Simulation_universe

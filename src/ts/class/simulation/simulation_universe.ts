@@ -327,16 +327,22 @@ export class Simulation_universe extends Simulation {
 		funct: (Simu: Simulation_universe, x: number, y: number, dy: number) => number,
 		interval: number[]
 	) {
+		let x: number[];
+		let y: number[];
+		let dy: number[];
+	
+
+	if ( interval[0] === 0 && interval[1] >= 1 ) {
 		// Init parameter
-		let x: number[] = [x_0];
-		let y: number[] = [y_0];
-		let dy: number[] = [dy_0];
+		x = [x_0];
+		y = [y_0];
+		dy= [dy_0];
 
 		// Computation loops
 		// Computing with a positive step, i increments the array
 		let i = 0;
 		let result_runge_kutta: number[];
-		while (interval[0] <= y[i] && y[i] < interval[1]) {
+		while (interval[0] <= y[i] && y[i] <= interval[1]) {
 			result_runge_kutta = this.runge_kutta_equation_order2(
 				this,
 				step,
@@ -356,7 +362,7 @@ export class Simulation_universe extends Simulation {
 			since we decrease the value of x we add the elements at the beginning of the arrays,
 			so for each step we take the first element of the array to compute the next one.
 		*/
-		while (interval[0] <= y[0] && y[0] < interval[1]) {
+		while (interval[0] <= y[0] && y[0] <= interval[1]) {
 			result_runge_kutta = this.runge_kutta_equation_order2(
 				this,
 				-step,
@@ -369,6 +375,100 @@ export class Simulation_universe extends Simulation {
 			y.unshift(result_runge_kutta[1]);
 			dy.unshift(result_runge_kutta[2]);
 			i++;
+		}}
+
+		else {
+			//This is for the values amin and amax that are different than above conditions and we can't calculate it from above initital conditions
+			//check the model
+			let aMin = interval[0];
+			let aMax = interval[1];
+			const {bigBang} = this.check_singularity();
+			// if big bang model then we can use emission_age method to calulate the t at initial condition
+			if(bigBang.isBigBang){
+
+				let dy1_0 : number = Math.sqrt(-(this.calcul_omega_r() / Math.pow(aMax, 2)) + (this.matter_parameter / aMax)
+									+ this.dark_energy.parameter_value + this.calcul_omega_k());
+  
+				let tMax  = this.emission_age(aMax);
+
+				//runge kutta starting at amin
+				x= [tMax];
+				y= [aMax];
+				dy= [dy1_0];
+				console.log(dy1_0)
+				
+
+				// Computation loops
+				// Computing with a positive step, i increments the array
+				let i = 0;
+				let result_runge_kutta: number[];
+
+				while (aMin <= y[0] && y[0] <= aMax) {
+					result_runge_kutta = this.runge_kutta_equation_order2(
+						this,
+						-step,
+						x[0],
+						y[0],
+						dy[0],
+						funct
+					);
+					x.unshift(result_runge_kutta[0]);
+					y.unshift(result_runge_kutta[1]);
+					dy.unshift(result_runge_kutta[2]);
+					i++;
+				}
+
+			}
+			//if not big bang model we fix amin to 0 and if amax is less than 1 we fix it to 5
+			else{
+				if(aMax<1){
+					aMax=5;
+				}
+				aMin=0;
+
+				//runge kutta starting at amin
+				x= [x_0];
+				y= [y_0];
+				dy = [dy_0];
+
+				// Computation loops
+				// Computing with a positive step, i increments the array
+				let i = 0;
+				let result_runge_kutta: number[];
+				while (aMin <= y[i] && y[i] <= aMax) {
+					result_runge_kutta = this.runge_kutta_equation_order2(
+						this,
+						step,
+						x[i],
+						y[i],
+						dy[i],
+						funct
+					);
+					x.push(result_runge_kutta[0]);
+					y.push(result_runge_kutta[1]);
+					dy.push(result_runge_kutta[2]);
+					i++;
+				}
+
+				// Computing with a negative step,
+
+				while (aMin <= y[0] && y[0] <= aMax) {
+					result_runge_kutta = this.runge_kutta_equation_order2(
+						this,
+						-step,
+						x[0],
+						y[0],
+						dy[0],
+						funct
+					);
+					x.unshift(result_runge_kutta[0]);
+					y.unshift(result_runge_kutta[1]);
+					dy.unshift(result_runge_kutta[2]);
+					i++;
+				}
+
+			}
+
 		}
 
 		return {
@@ -876,7 +976,7 @@ export class Simulation_universe extends Simulation {
 	 * @returns result of the right part\
 	 * Note: tau and da are not used but have to be defined for this method to be accepted in the runge_kutta_equation_order2 method of simulation class
 	 */
-	protected equa_diff_a(Simu: Simulation_universe, tau: number, a: number, da: number = 0): number {
+	protected 	equa_diff_a(Simu: Simulation_universe, tau: number, a: number, da: number = 0): number {
 		let omega_r = Simu.calcul_omega_r();
 		let omega_m = Simu.matter_parameter;
 		let omega_de = Simu.dark_energy.parameter_value;

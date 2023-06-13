@@ -20,6 +20,7 @@ interface Props {
         yData:number[][],
         yName:string,
         name?:string[],
+        yRange?:{yMin:number, yMax:number},
     }
     title: string | undefined,
     downloadButton?: {
@@ -41,7 +42,7 @@ if(props.y.yData.length <= 1){
     data.push({
         x: props.x.xData,
         y: props.y.yData[0],
-        mode: 'lines',
+        //mode: 'lines',
         type: 'scatter',
     });
 }
@@ -51,7 +52,7 @@ else{
         data.push({
             x: props.x.xData,
             y: props.y.yData[index],
-            mode: 'lines',
+            // mode: 'lines',
             type: 'scatter',
             name: props.y.name ? props.y.name[index] : undefined,
         });
@@ -71,6 +72,7 @@ const layout = {
         autorange: true,    
         titlefont:{family:"Time New Roman, sans-serif",size:16,color:"#111111"},
         showline: true,
+        Range: props.y.yRange ? [props.y.yRange.yMin, props.y.yRange.yMax] : undefined,
     },
     title: props.title,
     width: 900 ,

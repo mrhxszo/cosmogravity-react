@@ -52,7 +52,7 @@ export default function DarkEnergy (props: Props){
 		const [aTau, setATau] = useState({ x: [0], y: [0] });
 
 		//useState for y axis range
-		const [aRange, setYRange] = useState({ aMin: 0.1, aMax: 10 });
+		const [aRange, setYRange] = useState({ aMin: 0, aMax: 5 });
 	
 	
 		//useState for download button
@@ -179,8 +179,8 @@ export default function DarkEnergy (props: Props){
 			{/* <!-- GRAPHIQUE--> */}
 			<div id="graphique">
 				<PlotlyComponent 
-				x = {{xData:[aTau.x.map(element => element/(1e9))], xName:"t(Ga)"}} //divide by 1e16 to convert in Gyears
-				y = {{yData:[aTau.y],yName:"a(t)"}} 
+				x = {{xData:aTau.x.map(element => element/(1e9)), xName:"t(Ga)"}} //divide by 1e16 to convert in Gyears
+				y = {{yData:[aTau.y.filter((element)=> (element<=aRange.aMax && element>=aRange.aMin))],yName:"a(t)", yRange: {yMin:aRange.aMin, yMax:aRange.aMax}}} 
 				title={t("calculs_univers.titre").toString()}
 				downloadButton={
 					{changeDownload: setDownload,
