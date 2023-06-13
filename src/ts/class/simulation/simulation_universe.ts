@@ -384,13 +384,13 @@ export class Simulation_universe extends Simulation {
 			let aMax = interval[1];
 			const {bigBang} = this.check_singularity();
 			// if big bang model then we can use emission_age method to calulate the t at initial condition
-			if(bigBang.isBigBang){
+			if(this.hubble_cst > 0 && bigBang.isBigBang){
 
 
 				let dy1_0 : number = Math.sqrt(-(this.calcul_omega_r() / Math.pow(aMax, 2)) + (this.matter_parameter / aMax)
 									+ this.dark_energy.parameter_value + this.calcul_omega_k());
   
-				let tMax  = this.emission_age(aMax);
+				let tMax  = this.emission_age(((1-aMax)/aMax));
 
 				x = [tMax];
 				y = [aMax];
@@ -401,31 +401,60 @@ export class Simulation_universe extends Simulation {
 					y = [1];
 					dy = [1];
 
-					// Computation loops
-				// Computing with a positive step, i increments the array
-				let i = 0;
-				let result_runge_kutta: number[];
+						// Computation loops
+					// Computing with a positive step, i increments the array
+					let i = 0;
+					let result_runge_kutta: number[];
 
-				while (aMin <= y[0] && y[0] <= 1) {
-					result_runge_kutta = this.runge_kutta_equation_order2(
-						this,
-						-step,
-						x[0],
-						y[0],
-						dy[0],
-						funct
-					);
-						x.unshift(result_runge_kutta[0]);
-						y.unshift(result_runge_kutta[1]);
-						dy.unshift(result_runge_kutta[2]);
-						i++;
+					while (aMin <= y[0] && y[0] <= 1) {
+						result_runge_kutta = this.runge_kutta_equation_order2(
+							this,
+							-step,
+							x[0],
+							y[0],
+							dy[0],
+							funct
+						);
+							x.unshift(result_runge_kutta[0]);
+							y.unshift(result_runge_kutta[1]);
+							dy.unshift(result_runge_kutta[2]);
+							i++;
+					}
+
+					y = y.filter((value) => value <= aMax);
+					x = x.slice(0, y.length);
+					dy = dy.slice(0, y.length);
+
+
 				}
+				else if(aMin>1 && aMax>1){
 
-				y = y.filter((value) => value <= aMax);
-				x = x.slice(0, y.length);
-				dy = dy.slice(0, y.length);
+					// x = [1];
+					// y = [1];
+					// dy = [1];
 
-
+					let i = 0;
+					let result_runge_kutta: number[];
+					let count = 0; 
+					while (aMin <= y[0] && y[0] <= aMax && count<100) {
+						console.log(y[i]);
+						result_runge_kutta = this.runge_kutta_equation_order2(
+							this,
+							-step,
+							x[0],
+							y[0],
+							dy[0],
+							funct
+						);
+							x.push(result_runge_kutta[0]);
+							y.push(result_runge_kutta[1]);
+							dy.push(result_runge_kutta[2]);
+							i++;
+							count++;
+					}
+					y = y.filter((value) => value >= aMin);
+					x = x.slice(0, y.length);
+					dy = dy.slice(0, y.length);
 				}
 				
 
