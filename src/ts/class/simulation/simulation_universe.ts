@@ -326,202 +326,195 @@ export class Simulation_universe extends Simulation {
 		dy_0: number = 1,
 		funct: (Simu: Simulation_universe, x: number, y: number, dy: number) => number,
 		interval: number[]
-	) {
-		let x: number[];
-		let y: number[];
-		let dy: number[];
-	
-	if(isNaN(interval[0]) || isNaN(interval[1])) {		
-		x = [x_0];
-		y = [y_0];
-		dy= [dy_0]; 
-		return {
+	  ) {
+		let x: number[] = [];
+		let y: number[] = [];
+		let dy: number[] = [];
+	  
+		if (isNaN(interval[0]) || isNaN(interval[1])) {
+		  // Handle the case where interval values are NaN
+		  x.push(x_0);
+		  y.push(y_0);
+		  dy.push(dy_0);
+		  return {
 			x: x,
 			y: y,
 			dy: dy
+		  };
 		}
-	}
-	else if ( interval[0] === 0 && interval[1] >= 1 ) {
-		// Init parameter
-		x = [x_0];
-		y = [y_0];
-		dy= [dy_0];
-
-		// Computation loops
-		// Computing with a positive step, i increments the array
-		let i = 0;
-		let result_runge_kutta: number[];
-		while (interval[0] <= y[i] && y[i] <= interval[1]) {
+	  
+		if (interval[0] === 0 && interval[1] >= 1) {
+		  // Handle the case where the interval is [0, 5]
+		  x.push(x_0);
+		  y.push(y_0);
+		  dy.push(dy_0);
+	  
+		  let i = 0;
+		  let result_runge_kutta: number[];
+	  
+		  // Compute with a positive step until y reaches the interval upper bound
+		  while (interval[0] <= y[i] && y[i] <= interval[1]) {
 			result_runge_kutta = this.runge_kutta_equation_order2(
+			  this,
+			  step,
+			  x[i],
+			  y[i],
+			  dy[i],
+			  funct
+			);
+			x.push(result_runge_kutta[0]);
+			y.push(result_runge_kutta[1]);
+			dy.push(result_runge_kutta[2]);
+			i++;
+		  }
+	  
+		  // Compute with a negative step until y reaches the interval lower bound
+		  while (interval[0] <= y[0] && y[0] <= interval[1]) {
+			result_runge_kutta = this.runge_kutta_equation_order2(
+			  this,
+			  -step,
+			  x[0],
+			  y[0],
+			  dy[0],
+			  funct
+			);
+			x.unshift(result_runge_kutta[0]);
+			y.unshift(result_runge_kutta[1]);
+			dy.unshift(result_runge_kutta[2]);
+			i++;
+		  }
+		} else {
+		  let aMin = interval[0];
+		  let aMax = interval[1];
+		  const { bigBang } = this.check_singularity();
+	  
+		  if (this.hubble_cst > 0 && bigBang.isBigBang) {
+			// Handle the case of a Big Bang model with positive Hubble constant
+	  
+			let dy1_0: number = Math.sqrt(
+			  -(this.calcul_omega_r() / Math.pow(aMin, 2)) +
+			  (this.matter_parameter / aMin) +
+			  this.dark_energy.parameter_value +
+			  this.calcul_omega_k()
+			);
+	  
+			let tauMin = this.hubble_cst * (this.emission_age((1 - aMin) / aMin) - 1);
+	  
+			x.push(tauMin);
+			y.push(aMin);
+			dy.push(dy1_0);
+	  
+			if (aMin < 1 && aMax <= 1) {
+			  // Handle the case where aMin < 1 and aMax <= 1
+	  
+			  // Initialize arrays with default values
+			  x = [1];
+			  y = [1];
+			  dy = [1];
+	  
+			  let i = 0;
+			  let result_runge_kutta: number[];
+	  
+			  // Compute with a negative step until y reaches the interval lower bound
+			  while (aMin <= y[0] && y[0] <= 1) {
+				result_runge_kutta = this.runge_kutta_equation_order2(
+				  this,
+				  -step,
+				  x[0],
+				  y[0],
+				  dy[0],
+				  funct
+				);
+				x.unshift(result_runge_kutta[0]);
+				y.unshift(result_runge_kutta[1]);
+				dy.unshift(result_runge_kutta[2]);
+				i++;
+			  }
+	  
+			  // Filter y values to fit the interval and update the corresponding x and dy arrays
+			  y = y.filter((value) => value <= aMax);
+			  x = x.slice(0, y.length);
+			  dy = dy.slice(0, y.length);
+			} else if (aMin >= 1 && aMax > 1) {
+			  // Handle the case where aMin >= 1 and aMax > 1
+	  
+			  let i = 0;
+			  let result_runge_kutta: number[];
+			  let count = 0;
+			  
+			  // Compute with a positive step until y reaches the interval upper bound
+			  while (aMin <= y[i] && y[i] <= aMax) {
+				result_runge_kutta = this.runge_kutta_equation_order2(
+				  this,
+				  step,
+				  x[i],
+				  y[i],
+				  dy[i],
+				  funct
+				);
+				x.push(result_runge_kutta[0]);
+				y.push(result_runge_kutta[1]);
+				dy.push(result_runge_kutta[2]);
+				i++;
+				count++;
+			  }
+			}
+		  } else {
+			// Handle the case where it's not a Big Bang model
+	  
+			if (aMax < 1) {
+			  aMax = 5;
+			}
+			aMin = 0;
+	  
+			x.push(x_0);
+			y.push(y_0);
+			dy.push(dy_0);
+	  
+			let i = 0;
+			let result_runge_kutta: number[];
+	  
+			// Compute with a positive step until y reaches the interval upper bound
+			while (aMin <= y[i] && y[i] <= aMax) {
+			  result_runge_kutta = this.runge_kutta_equation_order2(
 				this,
 				step,
 				x[i],
 				y[i],
 				dy[i],
 				funct
-			);
-			x.push(result_runge_kutta[0]);
-			y.push(result_runge_kutta[1]);
-			dy.push(result_runge_kutta[2]);
-			i++;
-		}
-
-		/*
-			Computing with a negative step,
-			since we decrease the value of x we add the elements at the beginning of the arrays,
-			so for each step we take the first element of the array to compute the next one.
-		*/
-		while (interval[0] <= y[0] && y[0] <= interval[1]) {
-			result_runge_kutta = this.runge_kutta_equation_order2(
+			  );
+			  x.push(result_runge_kutta[0]);
+			  y.push(result_runge_kutta[1]);
+			  dy.push(result_runge_kutta[2]);
+			  i++;
+			}
+	  
+			// Compute with a negative step until y reaches the interval lower bound
+			while (aMin <= y[0] && y[0] <= aMax) {
+			  result_runge_kutta = this.runge_kutta_equation_order2(
 				this,
 				-step,
 				x[0],
 				y[0],
 				dy[0],
 				funct
-			);
-			x.unshift(result_runge_kutta[0]);
-			y.unshift(result_runge_kutta[1]);
-			dy.unshift(result_runge_kutta[2]);
-			i++;
-		}}
-
-		else {
-			//This is for the values amin and amax that are different than above conditions and we can't calculate it from above initital conditions
-			//check the model
-			let aMin = interval[0];
-			let aMax = interval[1];
-			const {bigBang} = this.check_singularity();
-			// if big bang model then we can use emission_age method to calulate the t at initial condition
-			if(this.hubble_cst > 0 && bigBang.isBigBang){
-
-
-				let dy1_0 : number = Math.sqrt(-(this.calcul_omega_r() / Math.pow(aMin, 2)) + (this.matter_parameter / aMin)
-									+ this.dark_energy.parameter_value + this.calcul_omega_k());
-  
-				let tauMin  = this.hubble_cst * (this.emission_age((1-aMin)/aMin)-1);
-
-				x = [tauMin];
-				y = [aMin];
-				dy = [dy1_0];
-				//runge kutta starting at amin
-				if (aMin < 1 && aMax <= 1) {
-					x = [1];
-					y = [1];
-					dy = [1];
-
-						// Computation loops
-					// Computing with a positive step, i increments the array
-					let i = 0;
-					let result_runge_kutta: number[];
-
-					while (aMin <= y[0] && y[0] <= 1) {
-						result_runge_kutta = this.runge_kutta_equation_order2(
-							this,
-							-step,
-							x[0],
-							y[0],
-							dy[0],
-							funct
-						);
-							x.push(result_runge_kutta[0]);
-							y.push(result_runge_kutta[1]);
-							dy.push(result_runge_kutta[2]);
-							i++;
-					}
-
-					y = y.filter((value) => value <= aMax);
-					x = x.slice(0, y.length);
-					dy = dy.slice(0, y.length);
-
-
-				}
-				else if(aMin>=1 && aMax>1){
-
-					let i = 0;
-					let result_runge_kutta: number[];
-					let count = 0; 
-					while (aMin <= y[i] && y[i] <= aMax) {
-						// console.log(y[i]);
-						result_runge_kutta = this.runge_kutta_equation_order2(
-							this,
-							step,
-							x[i],
-							y[i],
-							dy[i],
-							funct
-						);
-							x.push(result_runge_kutta[0]);
-							y.push(result_runge_kutta[1]);
-							dy.push(result_runge_kutta[2]);
-							i++;
-							count++;
-					}
-					// y = y.filter((value) => value >= aMin);
-					// x = x.slice(0, y.length);
-					// dy = dy.slice(0, y.length);
-				}
-				
-
+			  );
+			  x.unshift(result_runge_kutta[0]);
+			  y.unshift(result_runge_kutta[1]);
+			  dy.unshift(result_runge_kutta[2]);
+			  i++;
 			}
-			//if not big bang model we fix amin to 0 and if amax is less than 1 we fix it to 5
-			else{
-				if(aMax<1){
-					aMax=5;
-				}
-				aMin=0;
-
-				//runge kutta starting at amin
-				x= [x_0];
-				y= [y_0];
-				dy = [dy_0];
-
-				// Computation loops
-				// Computing with a positive step, i increments the array
-				let i = 0;
-				let result_runge_kutta: number[];
-				while (aMin <= y[i] && y[i] <= aMax) {
-					result_runge_kutta = this.runge_kutta_equation_order2(
-						this,
-						step,
-						x[i],
-						y[i],
-						dy[i],
-						funct
-					);
-					x.push(result_runge_kutta[0]);
-					y.push(result_runge_kutta[1]);
-					dy.push(result_runge_kutta[2]);
-					i++;
-				}
-
-				// Computing with a negative step,
-
-				while (aMin <= y[0] && y[0] <= aMax) {
-					result_runge_kutta = this.runge_kutta_equation_order2(
-						this,
-						-step,
-						x[0],
-						y[0],
-						dy[0],
-						funct
-					);
-					x.unshift(result_runge_kutta[0]);
-					y.unshift(result_runge_kutta[1]);
-					dy.unshift(result_runge_kutta[2]);
-					i++;
-				}
-
-			}
-
+		  }
 		}
-
+	  
 		return {
-			x: x,
-			y: y,
-			dy: dy
+		  x: x,
+		  y: y,
+		  dy: dy
 		};
-	}
+	  }
+	  
 
 	/**
 	 * compute radiation density parameter at current time
