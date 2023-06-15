@@ -47,7 +47,7 @@ export default function CosmologicalConstant(props: Props){
 	const [aTau, setATau] = useState({ x: [0], y: [0] });
 
 	//useState for y axis range
-	const [aRange, setaRange] = useState({ aMin: 0.1, aMax: 10 });
+	const [aRange, setaRange] = useState({ aMin: 0, aMax: 5 });
 
 
 	//useState for download button
@@ -59,7 +59,7 @@ export default function CosmologicalConstant(props: Props){
 		if(Universe){
 			Universe.dark_energy.w_0 = -1;
 			Universe.dark_energy.w_1 = 0;
-			setATau(Universe.compute_scale_factor(0.001, [Number(aRange.aMin), Number(aRange.aMax)]));
+			setATau(Universe.compute_scale_factor(0.01, [Number(aRange.aMin)? Number(aRange.aMin):0, Number(aRange.aMax)? Number(aRange.aMax): 5]));
 		}
 
 
@@ -70,7 +70,7 @@ export default function CosmologicalConstant(props: Props){
 	//handClick to do the universe calculation
 	function handleClick() {
 		if(Universe){
-		setATau(Universe.compute_scale_factor(0.001, [Number(aRange.aMin), Number(aRange.aMax)]));}
+		setATau(Universe.compute_scale_factor(0.01, [Number(aRange.aMin)? Number(aRange.aMin):0, Number(aRange.aMax)? Number(aRange.aMax): 5]));}
 	}
 	
 	
@@ -109,7 +109,6 @@ export default function CosmologicalConstant(props: Props){
 		}
 			
 	}};
-	console.log(Universe?.compute_scale_factor(0.001, [Number(aRange.aMin), Number(aRange.aMax)]));
 
     return(
 

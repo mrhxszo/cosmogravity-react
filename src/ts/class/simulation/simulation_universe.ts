@@ -331,8 +331,17 @@ export class Simulation_universe extends Simulation {
 		let y: number[];
 		let dy: number[];
 	
-
-	if ( interval[0] === 0 && interval[1] > 1 ) {
+	if(isNaN(interval[0]) || isNaN(interval[1])) {		
+		x = [x_0];
+		y = [y_0];
+		dy= [dy_0]; 
+		return {
+			x: x,
+			y: y,
+			dy: dy
+		}
+	}
+	else if ( interval[0] === 0 && interval[1] >= 1 ) {
 		// Init parameter
 		x = [x_0];
 		y = [y_0];
@@ -387,16 +396,16 @@ export class Simulation_universe extends Simulation {
 			if(this.hubble_cst > 0 && bigBang.isBigBang){
 
 
-				let dy1_0 : number = Math.sqrt(-(this.calcul_omega_r() / Math.pow(aMax, 2)) + (this.matter_parameter / aMax)
+				let dy1_0 : number = Math.sqrt(-(this.calcul_omega_r() / Math.pow(aMin, 2)) + (this.matter_parameter / aMin)
 									+ this.dark_energy.parameter_value + this.calcul_omega_k());
   
-				let tMax  = this.emission_age(((1-aMax)/aMax));
+				let tauMin  = this.hubble_cst * (this.emission_age((1-aMin)/aMin)-1);
 
-				x = [tMax];
-				y = [aMax];
+				x = [tauMin];
+				y = [aMin];
 				dy = [dy1_0];
 				//runge kutta starting at amin
-				if (aMax <= 1) {
+				if (aMin < 1 && aMax <= 1) {
 					x = [1];
 					y = [1];
 					dy = [1];
@@ -415,9 +424,9 @@ export class Simulation_universe extends Simulation {
 							dy[0],
 							funct
 						);
-							x.unshift(result_runge_kutta[0]);
-							y.unshift(result_runge_kutta[1]);
-							dy.unshift(result_runge_kutta[2]);
+							x.push(result_runge_kutta[0]);
+							y.push(result_runge_kutta[1]);
+							dy.push(result_runge_kutta[2]);
 							i++;
 					}
 
@@ -427,23 +436,19 @@ export class Simulation_universe extends Simulation {
 
 
 				}
-				else if(aMin>1 && aMax>1){
-
-					// x = [1];
-					// y = [1];
-					// dy = [1];
+				else if(aMin>=1 && aMax>1){
 
 					let i = 0;
 					let result_runge_kutta: number[];
 					let count = 0; 
-					while (aMin <= y[0] && y[0] <= aMax && count<100) {
-						console.log(y[i]);
+					while (aMin <= y[i] && y[i] <= aMax) {
+						// console.log(y[i]);
 						result_runge_kutta = this.runge_kutta_equation_order2(
 							this,
-							-step,
-							x[0],
-							y[0],
-							dy[0],
+							step,
+							x[i],
+							y[i],
+							dy[i],
 							funct
 						);
 							x.push(result_runge_kutta[0]);
@@ -452,9 +457,9 @@ export class Simulation_universe extends Simulation {
 							i++;
 							count++;
 					}
-					y = y.filter((value) => value >= aMin);
-					x = x.slice(0, y.length);
-					dy = dy.slice(0, y.length);
+					// y = y.filter((value) => value >= aMin);
+					// x = x.slice(0, y.length);
+					// dy = dy.slice(0, y.length);
 				}
 				
 
