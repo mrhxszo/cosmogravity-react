@@ -4,7 +4,7 @@
 
 import React, { createContext} from "react";
 
-interface LinkContextProps {
+export interface LinkContextProps {
     linkClicked: string;
     setLinkClicked: React.Dispatch<React.SetStateAction<string>>;
   }

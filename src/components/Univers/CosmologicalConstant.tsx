@@ -9,6 +9,7 @@ import PlotlyComponent from "../Graphics/PlotlyComponent";
 import YRange from "./SubComponents/YRange";
 import Canvas from "../Graphics/Canvas/Canvas";
 import Output from "./SubComponents/Output";
+import Monofluide from "./Monofluide/Monofluide";
 //importing language using i18next
 import { useTranslation } from 'react-i18next';
 
@@ -21,13 +22,17 @@ interface Props {
 		T0: number,
 		H0: number,
 		omegam0: number,
-		omegaDE0: number
+		omegaDE0: number,
+		omega0: number,
+		omega1: number,
 	},
 	handleSelect: Function,
 	selectValue: {
 		value: string,
 		isFlat: boolean,
 	},
+	linkContext: string,
+	changeLinkContext: Function,
 }
 
 enum TypesImages {
@@ -38,6 +43,8 @@ enum TypesImages {
 }
 
 export default function CosmologicalConstant(props: Props){
+	
+	//get current value from useRef
 	const Universe = props.UniverseRef.current;
 
 	//language hook
@@ -110,98 +117,104 @@ export default function CosmologicalConstant(props: Props){
 			
 	}};
 
-    return(
+	if(props.linkContext !== "monofluide"){
+		return(
 
-    <>
-
-	{/* <!-- Paramètres  --> */}
-	<div id="params">
-		<p id="txt_entrees" style={{fontSize: "16px", fontWeight: "bold", textAlign: "center"}}>{t("page_univers_general.entrees")}</p>
-			<div>
-				<div className="inp">
-				<label>T<sub>0</sub> = </label>
-				{/* <!-- Onchange pour actuliser les paramètre envoyés par le formulaire a chaque changement --> */}
-				<input id="T0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.T0}></input>
-				<label> K</label>
+			<>
+		
+			{/* <!-- Paramètres  --> */}
+			<div id="params">
+				<p id="txt_entrees" style={{fontSize: "16px", fontWeight: "bold", textAlign: "center"}}>{t("page_univers_general.entrees")}</p>
+					<div>
+						<div className="inp">
+						<label>T<sub>0</sub> = </label>
+						{/* <!-- Onchange pour actuliser les paramètre envoyés par le formulaire a chaque changement --> */}
+						<input id="T0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.T0}></input>
+						<label> K</label>
+					</div>
+					<div id="balise_H0" className="inp">
+						<label>&nbsp; &nbsp; H<sub>0</sub> = </label>
+						<input id="H0" type="text" size={10} onChange={(event)=>props.handleChange(event)} value={props.params.H0}></input>
+						<label> km.s<sup>-1</sup>.Mpc<sup>-1</sup></label>
+					</div>
+					<div className="inp">
+						<label>Ω<sub>m0</sub> = </label>
+						<input id="omegam0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omegam0}></input>
+					</div>
+					<div className="inp">
+						<label>Ω<sub>Λ0</sub> = </label>
+						<input id="omegaDE0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omegaDE0}></input>
+					</div>
+				</div>
+				<div id="coche_sim">
+					<span id="txt_univplat" dangerouslySetInnerHTML={{ __html: t("page_univers.univers_plat") || '' }}></span><input id="univ_plat" type="checkbox" name="univ_plat" onChange={(event)=>props.handleSelect(event)}></input>
+				</div>
+				<div id="type_sim">
+					<select id="liste" onChange={(event)=>props.handleSelect(event)} value={props.selectValue.value}>
+						<option id="txt_MLRFCN" value="Matière, Lambda, RFC et Neutrinos">{t('page_univers.matierelambdaRFCNeu')}</option>
+						<option id="txt_MLRFC" value="Matière, Lambda et RFC">{t('page_univers.matierelambdaRFC')}</option>
+						<option id="txt_ML" value="Matière et Lambda">{t('page_univers.matierelambda')}</option>
+					</select>
+				</div>
+		
+		
+				{/* <!-- Bouton Tracer --> */}
+				<div id="trace_box">
+					{/* <!-- Valeurs par defaut --> */}
+					{/* <!-- <input className="myButton" id="valeurs_types" type="button" OnClick="valeurs_types()" value="Modèles Monofluide"></input> --> */}
+					<input className="myButton" id="monofluide" type="button" onClick={(event) => props.changeLinkContext(event)} value="Modèles Monofluides"></input>
+					<input id="trace" className="myButton" type="button" value="Tracer" onClick={handleClick}></input>
+					<div id="gif" style={{ position:"relative", display: "inline-block", marginLeft: "13px"}}></div>
+				</div>
 			</div>
-			<div id="balise_H0" className="inp">
-				<label>&nbsp; &nbsp; H<sub>0</sub> = </label>
-				<input id="H0" type="text" size={10} onChange={(event)=>props.handleChange(event)} value={props.params.H0}></input>
-				<label> km.s<sup>-1</sup>.Mpc<sup>-1</sup></label>
+		
+		
+			{/* <!-- INFORMATIONS --> */}
+			<Output Universe={props.UniverseRef} params={props.params} selectValue={props.selectValue}/>
+		
+			<div id="test" style={{display:"flex",justifyContent:"space-evenly"}}>
+				{/* <!-- GRAPHIQUE--> */}
+				<div id="graphique">
+					<PlotlyComponent 
+					x = {{xData:aTau.x.map(element => element/(1e9)), xName:"t(Ga)"}} //divide by 1e9 to convert in Gyears
+					y = {{yData:[aTau.y],yName:"a(t)"}} 
+					title={t("calculs_univers.titre").toString()}
+					downloadButton={
+						{changeDownload: setDownload,
+						isDownload: downloadStatus.download,
+						whatType: downloadStatus.type,					
+					}
+					}
+					/>
+					
+				</div>
+				{/* <!-- Canvas --> */}
+				<div id="modele">
+					{Universe? <Canvas UniverseRef={props.UniverseRef} 
+					handleClick={handleClick} 
+					handleChange={props.handleChange}
+					params={props.params}
+					/> : null}
+					
+				</div>
 			</div>
-			<div className="inp">
-				<label>Ω<sub>m0</sub> = </label>
-				<input id="omegam0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omegam0}></input>
+			<div id="enregistrer">
+				<YRange handleChild={handleChild}></YRange>
+				<span id="txt_enregistrerEn"></span>
+				<select id="format_enr" onChange={handleDownload} defaultValue={"png"}>
+					<option >png</option>
+					<option>jpg</option>
+					<option>svg</option>
+					<option>webp</option>
+				</select>&nbsp;
+				<input className="myButton" id="button_enregistrer" type="button" onClick={handleDownload} value="Enregistrer"></input>
 			</div>
-			<div className="inp">
-				<label>Ω<sub>Λ0</sub> = </label>
-				<input id="omegaDE0" type="text" onChange={(event)=>props.handleChange(event)} value={props.params.omegaDE0}></input>
-			</div>
-		</div>
-		<div id="coche_sim">
-			<span id="txt_univplat" dangerouslySetInnerHTML={{ __html: t("page_univers.univers_plat") || '' }}></span><input id="univ_plat" type="checkbox" name="univ_plat" onChange={(event)=>props.handleSelect(event)}></input>
-		</div>
-		<div id="type_sim">
-			<select id="liste" onChange={(event)=>props.handleSelect(event)} value={props.selectValue.value}>
-				<option id="txt_MLRFCN" value="Matière, Lambda, RFC et Neutrinos">{t('page_univers.matierelambdaRFCNeu')}</option>
-				<option id="txt_MLRFC" value="Matière, Lambda et RFC">{t('page_univers.matierelambdaRFC')}</option>
-				<option id="txt_ML" value="Matière et Lambda">{t('page_univers.matierelambda')}</option>
-			</select>
-		</div>
-
-
-		{/* <!-- Bouton Tracer --> */}
-		<div id="trace_box">
-			{/* <!-- Valeurs par defaut --> */}
-			{/* <!-- <input className="myButton" id="valeurs_types" type="button" OnClick="valeurs_types()" value="Modèles Monofluide"></input> --> */}
-			<input className="myButton" id="monofluide" type="button" OnClick="monofluide()" value="Modèles Monofluides"></input>
-			<input id="trace" className="myButton" type="button" value="Tracer" onClick={handleClick}></input>
-			<div id="gif" style={{ position:"relative", display: "inline-block", marginLeft: "13px"}}></div>
-		</div>
-	</div>
-
-
-	{/* <!-- INFORMATIONS --> */}
-	<Output Universe={props.UniverseRef} params={props.params} selectValue={props.selectValue}/>
-
-	<div id="test" style={{display:"flex",justifyContent:"space-evenly"}}>
-		{/* <!-- GRAPHIQUE--> */}
-		<div id="graphique">
-			<PlotlyComponent 
-			x = {{xData:aTau.x.map(element => element/(1e9)), xName:"t(Ga)"}} //divide by 1e9 to convert in Gyears
-			y = {{yData:[aTau.y],yName:"a(t)"}} 
-			title={t("calculs_univers.titre").toString()}
-			downloadButton={
-				{changeDownload: setDownload,
-				isDownload: downloadStatus.download,
-				whatType: downloadStatus.type,					
-			}
-			}
-			/>
-			
-		</div>
-		<div style={{display:'none'}} id="graphique_enr"></div>
-		{/* <!-- Canvas --> */}
-		<div id="modele">
-			{Universe? <Canvas UniverseRef={props.UniverseRef} 
-			handleClick={handleClick} 
-			handleChange={props.handleChange}
-			params={props.params}
-			/> : null}
-			
-		</div>
-	</div>
-	<div id="enregistrer">
-		<YRange handleChild={handleChild}></YRange>
-		<span id="txt_enregistrerEn"></span>
-		<select id="format_enr" onChange={handleDownload} defaultValue={"png"}>
-			<option >png</option>
-			<option>jpg</option>
-			<option>svg</option>
-			<option>webp</option>
-		</select>&nbsp;
-		<input className="myButton" id="button_enregistrer" type="button" onClick={handleDownload} value="Enregistrer"></input>
-	</div>
-    </>
-    );
-}
+			</>
+			);
+		}
+	else {
+			return(
+				<Monofluide UniverseRef={props.UniverseRef} params={props.params} changeEvent={props.handleChange}/>
+			);
+		}
+	}

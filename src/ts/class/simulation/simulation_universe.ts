@@ -51,8 +51,18 @@ import {c,k,h,G, AU, parsec, k_parsec, M_parsec, ly}from "../../constants";
  * @method equa_diff_a
  * @method equa_diff_time
  * @method check_singularity //2023
- * @method calculate_energy_density //2023
- * @method dz //2023
+ * @method calculate_energy_dens
+ * MonoFluid
+ * @method Monofluid //2023
+ * @method monoEinsteinSitter //2023
+ * @method reverse_monoEinsteinSitter //2023
+ * @method monoWeinberg //2023
+ * @method reverse_monoWeinberg //2023
+ * @method monoSitter //2023
+ * @method reverse_monoSitter //2023
+ * @method monoCourbure //2023
+ * @method reverse_monoCourbure //2023
+ * @method calcul_Tr //2023
  */
 
 
@@ -1135,4 +1145,125 @@ export class Simulation_universe extends Simulation {
 		return ((1 + z) * this.hubble_cst - this.compute_temp_and_hubble(z).hubble_cst)*31557600; //convert to seconds to years because dz/dt0 is shown in years in interface
 	}
 	  
+
+/******************************************Monofluid**************************************************************************************/
+
+	public Monofluid(interval: [number, number], modele: string): [number[], number[]] { //
+		const data_x: number[] = [];
+		const data_y: number[] = [];
+		let temps:number = 0;
+		let fy : number=0;
+		this.temperature=0;
+		var agedebut:number=0, agefinal:number=0,pas;
+		
+	
+		let facteur_pas=  1e-5  
+		if (Math.abs(this.hubble_cst)>=100) {
+		  let exposant=Math.round(Math.log10(Math.abs(this.hubble_cst)));
+		  facteur_pas= 1e-7*Math.pow(10,exposant);}
+	
+		switch (modele) {
+		  case "Matter":
+			  agedebut = this.reverse_monoEinsteinSitter(interval[0]); 
+			  agefinal = this.reverse_monoEinsteinSitter(interval[1]);
+			  this.matter_parameter = 1;
+			  this.has_cmb = false;
+			  this.dark_energy.parameter_value = 0;
+			  this.is_flat = true;
+			  pas =  Math.abs(agefinal-agedebut)*facteur_pas;
+			  while (fy >= agedebut && fy <= agefinal) {
+					fy = this.monoEinsteinSitter(temps);
+					data_x.push(temps);
+					data_y.push(fy);
+					temps = temps + pas;
+					}
+			  break;
+		  case "Radiation":
+			  agedebut = this.reverse_monoWeinberg(interval[0]);
+			  agefinal = this.reverse_monoWeinberg(interval[1]);
+			  this.matter_parameter = 0;
+			  this.dark_energy.parameter_value = 0;
+			  this.is_flat = true;
+			  this.temperature = this.calcul_Tr();
+			  pas =  Math.abs(agefinal-agedebut)*facteur_pas;
+			  while (fy >= agedebut && fy <= agefinal) {
+				fy = this.monoWeinberg(temps);
+				data_x.push(temps);
+				data_y.push(fy);
+				temps = temps + pas;
+			  }  
+			  break;
+		  case "Cosmological_constant":
+			  agedebut = this.reverse_monoSitter(interval[0]);
+			  agefinal = this.reverse_monoSitter(interval[1]);
+			  temps = -30;
+			  this.matter_parameter = 0;
+			  this.has_cmb = false;
+			  this.dark_energy.parameter_value = 1;
+			  this.is_flat = true;
+			  pas =  Math.abs(agefinal-agedebut)*facteur_pas
+			  while (fy >= agedebut && fy <= agefinal) {
+				fy = this.monoSitter( temps);
+				data_x.push(temps);
+				data_y.push(fy);
+				temps = temps + pas;
+			  }  
+			  break;
+		  case "Curvature":
+			  agedebut = this.reverse_monoCourbure( interval[0]);
+			  agefinal = this.reverse_monoCourbure( interval[1]);
+			  this.matter_parameter = 0;
+			  this.has_cmb = false;
+			  this.dark_energy.parameter_value = 0;
+			  this.is_flat = false;
+			  pas =  Math.abs(agefinal-agedebut)*facteur_pas
+			  while (fy >= agedebut && fy <= agefinal) {
+				fy = this.monoCourbure(temps);
+				data_x.push(temps);
+				data_y.push(fy);
+				temps = temps + pas;
+				}   
+				break;
+	
+			  }
+		  
+	
+		return [data_x, data_y] ;
+	  }
+	
+	  private monoEinsteinSitter(temps:number):number {
+		return Math.pow(3 * this.hubble_cst * 0.5, 2 / 3) * Math.pow(temps, 2 / 3);
+	  }
+	  private reverse_monoEinsteinSitter(a:number):number {// calcule de t 
+		return Math.pow(a, 3 / 2) * 2/(this.hubble_cst*3);
+	  }
+	
+	
+	  private monoWeinberg(temps:number):number {
+		return Math.pow(2 * this.hubble_cst, 1 / 2) * Math.pow(temps, 1 / 2);
+	  }  
+	  
+	  private reverse_monoWeinberg(a:number):number {
+		return Math.pow(a, 1 / 2) /(this.hubble_cst*2);
+	  }
+	
+	  
+	  private monoSitter(temps:number):number {
+		return Math.exp(this.hubble_cst * temps);
+	  }	  
+	  private reverse_monoSitter(a:number):number {
+		return Math.log(a)/this.hubble_cst;
+	  }
+	  
+	  private monoCourbure(temps:number) :number{
+		return this.hubble_cst * temps;
+	  }  
+	  private reverse_monoCourbure(a:number) :number{
+		return a/this.hubble_cst ;
+	  }
+	  private calcul_Tr():number{
+		return Math.pow((45*Math.pow(c,5)*Math.pow(h,3))/(64*Math.pow(Math.PI,6)*G*Math.pow(k,4)),1/4)*Math.pow(this.hubble_cst,1/2);
+	
+	  }
+
 }

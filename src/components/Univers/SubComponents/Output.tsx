@@ -10,9 +10,9 @@ interface Props{
 		omegam0: number,
 		omegaDE0: number,
         omega0: number,
-        omega1:number
+        omega1:number,
 	},
-    selectValue: {
+    selectValue?: {
         value: string,
         isFlat: boolean,
     },
@@ -47,9 +47,9 @@ export default function Output(props:Props){
             Universe.hubble_cst = props.params.H0;
             Universe.matter_parameter = props.params.omegam0;
             Universe.dark_energy.parameter_value = props.params.omegaDE0;
-            Universe.is_flat = props.selectValue.isFlat;
+            Universe.is_flat = props.selectValue?.isFlat? true : false;
 
-            switch (props.selectValue.value) {
+            switch (props.selectValue?.value) {
 				case "Matière et Lambda":
 					Universe.has_neutrino = false;
 					Universe.has_cmb = false;

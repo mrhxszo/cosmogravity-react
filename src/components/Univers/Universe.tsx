@@ -17,7 +17,7 @@ export default function Univers(){
 
 
     //useContext for knowing which link is clicked
-    const { linkClicked } = useContext(LinkContext);
+    const { linkClicked, setLinkClicked } = useContext(LinkContext);
 
     //instance of the class Simulation_universe
 	const UniverseRef = useRef(new Simulation_universe("universe"));
@@ -109,6 +109,17 @@ export default function Univers(){
 		
 	}
 
+	//handle the monofluid button
+function handleMonofluide(event: any) {
+		if(event.target.id === "monofluide"){
+			setLinkClicked("monofluide");
+		}
+		else{
+			setLinkClicked("Standard");
+		}
+			
+	}
+
 	return (
 		<>
 		  {/* Boutons Calculs annexes et params */}
@@ -136,6 +147,8 @@ export default function Univers(){
 					params={params}
 					handleSelect={handleSelect}
 					selectValue = {selectValue}
+					linkContext={linkClicked}
+					changeLinkContext={handleMonofluide}
 				  />
 				  </>
 				);
@@ -170,6 +183,8 @@ export default function Univers(){
 					params={params}
 					handleSelect={handleSelect}
 					selectValue = {selectValue}
+					linkContext={linkClicked}
+					changeLinkContext={handleMonofluide}
 				  />
 				  </>
 				);
