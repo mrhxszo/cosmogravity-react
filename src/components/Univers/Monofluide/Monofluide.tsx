@@ -2,7 +2,9 @@ import Output from "../SubComponents/Output";
 import { Simulation_universe } from "@/ts/class/simulation/simulation_universe";
 import YRange from "../SubComponents/YRange";
 import PlotlyComponent from "../../Graphics/PlotlyComponent";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { TypesImages } from "../CosmologicalConstant";
+import { use } from "i18next";
 
 interface Props {
     params: {
@@ -25,6 +27,17 @@ export default function Monofluide(props: Props) {
   //usestate for parametres
   const [aTau, setATau] = useState({ x: [0], y: [0] });
   const [model, setModel] = useState("Select");
+  const [aRange, setaRange] = useState({ aMin: 0, aMax: 5 });
+  	//useState for download button
+	const [downloadStatus, setDownload] = useState({download: false, type: TypesImages.png});
+
+  //useEffect for the graph
+  useEffect(() => {
+    if (Universe) {
+      let array = Universe?.Monofluid([Number(aRange.aMin) , Number(aRange.aMax)], model);
+      if(array) setATau({x: array[0], y: array[1]});
+    }
+  }, [aRange]);
 
   const handleChange = (event: any) => {
     setModel(event.target.value);
@@ -32,9 +45,43 @@ export default function Monofluide(props: Props) {
   }
 
   const handleClick = (event: any) => {
-    let array = Universe?.Monofluid([0 , 5], model);
+    let array = Universe?.Monofluid([Number(aRange.aMin) , Number(aRange.aMax)], model);
     if(array) setATau({x: array[0], y: array[1]});
   }
+
+  const handleChild = (aminChild: number , amaxChild: number) => {
+    setaRange({aMin: aminChild, aMax: amaxChild});
+  }
+
+  function handleDownload(event: any){
+		const [id, value] = [event.target.id, event.target.value]
+    console.log("download");
+		if(id === "button_enregistrer"){
+			
+			setDownload((prevState) => ({download:true, type: prevState.type}));
+		}
+		else{
+			//cases for the different types of images
+			switch (value) {
+				case "png":
+					setDownload((prevState) => ({download: prevState.download, type: TypesImages.png}));
+					break;
+				case "jpeg":
+					setDownload((prevState) => ({download: prevState.download, type: TypesImages.jpeg}));
+					break;
+				case "webp":
+					setDownload((prevState) => ({download: prevState.download, type: TypesImages.webp}));
+					break;
+				case "svg":
+					setDownload((prevState) => ({download: prevState.download, type: TypesImages.svg}));
+					break;
+				default:
+					setDownload((prevState) => ({download: prevState.download, type: TypesImages.png}));
+					break;
+		}
+			
+	}};
+
 
   return (
     <>
@@ -74,9 +121,15 @@ export default function Monofluide(props: Props) {
           {/* GRAPHIQUE*/}
           <div id="graphique">
 					<PlotlyComponent 
-					x = {{xData: aTau.x, xName:"t(Ga)"}} //divide by 1e9 to convert in Gyears
-					y = {{yData: [aTau.y],yName:"a(t)"}} 
+					x = {{xData:aTau.x.map(element => element/(1e9)), xName:"t(Ga)"}} //divide by 1e9 to convert in Gyears
+					y = {{yData:[aTau.y],yName:"a(t)"}} 
 					title={"Monofluide"}
+					downloadButton={
+						{changeDownload: setDownload,
+						isDownload: downloadStatus.download,
+						whatType: downloadStatus.type,					
+					}
+					}
 					/>
 					
 				</div>
@@ -86,22 +139,17 @@ export default function Monofluide(props: Props) {
           </div>
         </div>
         <div id="enregistrer">
-
-            <YRange handleChild={()=>console.log("check amin and amax")}/>
-
-
-          <span id="txt_enregistrerEn" style={{fontWeight: 'bold'}} />
-          <select id="format_enr">
-            <option selected>png</option>
-            <option>jpg</option>
-            <option>svg</option>
-          </select>&nbsp;
-          <input className="myButton" id="button_enregistrer" type="button" onclick="enre()" defaultValue="Enregistrer" />
-          <a id="png" download="Graphique.png" style={{display: 'none'}} />
-          <a id="jpg" download="Graphique.jpg" style={{display: 'none'}} />
-          <a id="svg-1" download="Graphique.svg" style={{display: 'none'}} />
-          <a id="ret" href="#nav" style={{display: 'none'}} />
-        </div></div>
+				<YRange handleChild={handleChild}></YRange>
+				<span id="txt_enregistrerEn"></span>
+				<select id="format_enr" onChange={handleDownload} defaultValue={"png"}>
+					<option >png</option>
+					<option>jpg</option>
+					<option>svg</option>
+					<option>webp</option>
+				</select>&nbsp;
+				<input className="myButton" id="button_enregistrer" type="button" onChange={handleDownload} value="Enregistrer"></input>
+			</div>
+      </div>
 
 
 

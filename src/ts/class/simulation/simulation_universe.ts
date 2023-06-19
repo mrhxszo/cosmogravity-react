@@ -1224,6 +1224,10 @@ export class Simulation_universe extends Simulation {
 				temps = temps + pas;
 				}   
 				break;
+			default:
+				data_x.push(temps);
+				data_y.push(fy);
+				break;
 	
 			  }
 		  

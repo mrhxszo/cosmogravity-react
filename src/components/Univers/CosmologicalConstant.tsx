@@ -35,7 +35,7 @@ interface Props {
 	changeLinkContext: Function,
 }
 
-enum TypesImages {
+export enum TypesImages {
 	png = "png",
 	jpeg = "jpeg",
 	webp = "webp",
@@ -93,6 +93,7 @@ export default function CosmologicalConstant(props: Props){
 		const [id, value] = [event.target.id, event.target.value]
 
 		if(id === "button_enregistrer"){
+			console.log("download");
 			setDownload((prevState) => ({download:true, type: prevState.type}));
 		}
 		else{
