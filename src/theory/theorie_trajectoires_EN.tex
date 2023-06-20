@@ -1,0 +1,723 @@
+\documentclass [12pt]{article}
+%\usepackage{ae,lmodern} % ou seulement l'un, ou l'autre, ou times etc.
+\usepackage{xcolor} 
+\usepackage{wrapfig}
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+%\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage{pdfpages}
+\usepackage[pdfnewwindow=true,
+    pdftex,                %
+    bookmarks         = true,%     % Signets
+    bookmarksnumbered = true,%     % Signets numÃ?Â©rotÃ?Â©s
+    pdfpagemode       = None,%     % Signets/vignettes fermÃ?Â© Ã?Â  l'ouverture
+    pdfstartview      = FitH,%     % La page prend toute la largeur
+    pdfpagelayout     = SinglePage,% Vue par page
+    colorlinks        = true,%     % Liens en couleur
+    urlcolor          = blue,%  % Couleur des liens externes
+		linkcolor         = blue,%   % Couleur des liens internes
+    pdfborder         = {0 0 0}%   % Style de bordure : ici, pas de bordure
+    ]{hyperref}%
+\parindent=0mm
+\textwidth=18cm
+\textheight=25cm
+\voffset=-3.5cm
+\hoffset=-2cm
+\def\ph#1{\hskip #1}
+\def\pv#1{\vskip #1}
+
+\font\petit=cmbx10 scaled 700
+\font\bidon=cmbx10 scaled 1200
+\font\titre=cmbx10 scaled 1100
+\font\defi=cmbxti10 scaled 1200
+\font\defibis=cmbxti10 scaled 1000
+\font\defilarge=cmbxti10 scaled 1500
+\font\large=cmbx10 scaled 1300
+
+\definecolor{bleu}{rgb}{0, 0, 1}
+
+
+\begin{document}
+
+\ph 150mm {\petit J.P.Cordoni} \pv -2mm
+
+\ph 150mm {\petit 2023/01/25}
+
+
+	\begin{wrapfigure}{r}{0.5\textwidth}
+        %centering
+				%\begin{center}
+	   \includegraphics[scale=0.4]{../Images/scientifique_deconcerte_EN.jpg}	
+		\vspace{-5cm}
+		\centering
+		%\end{center}
+		%\caption{ }
+    %\label{ }
+	  \end{wrapfigure}
+ 
+\centerline{\defilarge Trajectories Theory and Cosmogravity } \pv 10mm
+
+              
+   \hyperlink{ancre01}{\titre I - Schwarzschild Metrics}
+
+\ph 5mm \hyperlink{ancre02}{\petit I.1 External Metric}
+
+\ph 5mm \hyperlink{ancre03}{\petit I.2 Internal Metric}
+
+\hyperlink{ancre04}{\titre II - Kerr Metric }
+
+\hyperlink{ancre05}{\titre III - Appendix}
+
+\ph 5mm \hyperlink{ancre06}{\petit III.1 Euler-Lagrange equations}
+
+\ph 5mm \hyperlink{ancre07}{\petit III.2  Metrics and geodesics }
+
+\ph 5mm \hyperlink{ancre08}{\petit III.3  Application }
+
+\ph 5mm \hyperlink{ancre09}{\petit III.4  Runge-Kutta method of order  4}
+
+\ph 5mm \hyperlink{ancre10}{\petit III.5  Physical speed  }
+
+\ph 5mm \hyperlink{ancre11}{\petit III.6  Physical speed in Schwarzschild metric }
+
+\ph 5mm \hyperlink{ancre12}{\petit III.7  Physical speed in Kerr metric }
+
+\pv 5mm
+
+
+
+\hypertarget{ancre01}{\centerline{\large\textcolor{red}{ I - Schwarzschild Metrics}} }\pv 5mm
+            \hypertarget{ancre02}{{\bidon I.1 External Metric}} \pv3mm       
+
+
+
+              We wish to study the motion of a particle (massive or photon) in the external gravitational field of a centro-symmetric mass, without rotation,
+			placed at the origin of spatial coordinates $r, \theta,\varphi$ and time $t$.
+			The model is a static space-time with spherical symmetry of metric :
+			$$ds^2= -e^{\lambda(r)}dr^2 -r^2(d\theta^2+sin^2\theta d\varphi^2)+e^{\nu(r)} c^2dt^2$$
+			In  {\bf general relativity}, for a mass $M$  without rotation, spherically symmetric, placed at the origin of the coordinates, in an empty space-time, the solution of Einstein's equations is:
+		\pv 3mm
+			\centerline{$\lambda+\nu=0 \ \ \ \ \  \displaystyle e^\nu=1-\frac{r_s}{r}$ \ph 5mm   with \ph 5mm  \fcolorbox{black}{green}{$r_s=2\,\displaystyle\frac{GM}{c^2}$}}
+			\pv 3mm									
+			hence the expression of   Schwarzschild's  metric :
+	\pv 3mm
+			\centerline {\fcolorbox{black}{green}{${ ds^2= -\displaystyle\frac{dr^2}{ 1-\displaystyle\frac{r_s}{r}} - r^2(d\theta^2 + sin^2 \theta d\varphi^2) +\left( 1-\frac{r_s}{r} \right) c^2dt^2 }$}}
+\pv 3mm   
+  $c$  the speed of light  and  G  the gravitational constant .
+								
+                 $r_s$  is called \og Schwarzschild rayon\fg \, or \og black hole horizon\fg. It represents the limit of the region from which light and matter cannot escape.
+         \pv 3mm    
+			  This Schwarzschild solution is of remarkable importance since it is also the only solution to Einstein's equations outside of any spherically symmetric body of mass M, without rotation.
+			This metric is therefore not limited to describe only black holes, it is also valid outside a star, planet, or any other spherically symmetric body without rotation.  
+			This result is known as the Birkhoff theorem (Gauss theorem in Newtonian gravitation).
+			 
+
+             
+                The trajectories of a free particle are the geodesics of metric. 
+								
+								By reason of symmetry   the trajectory is flat  (we will take $\theta=\displaystyle\frac{\pi}{2}$).
+             
+			\pv 20mm
+          {\defi I.1.1 Massive particle} 
+       \pv 2mm    
+		  		    The first integrals found using the Lagrangian $\mathcal L=\displaystyle{ds\over d\tau}$ are written:
+       
+         $$(S^e_{pm}1)\ph 3mm \displaystyle{dt\over d\tau}(r)={ E_e\over \displaystyle {1- {r_s \over r}}}\ph 5mm  and \ph 5mm \ph 3mm (S^e_{pm}2)\ph 3mm {d\varphi\over d\tau}(r) = {c\,L_e\over r^2}$$
+       
+       
+        With two integration constants: $E_e$ dimensionless and $L_e$ one length. These functions reported in the expression $ds=c\,d\tau$ involve:
+
+      		$$(S^e_{pm}3)\ph 3mm \displaystyle(\frac{dr}{d\tau})^2+ V^e_{Spm}=c^2E_e^2 \ph 3mm  where \ph 3mm V^e_{Spm}(r)= c^2(1 -\frac{r_s}{r}) (1+\frac{L_e^2}{r^2}) $$
+
+        These relations verify the equations of the geodesics. 
+
+		 By deriving with respect to $\tau$ the equation $(S^e_{pm}3)$ and for non-circular orbits, we deduce the following differential equation used to make the simulation :
+			$$(S^e_{pm}4)\ph 3mm  \frac{d^2r}{d\tau^2}= -\frac{1}{2} \frac{dV^e_{Spm}}{dr}=\frac{c^2}{2r^4}(-r_sr^2+2rL_e^2-3r_sL_e^2)=f^e_{Spm}(r) $$ 
+
+
+		The study of the function $V^e_{Spm}$ allows us to deduce that there can exist two circular orbits of radii :
+		$$\displaystyle\frac{L_e}{r_s}\left(L_e+\sqrt{L_e^2-3r_s^2}\right)~~(stable)~~~ and~~~ \displaystyle\frac{L_e}{r_s}\left(L_e-\sqrt{L_e^2-3r_s^2}\right)~~ (unstable).$$
+
+		The equation $S^e_{pm}4$ is solved numerically by the Runge-Kutta method.
+		
+		\hyperlink{A2massif} {Initial values III.6-A.2}
+		       
+			 The observer who has stayed away from the black hole sees his colleague moving more and more slowly and eventually freezing when he reaches the $r_s$ horizon.
+			 A traveler who falls into the black hole arrives at the center (r=0) in a finite time while his colleague has the impression that he remains frozen on the horizon.
+			 (and, in practice, disappears because of the spectral shift). 
+             
+\pv 1.5mm
+
+{\defi I.1.2 Photon}
+          
+    \pv 1.5mm          
+         We keep the relations in $t$ and  $\varphi$  with a different parameter $\lambda$ of the proper time $\tau$ since for a
+photon we have always $d\tau$ = 0.
+\pv -2mm
+		$$(S^e_{ph}1)\ph 3mm \displaystyle{dt\over d\lambda}(r)={ E_e\over \displaystyle {1- {r_s \over r}}}\ph 5mm  and \ph 5mm \ph 3mm (S^e_{ph}2)\ph 3mm {d\varphi\over d\lambda}(r) = {c\,L_e\over r^2}$$
+		These functions reported in the expression $ds=0$ involve:
+\pv -2mm
+      		$$(S^e_{ph}3)\ph 3mm \displaystyle(\frac{dr}{d\lambda})^2+ V^e_{Sph}=c^2E_e^2 \ph 3mm  where \ph 3mm V^e_{Sph}(r)= c^2(1 -\frac{r_s}{r})\frac{L_e^2}{r^2} $$
+
+			These relations verify the equations of the geodesics.
+
+		By deriving with respect to $\lambda$ the equation $(S^e_{ph}3)$ and for non-circular orbits, we deduce the following differential equation used to make the simulation :
+			$$(S^e_{ph}4)\ph 3mm  \frac{d^2r}{d\lambda^2}= -\frac{1}{2} \frac{dV^e_{Sph}}{dr}=\frac{c^2}{2r^4}(2rL_e^2-3r_sL_e^2)=f^e_{Sph}(r) $$ 
+
+
+		The study of the function $V^e_{Sph}$ shows that there is an unstable circular orbit of radius $\displaystyle\frac{3}{2}r_s$.  
+		
+		The equation $S^e_{ph}4$ is solved numerically by the Runge-Kutta method.  
+		
+		\hyperlink{A1photon} {Initial values III.6-A.1}
+      
+			\pv 5mm
+				
+			\hypertarget{ancre03}{{\bidon I.2 Internal Metric}}
+     \pv 3mm 
+           	
+		  
+		 We wish to study the motion of a particle (subject only to gravitation) inside a {\bf constant density}, centro-symmetric, non-rotating object. 
+			 The mass is placed at the origin of spatial coordinates $r, \theta,\varphi$ and time $t$. 
+		<The model is a static space-time with spherical symmetry. 
+			 The solution of Einstein's equations gives the metric :  
+	\pv 3mm
+			  \centerline{\fcolorbox{black}{green}{$ {ds^2= -\alpha(r) dr^2\ -\ r^2(d{\theta}^2+\sin^2\theta\, d{\varphi}^2)\ +\ \beta(r)^2\,c^2dt^2 }$}}
+			\pv 3mm
+			 \centerline {  \ph 18mm where \ph 5mm \fcolorbox{black}{green}{$\alpha (r)= 1-\displaystyle\frac{r^2 r_s}{R^3}$} \ph 5mm\fcolorbox{black}{green}{$\beta (r)=\frac{3}{2}\ \sqrt{\displaystyle 1-\frac{r_s}{ R}}\ -
+             \ \frac{1}{2}\ \sqrt{\displaystyle 1-\frac{r^2 r_s}{R^3}}$} \ph 5mm  $ R$ object radius }
+			  \pv 3mm					  
+                The trajectories of a free particle are the geodesics of metric. 
+								
+								By reason of symmetry   the trajectory is flat  (we will take $\theta=\displaystyle\frac{\pi}{2}$).
+              \pv 1.5mm
+			 For the establishment of this metric see \href{./documents/Andrillat.pdf#page=1 }{\textcolor{bleu}{Henri Andrillat - Introduction \`a l'\'etude des cosmologies} }. 
+			
+			 
+	  	\pv 2mm      
+	  {\defi I.2.1 Massive particle} 
+		
+		\begin{figure}[!h]
+    %\centering
+	   \includegraphics[width=150mm,height=60mm,center]{../Images/masse_non_baryonique_en.jpg}	
+		%\caption{ }
+    %\label{ }
+	  \end{figure}
+		
+		          
+	  	  	 	 	 
+		    The first integrals found using the Lagrangian $\mathcal L=\displaystyle{ds\over d\tau}$ are written:
+       
+      
+        $$(S^i_{pm}1) \ph 3mm  \beta(r)^2\displaystyle{dt\over d\tau}(r)=E_i \ph 5mm  and \ph 5mm \ph 3mm (S^i_{pm}2)\ph 3mm {d\varphi\over d\tau}(r) = {c\,L_i\over r^2}$$    
+      
+       
+        With two integration constants: $E_i$ dimensionless and $L_i$ one length. These functions reported in the expression $ds=c\,d\tau$ involve:
+
+      	$$ (S^i_{pm}3)\ph 5mm ({dr\over d\tau})^2\,+\,V^i_{Spm}(r) = c^2 E_i^2 \ph 3mm  where  \ph 3mm  V^i_{Spm}(r)=c^2 E_i^2 - \ c^2\alpha (r)\,\left [\frac{E_i^2}{\beta (r)^2}-\frac{L_i^2}{r^2}-1\right ]$$
+	
+					  				
+		 	 These relations verify the equations of the geodesics. 
+
+		 By deriving with respect to $\tau$ the equation $(S^i_{pm}3)$ and for non-circular orbits, we deduce the following differential equation used to make the simulation :
+		\pv-2mm
+		
+			$$(S^i_{pm}4)\ph 3mm  \frac{d^2r}{d\tau^2}=-\frac{1}{2}\,\frac{dV^i_{Spm}}{dr} = -\frac{c^2\,r\,r_s}{R^3}\left [\frac{E_i^2}{\beta (r)^2}-\frac{L_i^2}{r^2}-1\right ]+
+            \frac{c^2\,\alpha(r)}{2}\left [\frac{-E_i^2\,r\,r_s}{\beta(r)^3\sqrt{\alpha(r)}R^3}+2\frac{L_i^2}{r^3}\right ]=f^i_{Spm}(r) $$ 
+\pv -2mm
+		
+		The equation $S^i_{pm}4$ is solved numerically by the Runge-Kutta method.  
+	   
+		 \hyperlink{B2massif}{Initial values III.6-B.2}
+  	  \pv 50mm 
+	  
+	  	  
+	  {\defi I.2.2 Photon}
+       \pv 2mm   
+		   
+     		   We keep relations in $t$ and $\varphi$ :  
+
+		$$(S^i_{ph}1)\ph 3mm \beta(r)^2\displaystyle{dt\over d\lambda}(r)=E_i\ph 5mm  and \ph 5mm \ph 3mm (S^i_{ph}2)\ph 3mm {d\varphi\over d\lambda}(r) = {c\,L_i\over r^2}$$
+		 These functions reported in the expression $ds=0$ involve:	  
+	 $$ ({dr\over d\lambda})^2\,+\,V^i_{Sph}(r) = c^2 E_i^2 \ph 3mm  and \ph 3mm  V^i_{Sph}(r)=c^2 E_i^2 - \ c^2\alpha (r)\,\left [\frac{E_i^2}{\beta (r)^2}-\frac{L_i^2}{r^2}\right ]$$
+	 
+	  By deriving with respect to $\lambda$ the equation $(S^i_{ph}3)$ and for non-circular orbits, we deduce the following differential equation used to make the simulation :
+			$$(S^i_{ph}4)\ph 3mm  \frac{d^2r}{d\lambda^2}=-\frac{1}{2}\,\frac{dV^i_{Sph}}{dr} = -\frac{c^2\,r\,r_s}{R^3}\left [\frac{E_i^2}{\beta (r)^2}-\frac{L_i^2}{r^2}\right ]+
+			\frac{c^2\,\alpha(r)}{2}\left [\frac{-E_i^2\,r\,r_s}{\beta(r)^3\sqrt{\alpha(r)}R^3}+2\frac{L_i^2}{r^3}\right ]=f^i_{Sph}(r) $$ 
+	
+		 
+	The equation $S^i_{ph}4$ is solved numerically by the Runge-Kutta method.  
+	  
+	   
+	 \hyperlink{B1photon} {Initial values  III.6-B.1} 
+	  	\pv 7mm
+				
+		    \hypertarget{ancre04}{ \centerline {\large\textcolor{red}{ II - Kerr Metric } }} \pv 2mm
+      {\bidon II.1 General Theory}  
+	 
+       \pv 5mm    
+       We wish to study the motion of a particle (massive or photon) in the gravitational field of a centro-symmetric, rotating mass,
+        placed at the origin of the coordinates . 
+	
+		In  {\bf general relativity} , for a  mass $M$ in rotation, spherically symmetric, placed at the origin of the Boyer-Lindquist coordinates $r, \theta,\varphi ,t$, in an empty space-time, 		the solution of Einstein's equations is the  Kerr metric :
+       
+			\pv 5mm
+	\centerline{\fcolorbox{black}{green}{ $\displaystyle ds^2={-\rho^2\over\Delta}dr^2-\rho^2 d\theta^2-(r^2+a^2+{r_s\,r\,a^2\over\rho^2}\,\sin^2\theta)\sin^2\theta\,d{\varphi}^2
+        +{2\,r_s\,r\,a\over\rho^2}\,\sin^2\theta\,c\,dt\,d\varphi+(1-\displaystyle {r_s\,r\over \rho^2})\,c^2dt^2 $} }
+      \pv 5mm 
+     
+			\centerline {where \ph 5mm \fcolorbox{black}{green}{$\rho^2(r)=r^2+a^2\cos^2\theta$} \ph 5mm \fcolorbox{black}{green}{$\Delta(r)=r^2-r_s\,r+a^2$} \ph 5mm
+			\fcolorbox{black}{green}{$a=\displaystyle{J\over c\,M}$} \ph 5mm (J\ angular\  momentum)}
+              
+
+         \pv 3mm
+          Unlike Schwarzschild metric, there is no equivalent of Birkhoff's theorem in Kerr metric. This geometry therefore only describes \fcolorbox{black}{green}{rotating black holes}, not space-time
+		  external to other objects such as rotating stars or planets.
+
+         The trajectories of a free particle are the geodesics of the metric.   
+				
+				{\bf Only flat trajectories will be studied }  (with $\theta=\displaystyle\frac{\pi}{2}$).
+
+			   The event horizon  corresponds to the change of sign of $g_{rr}$ , i.e. to the solutions of the equation $\Delta=0$. 	 
+			If $\displaystyle a<{r_s\over 2}$ we get two values :
+	\pv 2mm		
+			\centerline{\fcolorbox{black}{green}{$R_{H+}=\displaystyle\frac{r_s+\sqrt{r_s^2-4a^2}}{2}$} \ph 3mm and \ph 3mm \fcolorbox{black}{green}{$R_{H-}=\displaystyle\frac{r_s-\sqrt{r_s^2-4a^2}}{2}$} 
+				\ph 3mm		so \ph 3mm \fcolorbox{black}{green}{$\Delta(r)=(r-R_{H+})(r-R_{H-})$} } 
+			 \pv 5mm				
+			  The domain between $r_s$ and $R_{H+}$ is called  ergoregion  (in Schwarzschild metric there is no ergoregion $a=0$ and   $R_{H+}=r_s$) see
+			\href{documents/Extrait_Gourgoulhon_relatM2-page133.pdf }{\textcolor{bleu}{\'Eric Gourgoulhon - Relativit\'e g\'en\'erale} }  .
+			
+     \pv 50mm
+      {\defi II.2 Massive particle}
+			
+				\begin{figure}[!h]
+    %\centering
+	   \includegraphics[width=150mm,height=60mm,center]{../Images/masse_Kerr_en.jpg}	
+		%\caption{ }
+    %\label{ }
+	  \end{figure}  	
+        \pv -2mm
+               The first integrals found using the Lagrangian $\mathcal L=\displaystyle{ds\over d\tau}$ are written:
+              \pv -4mm
+        $$(K_{pm}1)\ph 3mm \displaystyle{dt\over d\tau}(r)={1\over\Delta(r)}\,\left[\,(r^2+a^2+{r_s\over r}\,a^2)\,E-{r_s\,a\over r}\,L\,\right]\ph 3mm  and\ph 3mm 
+        (K_{pm}2)\ph 3mm \displaystyle{d\varphi\over d\tau}(r) = {c\over\Delta(r)}\,\left[\,{r_s\,a\over r}\,E+(1-{r_s\over r})\,L\,\right]$$
+         With two integration constants: $E$ dimensionless and $L$ one length.
+            
+        These functions reported in the expression $ds=c\,d\tau$ involve:
+       \pv -6mm
+        $$(K_{pm}3)\ph 3mm \displaystyle({dr\over d\tau})^2+V_{Kpm}=c^2E^2 \ \ \ \ \ where \ \ \ \ \ V_{Kpm}(r)=c^2-{r_s\over r}\,c^2-{c^2\over r^2}\,(\,a^2\,(E^2-1)-L^2\,)-{r_s\,c^2\over r^3}\,(L-a\,E)^2 $$
+               These relations verify the equations of the geodesics.
+
+		  Deriving from $\tau$ the equation $(K_{pm}3)$ and for non-circular orbits, we deduce the following differential equation used to make the simulation : 
+			\pv -4mm
+		$$(K_{pm}4)\ph 3mm \frac{d^2r}{d\tau^2}=-\frac{1}{2}\frac{dV_{Kpm}}{dr}\  =\ -\frac{c^2}{2\,r^4}\,\left[r_s\,r^2+2\,r\,(a^2(E^2-1)-L^2)+3\,r_s\,(L-aE)^2\right]\ =f_{Kpm}(r)$$  
+		\pv -4mm
+	
+		The equation $K_{pm}4$ is solved numerically by the Runge-Kutta method.
+		 
+		   \hyperlink{Kerrmassif} {Initial values III.7-A.2}
+\pv 2mm
+          {\defi II.3 Photon}
+  \pv 2mm     
+   
+           We keep relations in $t$ and $\varphi$  :  \pv -5mm
+              
+        $$(K_{ph}1)\ph 3mm \displaystyle{dt\over d\lambda}={1\over\Delta(r)}\,\left[\,(r^2+a^2+{r_s\over r}\,a^2)\,E-{r_s\,a\over r}\,L\,\right]\ph 5mm and \ph 5mm 
+         (K_{ph}2)\ph 3mm \displaystyle{d\varphi\over d\lambda} = {c\over\Delta(r)}\,\left[\,{r_s\,a\over r}\,E+(1-{r_s\over r})\,L\,\right]$$
+       
+        These functions reported in the expression $ds=0$ involve :
+             
+        $$(K_{ph}3)\ph 3mm  \displaystyle({dr\over d\lambda})^2+V_{Kph}(r)=c^2\,E^2 \ \ \ where\ \ \  V_{Kph}(r)=\displaystyle -{c^2\over r^2}\,(\,a^2\,E^2-L^2\,)-{r_s\,c^2\over r^3}\,(L-a\,E)^2 $$
+       
+       
+        These relations verify the equations of the geodesics.
+
+		By deriving with respect to $\lambda$ the equation $(K_{ph}3)$ and for non-circular orbits, we deduce the following differential equation used to make the simulation :
+		
+      $$(K_{ph}4)\ph 3mm \frac{d^2r}{d\lambda^2}=-\frac{1}{2}\frac{dV_{Kph}}{dr}=-\frac{c^2}{2\,r^4}\,\left[2\,r\,(a^2E^2-L^2)+3\,r_s\,(L-aE)^2\right]=f_{Kph}(r)$$
+			
+	\pv 50mm
+		   	There are two unstable circular orbits of radii (see \href{documents/Bardeen_1972_ApJ.pdf}{\textcolor{bleu}{ James M. Bardeen} })   :
+			
+		$$r_s\{ 1+\cos [\frac{2}{3} \arccos(\frac{2a}{r_s})]\}\ph 3mm  and \ph 3mm  r_s\{ 1+\cos [\frac{2}{3} \arccos(\frac{-2a}{r_s})]\}$$
+
+      The equation $K_{ph}4$ is solved numerically by the Runge-Kutta method.
+			
+			\hyperlink{Kerrphoton} {Initial values III.7-A.1}
+			\pv 10mm
+			
+							\hypertarget{ancre05}{\centerline{\large\textcolor{red}{ III - Appendix } }} \pv4mm
+            \hypertarget{ancre06}{{\bidon III.1 Euler-Lagrange equations }} \pv3mm  
+
+					Let $\mathcal L\,(x^1(\lambda),x^2(\lambda),...,x^n(\lambda)\, , \,\dot x^1(\lambda),\dot x^2(\lambda),...,\dot x^n(\lambda))$
+			a function of 2n independent variables 
+			
+			where $\dot x^i= \displaystyle{dx^i \over d\lambda}$. 
+			
+			So, the value of the integral $\displaystyle\int_{\lambda_a}^{\lambda_b} \mathcal L \,(\lambda)\,d\lambda$ is extreme for curves $\{x^i(\lambda)\}_{i\in\{1,2...,n\}}$ 
+			\pv 2mm
+			that verify Euler-Lagrange's equations :
+		$$ {d\over d\lambda}\,{\partial\mathcal L \over \partial\dot x^k} -{\partial\mathcal L\over \partial x^k}\,=\,0  \ph 3mm  \forall k\in\{1,2,...n\}$$
+		 
+\pv 3mm
+		\hypertarget{ancre07}{{\bidon III.2  Metrics and geodesics }} \pv3mm
+		For an exhaustive study see \href{https://luth.obspm.fr/~luthier/gourgoulhon/bh16/bholes.pdf}{\textcolor{bleu}{Eric Gourgoulhon - Geometry and physics of black holes } } 
+		
+		and \href{https://luth.obspm.fr/~luthier/gourgoulhon/fr/master/relatM2.pdf}{\textcolor{bleu}{Eric Gourgoulhon - Relativit\'e g\'en\'erale } } .
+		\pv 3mm
+		{\defi Metrics} \pv2mm  
+				  In a space-time, we represent by $ds^2$ the infinitesimal interval between two events marked by the coordinates $(x^1, x^2,x^3,x^4=ct)$ and $(x^1+dx^1, x^2+dx^2,x^3+dx^3,ct+cdt)$ where
+
+		$$\ \ ds^2\,=\,\displaystyle \sum ^4_{i=1}\,\sum ^4_{j=1}\,g_{ij}(x^1,x^2,x^3,x^4)\,dx^i\,dx^j\,=\,g_{ij}\,dx^i\,dx^j \ \ (with\  Einstein\  summation\  notation) $$
+		
+		By abuse of language, we will speak of \og distance \fg \,between these two events.
+		The 4x4 symmetric matrix of the 16 functions $g_{ij}$ (coefficients of the metric) allowing an inverse (whose coefficients are noted $g^{\alpha\beta}$) at any point where the metric is defined.
+		\pv 2mm
+		Basic properties of this \og distance \fg \, :
+
+		  $\ \ \ $     - It's an invariant for any change in coordinates
+			$$\ \ \ ds^2\,=\,\displaystyle \sum ^4_{i=1}\,\sum ^4_{j=1}\, g_{ij}(x^1,x^2,x^3,x^4)\,dx^i\,dx^j\,=
+		\,\displaystyle \sum ^4_{i=1}\,\sum ^4_{j=1}\,\bar g_{pq}(y^1,y^2,y^3,y^4)\,dy^p\,dy^q \ \ \ \ \ \ \ \ \ (g_{ij}\,dx^i\,dx^j\,=\,\bar g_{pq}\,dy^p\,dy^q)  $$
+
+		    $\ \ \ $   - It's spelled $ds=c\,d\tau$ where $\tau$ is the eigentime measured (by clock) between events $(x^1, x^2,x^3,x^4)$ and $(x^1+dx^1, x^2+dx^2,x^3+dx^3,x^4+dx^4)$ 
+				\pv 2mm
+		   $\ \ \ $   - For a photon, you always have $ds=0$  
+
+		 \pv 50mm 
+		 {\defi Geodesics} 
+	 
+		The curves that make the \og distance \fg \, between two events in space-time extreme are called geodesics. They verify the differential equations :
+		$$\ \ \ \displaystyle{d^2x^k\over d\lambda^2}\ +\ \Gamma_{ij}^k{dx^i\over d\lambda}{dx^j\over d\lambda}\, =\,0\ \ \ k\in\{1,2,3,4\} \ \ \ $$
+		with the connection coefficients (Christoffel symbols of second kind)
+		$$\ \ \ \displaystyle \Gamma_{jk}^i=\Gamma_{kj}^i={1\over 2}g^{ip}(\,{\partial g_{pk} \over  \partial x^j} +\,{\partial g_{pj} \over  \partial x^k}-\,{\partial g_{kj} \over  \partial x^p})$$ 
+
+		With the function :$\ \ \mathcal L \,(..x^p(\lambda)..,\,..\dot x^q(\lambda)..)\,=\,\displaystyle \sqrt {\epsilon\,g_{ij}\,{ dx^i\over d\lambda}\,{dx^j\over d\lambda} }\,=\,{ds\over d\lambda}\ \  $
+		\pv 4mm
+		 where $\ \ \epsilon=1$ for timelike curves ($ds^2>0$) and $\epsilon=-1$ for spacelike curves ( $ds^2<0$) 
+		
+		(for a signature $\ -\ -\ -\ +$) . 
+
+
+		The curves $\{x^k(\lambda)\}_{k\in\{1,2,3,4\} }$ that make the integral $\displaystyle \int_a^b ds\,=\,\int_{\lambda_a}^{\lambda_b} \mathcal L \,(\lambda)\,d\lambda\,=\,s(b)-s(a)$ 
+				
+				extreme are the geodesics. \\ 
+
+		To find first integrals of geodesic equations, we can look for solutions \pv 2mm
+		to Euler-Lagrange's equations :
+		$\ \ \ \displaystyle {d\over d\lambda}\,{\partial\mathcal L \over \partial\dot x^k} -{\partial\mathcal L\over \partial x^k}\,=\,0 \ \ \ k\in\{1,2,3,4\}$  
+		 
+			\pv 2mm
+		
+		\hypertarget{ancre08}{{\bidon III.3  Application }} 
+		 
+		 
+		  For Schwarzschild and Kerr metrics the functions $g_{ij}$ are independent of $t$ and $\varphi$  :
+			
+		$$ \displaystyle\frac{\partial\mathcal L}{\partial t}=0  \ph 5mm  and  \ph 5mm \displaystyle\frac{\partial\mathcal L}{\partial\varphi}=0 $$
+		
+		$$\Longrightarrow \ph 5mm \displaystyle\frac{\partial\mathcal L}{\partial\dot t}= constante1 \ph 5mm  and  \ph 5mm \displaystyle\frac{\partial\mathcal L}{\partial\dot\varphi}=  constante2 $$ 
+		\pv 3mm
+		By imposing $\displaystyle\theta =\frac{\pi}{2}$ the combination of the two previous relationships gives the equations $S1,S2,K1,K2$.
+		 
+
+		\hypertarget{ancre09}{{\bidon III.4  Runge-Kutta method of order 4 } }
+		 		 
+
+		  Method for numerically solving the differential equation :
+        $~~~\displaystyle\frac{d^2r}{d\lambda^2}(r)= f(r)$ 
+				
+				with initial values $\ph 3mm \lambda=\lambda_0~~~,~~~r=r_0~~ $ and $~~ \displaystyle\frac{dr}{d\lambda}(r_0)$.  
+
+		We calculate the values $r_n$ , $y'_n=\displaystyle\frac{dr}{d\lambda}(r_n)$ and $\varphi_n$ starting from $(r_0\ ,\displaystyle\frac{dr}{d\lambda}(r_0))\ ,\ \varphi_0)$
+		with a $h$ step for the variable $\lambda$.	
+			\pv -5mm
+		$$k_1 = f(r_n) \ \ \ , \ \ \  k_2 = f (r_n + \frac{h}{2}\,y'_n) \ \ \ ,\ \ \ k_3 = f(r_n + \frac{h}{2}\,y'_n+\frac{h^2}{4}\,k_1)\ \ \ ,\ \ \ k_4 = f(r_n + h\,y'_n+\frac{h^2}{2}\,k_2)$$
+        $$r_{n+1} = r_n +h\,y'_n+\frac{h^2}{6}\,(k_1+k_2+k_3)$$
+        $$y'_{n+1}=y'_n+\frac{h}{6}\,(k_1+2\,k_2+2\,k_3+k_4)$$
+		$$ \varphi_{n+1}=\varphi_n+d\varphi ~~~ see ~~~ S2~~~ or ~~~ K2$$ \pv -2mm
+		see \href{./documents/Rungekutta.pdf}{\textcolor{bleu}{here} }
+		
+	\pv 50mm	
+		
+		\hypertarget{ancre10}{{\bidon III.5  Physical speed}} \pv 8mm
+
+\begin{wrapfigure}[9]{r}{0.55\textwidth}   % [9] indique le nombre de lignes pour la figure
+ \vspace{-2.7cm}
+  \centering
+    \includegraphics[width=0.40\textwidth]{../Images/position_vitesse_physique.jpg}
+  \end{wrapfigure}
+
+The physical speed of a moving body passing at the point $r,\theta,\varphi$ of the space-time is the one which would be measured in an orthonormal r\'ef\'erential
+attached to an observer (not to be confused with the "distant observer") located at the point  $r,\theta,\varphi$.
+
+With  $\theta=\displaystyle\frac{\pi}{2} $ we note :
+
+-\ \ $r$ and $\varphi$ the polar coordinates of a point $P$ of the trajectory (initial values $r_0$ et $\varphi_0$).
+
+-\ \ $\phi$  the polar angle of the physical velocity vector (initial value $\phi_0$).
+
+-\ \ $V$ the physical speed module (\fcolorbox{black}{green}{$v_0=V(r_0)\ph 5mm \phi_0=\phi(r_0)$}).
+
+-\ \  $V_r\,=V\,cos(\phi)$ et $V_\varphi\,=\,V\,\,sin(\phi)$ the algebraic values of the physical radial velocity and the physical tangential velocity 
+\pv 5mm
+		
+				\hypertarget{ancre11}{{\bidon III.6  Physical speed in Schwarzschild metric}} \pv 3mm
+The Scharwzschild tensor (internal and external) can be written as :
+ $$ds^2= g_{t,t}(r)\,dt^2\,+\,g_{r,r}(r)\,dr^2\,+ \,g_{\theta,\theta}(r)\,d{\theta}^2\,+\, g_{\varphi,\varphi}(r)\,d{\varphi}^2 $$
+in a system of coordinates $\{t,r,\theta,\varphi\}$.
+
+\begin{wrapfigure}{l}{0.40\textwidth}
+ \vspace{-30pt}
+  \begin{center}
+    \includegraphics[width=0.3\textwidth]{../Images/vitesse_locale.jpg}
+  \end{center}
+ % \vspace{-50pt}
+  %\caption{A gull}
+  %\vspace{-10pt}
+\end{wrapfigure}
+
+\ph 10mm At point $M$, the observer (zero mass) (geodesic $r, \theta, \varphi$ constants, with a four-speed $\vec {u_0}$), 
+determine the physical speed $\vec {V}$ from a particle with a four-speed $\vec u$.	
+
+The generic basis of the tangent vector space in $M$ shall be noted :
+ $\{\vec {\partial_t}, \vec {\partial_r}, \vec {\partial_\theta}, \vec {\partial_\varphi}  \}$ 
+and an orthonormal basis $\{\vec {e^t},\vec {e^r}, \vec {e^\theta}, \vec {e^\varphi} \}$, so the speed $\vec {V}$ is written as    :
+
+ $$\vec {V}\,=\,V^r \vec {\partial_r} \,+\,V^\theta \vec {\partial_\theta}\,+\,V^\varphi \vec {\partial_\varphi}$$
+ $$=\,V_r \vec {e^r}\,+\,V_\theta \vec {e^\theta} ,+\,V_\varphi \vec {e^\varphi} $$
+With the obvious orthonormal basis : $\{\vec {e^t}=\frac{1}{\sqrt{  g_{t,t} }}\,\vec {\partial_t},\,\vec {e^r}=
+\frac{1}{\sqrt{  g_{r,r} }}\,\vec {\partial_r},\,\vec {e^\theta}=
+\frac{1}{\sqrt{  g_{\theta,\theta} }}\,\vec {\partial_\theta},\,\vec {e^\varphi}=\frac{1}{\sqrt{  g_{\varphi,\varphi} }}\,\vec {\partial_\varphi} \} $
+\pv 3mm
+so : $\ph 10mm V_r^2\,=\,g_{r,r}{V^r}^2 \ph 10mmV_\theta^2\,=\,g_{\theta,\theta}{V^\theta}^2 \ph10mm V_\varphi^2\,=\,g_{\varphi,\varphi}{V^\varphi}^2$
+\pv 3mm
+The 4-speed of the local observer $\vec{u_0}=(\displaystyle\frac{dt}{d\tau_{loc}},\frac{dr}{d\tau_{loc}},\frac{d\theta}{d\tau_{loc}},\frac{d\varphi}{d\tau_{loc}})
+=(\frac{c}{\sqrt{  g_{t,t} }},0,0,0)  $ and  the 4-speed of the particle $\vec{u}=(\displaystyle\frac{dt}{d\lambda},\frac{dr}{d\lambda},
+\frac{d\theta}{d\lambda},\frac{d\varphi}{d\lambda})$ (parameters $\lambda$ for photons and $\tau$ for the proper time of other particles).
+
+With hypothesis $ \vec u\,=\,\Gamma(\vec {u_0}\,+\,\vec {V})$ and the scalar product $\vec {u_0} . \vec {V} = 0$ 
+ the square of the physical speed is equal to : $V_r^2\,+\,V_\theta^2\,+\,V_\varphi^2$ .
+
+Calculation for $\Gamma$ with $\vec u.\vec {u_0}=\Gamma(\vec {u_0}.\vec {u_0}+\vec {u_0}.\vec {V})$ so : 
+
+$$g_{\alpha,\beta}u^\alpha u_0^\beta= g_{t,t}\displaystyle\frac{c}{\sqrt{  g_{t,t} }}\frac{dt}{d\lambda}   = \Gamma g_{\alpha,\beta}u_0^\alpha u_0^\beta=\Gamma c^2
+\ph 10mm\Longrightarrow \ph 10mm \Gamma= \frac{\sqrt{  g_{t,t} }}{c}\frac{dt}{d\lambda}        $$.
+
+On the other hand : 
+ $$\ph -5mm \Gamma V^r=\displaystyle \frac{dr}{d\lambda}\ \ et\ \  V_r^2=\frac{  g_{r,r}  }{\Gamma^2}({\frac{dr}{d\lambda}})^2 
+\ph 10mm \Gamma V^\theta=\displaystyle \frac{d\theta}{d\lambda}\ \ et\ \ V_\theta^2=\frac{  g_{\theta,\theta}   }{\Gamma^2}({\frac{d\theta}{d\lambda}})^2
+ \ph 10mm \Gamma V^\varphi=\displaystyle \frac{d\varphi}{d\lambda}\ \ et\ \ V_\varphi^2=\frac{  g_{\varphi,\varphi}   }{\Gamma^2}({\frac{d\varphi}{d\lambda}})^2$$
+
+So, expression for the \fcolorbox{black}{green}{physical speed squared} :
+
+$$\displaystyle\frac{c^2}{ \mid g_{t,t}\mid   } \left[   g_{r,r}   (\frac{dr}{d\lambda})^2 \,+\,   g_{\theta,\theta}   (\frac{d\theta}{d\lambda})^2\,+
+\,   g_{\varphi,\varphi}   (\frac{d\varphi}{d\lambda})^2 \right] (\frac{d\lambda}{dt})^2 $$
+
+\centerline{ = \fcolorbox{black}{green}{$\,\displaystyle \frac{c^2}{  \mid g_{t,t} \mid  } \left[   g_{r,r}   (\frac{dr}{dt})^2 \,+\,   g_{\theta,\theta}   (\frac{d\theta}{dt})^2\,+\,   g_{\varphi,\varphi}   (\frac{d\varphi}{dt})^2 \right]     $}  }
+\pv 3mm
+This method is the formatting of handwritten notes from {\bidon Eric Gougoulhon}   (presented a conference in Montpellier in 2017).
+\pv 5mm
+{\bidon A - External Scharwzschild metric - particular case $\theta=\displaystyle\frac{\pi}{2} $} 
+        \pv 3mm
+				Metric outside a centro-symmetrical star, of mass $M$, without rotation.
+\pv 2mm
+				The coefficients of the metric are : 
+				$$\displaystyle g_{t,t}= -c^2(1-\frac{r_s}{r}) \ph 10mm g_{r,r}= \frac{1}{(1-\displaystyle\frac{r_s}{r})} \ph 10mm
+				g_{\theta,\theta}=0 \ph 10mm g_{\varphi,\varphi}=r^2 $$
+								\pv 3mm
+{\titre A.1  Photons} 
+
+First integrals : \ph 30mm $ \displaystyle{dt\over d\lambda}= \displaystyle{E\over 1-\displaystyle{r_s\over r}}\ph 20mm {d\varphi\over d\lambda} = {c\,L\over r^2}$     
+$${d\varphi\over dt}\ =\ {1\over E}\ (1-{r_s\over r})\ {c\,L\over r^2} \ph 20mm
+({dr \over dt})^2 \ =\ {c^2\over E^2}\ (1-{r_s\over r})^2 \left[E^2-\displaystyle (1-{r_s\over r}){L^2\over r^2}\right] $$ 
+Calculation for the  \fcolorbox{black}{green}{physical speed squared} :
+$$ \frac{1}{(1-\displaystyle\frac{r_s}{r})^2}\, \left[ ({dr \over dt})^2 \ + \ ({1-\frac{r_s}{r}})\,r^2\,({d\varphi\over dt})^2 \right]\ =\ \fcolorbox{black}{green}{$c^2$} $$
+\pv 3mm
+\hypertarget{A1photon}{\fcolorbox{black}{white}{\defi Initial values  III.6-A.1 }}\pv -3mm
+  $$V_r(r_0)=c\,cos(\phi_0) \ph 20mm  V_\varphi(r_0)=c\,sin(\phi_0)$$
+  so  \pv -8mm
+  $$E=1    \ph 20mm L=\displaystyle\frac{r_0\,sin(\phi_0)}{\sqrt{1-\displaystyle\frac{r_s}{r_0}}} $$
+
+{\titre A.2  Other particles}
+
+First integrals : \ph 30mm $\displaystyle{dt\over d\tau}=\displaystyle{E\over 1-\displaystyle{r_s\over r}}\ph 20mm {d\varphi\over d\tau} = {c\,L\over r^2}$ 
+$${d\varphi\over dt}\ =\ {1\over E}\ (1-{r_s\over r})\ {c\,L\over r^2} \ph 20mm
+({dr \over dt})^2 \ =\ {c^2\over E^2}\ (1-{r_s\over r})^2 \left[E^2-\displaystyle (1-{r_s\over r})(1+{L^2\over r^2}) \right]       $$
+Calculation for the \fcolorbox{black}{green}{physical speed squared} :
+$$ \frac{1}{(1-\displaystyle\frac{r_s}{r})^2}\, \left[ ({dr \over dt})^2 \ + \ ({1-\frac{r_s}{r}})\,r^2\,({d\varphi\over dt})^2 \right]
+\ =\ \fcolorbox{black}{green}{$\displaystyle\frac{c^2}{E^2}\,\left[E^2-(1-\displaystyle\frac{r_s}{r})\right]$} $$
+\pv 5mm
+\hypertarget{A2massif}{\fcolorbox{black}{white}{\defi Initial values  III.6-A.2}}
+ $$V_r(r_0)=v_0\,cos(\phi_0) \ph 20mm  V_\varphi(r_0)=v_0\,sin(\phi_0)$$
+ so
+   $$E=\displaystyle\frac{\sqrt{1-\displaystyle\frac{r_s}{r_0}}}{\sqrt{1-\displaystyle\frac{v_0^2}{c^2}}} \ph 10mm L=\frac{v_0}{c}\frac{ r_0 E \sin(\phi_0)}{ \sqrt{1-\displaystyle\frac{r_s}{r_0}}} $$
+
+{\bidon B - Internal Scharwzschild metric - particular case $\theta=\displaystyle\frac{\pi}{2} $} 
+\pv 3mm
+Metric inside a star of radius $R$, mass $M$, constant density , without rotation.
+        \pv 2mm
+				The coefficients of the metric are : 
+				$$\displaystyle g_{t,t}=- c^2 \left [\frac{3}{2}\ \sqrt{ 1-\frac{r_s}{ R}}\ -\ \frac{1}{2}\ \sqrt{1-\frac{r^2 r_s}{R^3}}\ \right ]^2
+				\ph 10mm g_{r,r}=\displaystyle\frac{1}{1-\displaystyle\frac{r^2 r_s}{R^3} }\ph 10mm
+				g_{\theta,\theta}=0 \ph 10mm g_{\varphi,\varphi}=r^2 $$
+								\pv 3mm
+	 With \ph 10mm $\alpha (r)= 1-\displaystyle\frac{r^2 r_s}{R^3}$ \ph 20mm $\beta (r)=\frac{3}{2}\ \sqrt{\displaystyle 1-\frac{r_s}{ R}}\ -
+\ \frac{1}{2}\ \sqrt{\displaystyle 1-\frac{r^2 r_s}{R^3}}$ 
+\pv 5mm
+{\titre B.1  Photons} 
+
+First integrals : \ph 30mm $ \displaystyle \beta(r)^2 {dt\over d\lambda}=E \ph 20mm {d\varphi\over d\lambda} = \frac{c L}{r^2}$
+$${d\varphi\over dt}\ =\ {\beta(r)^2\over E}\,{c\,L\over r^2} \ph 20mm ({dr \over dt})^2 \ 
+=\ {c^2\over E^2}\,\alpha(r)\,\beta(r)^4 \left[\frac{E^2}{\beta(r)^2}\,-\,\frac{L^2}{r^2}\right] $$ 
+Calculation for the \fcolorbox{black}{green}{physical speed squared} :
+$$ \frac{1}{\beta(r)^2 \alpha(r)}\, \left[\displaystyle ({dr \over dt})^2 \ + \ \alpha(r) r^2\,({d\varphi\over dt})^2 \right]\ =\ \fcolorbox{black}{green}{$c^2$}  $$
+\pv 3mm
+\hypertarget{B1photon}{\fcolorbox{black}{white}{\defi Initial values III.6-B.1}}
+  $$V_r(r_0)=c\,cos(\phi_0) \ph 20mm  V_\varphi(r_0)=c\,sin(\phi_0)$$
+  so
+  $$E=1    \ph 20mm L=\displaystyle\frac{r_0\,sin(\phi_0)}{\beta(r_0)} $$
+	\pv 50mm
+{\titre B.2  Other particles}
+
+First integrals : \ph 30mm $ \displaystyle \beta(r)^2 {dt\over d\tau}=E \ph 20mm {d\varphi\over d\tau} = \frac{c L}{r^2}$
+$${d\varphi\over dt}\ =\ {\beta(r)^2\over E}\,{c\,L\over r^2} \ph 20mm ({dr \over dt})^2 \ 
+=\ {c^2\over E^2}\,\alpha(r)\,\beta(r)^4 \left[\frac{E^2}{\beta(r)^2}\,-\,\frac{L^2}{r^2}\,-1\right] $$ 
+Calculation for the \fcolorbox{black}{green}{physical speed squared} :
+$$ \frac{1}{\beta(r)^2 \alpha(r)}\, \left[\displaystyle ({dr \over dt})^2 \ + \ \alpha(r) r^2\,({d\varphi\over dt})^2 \right]\ 
+=\ \fcolorbox{black}{green}{$\displaystyle\frac{c^2}{E^2}\,\left[E^2-\beta(r)^2\right]$}$$
+\pv 3mm
+\hypertarget{B2massif}{\fcolorbox{black}{white}{\defi Initial values III.6-B.2}}
+  $$V_r(r_0)=v_0\,cos(\phi_0) \ph 20mm  V_\varphi(r_0)=v_0\,sin(\phi_0)$$
+  d'o\`u
+     $$E=\displaystyle\frac{\beta(r_0)}{\sqrt{1-\displaystyle\frac{v_0^2}{c^2}}} 
+		\ph 20mm L=\frac{v_0}{c}\frac{r_0 \sin{\phi_0}}{\sqrt{1-\displaystyle\frac{v_0^2}{c^2}}}  $$
+
+
+		\hypertarget{ancre12}{{\bidon III.7  Physical speed in Kerr metric }} \pv 3mm
+		The Kerr tensor can be written as :
+ $$ds^2= g_{t,t}(r)\,dt^2\,+\,g_{t,\varphi}(r)\,dt\,d\varphi\,+g_{\varphi,t}(r)\,d\varphi\,dt\,+\,g_{r,r}(r)\,dr^2\,+ \,g_{\theta,\theta}(r)\,d{\theta}^2\,+\, g_{\varphi,\varphi}(r)\,d{\varphi}^2 $$
+in a system of coordinates $\{t,r,\theta,\varphi\}$.
+
+\begin{wrapfigure}{l}{0.40\textwidth}
+ \vspace{-30pt}
+  \begin{center}
+    \includegraphics[width=0.3\textwidth]{../Images/vitesse_locale.jpg}
+  \end{center}
+ % \vspace{-50pt}
+  %\caption{A gull}
+  %\vspace{-10pt}
+\end{wrapfigure}
+
+\ph 10mm At point $M$, the observer (zero mass) (geodesic $r, \theta, \varphi$ constants,  with a four-speed $\vec {u_0}$), 
+determine the physical speed $\vec {V}$ from a particle  with a four-speed $\vec u$.	
+
+The generic basis of the tangent vector space in $M$ shall be noted :
+ $\{\vec {\partial_t}, \vec {\partial_r}, \vec {\partial_\theta}, \vec {\partial_\varphi}  \}$ 
+and an orthonormal basis $\{\vec {e^t},\vec {e^r}, \vec {e^\theta}, \vec {e^\varphi} \}$, so the speed $\vec {V}$ is written as :
+
+ $$\vec {V}\,=\,V^r \vec {\partial_r} \,+\,V^\theta \vec {\partial_\theta}\,+\,V^\varphi \vec {\partial_\varphi}$$
+ $$=\,V_r \vec {e^r}\,+\,V_\theta \vec {e^\theta} ,+\,V_\varphi \vec {e^\varphi} $$
+ With the orthonormal basis : 
+$$\{\ph 5mm \vec {e^t}=\frac{1}{\sqrt{  g_{t,t} }}\,\vec {\partial_t} \ph 10mm \vec {e^r}=
+\frac{1}{\sqrt{  g_{r,r} }}\,\vec {\partial_r}\ph 10mm\vec {e^\theta}=
+\frac{1}{\sqrt{  g_{\theta,\theta} }}\,\vec {\partial_\theta}\,$$
+$$\vec {e^\varphi}=\frac{-g_{t,\varphi}}{g_{t,t}\,\sqrt{  \displaystyle\frac {g_{t,t}\,g_{\varphi,\varphi}\,-\,g_{t,\varphi}\,g_{\varphi,t}}{g_{t,t}} }}\,\vec {\partial_t} 
+\,+\,\frac{{1}}{\sqrt{  \displaystyle\frac {g_{t,t}\,g_{\varphi,\varphi}\,-\,g_{t,\varphi}\,g_{\varphi,t}}{g_{t,t}} }}\,\vec {\partial_\varphi} \ph 5mm \} $$
+
+so : $\ph 10mmV_r^2\,=\, g_{r,r}{V^r}^2 \ph 10mm V_\theta^2\,=\,g_{\theta,\theta}{V^\theta}^2 \ph 10mmV_\varphi^2\,=\,\displaystyle\frac {(g_{t,t}\,g_{\varphi,\varphi}\,-\,g_{t,\varphi}\,g_{\varphi,t})}{g_{t,t}} {V^\varphi}^2$
+\pv 3mm
+The 4-speed of the local observer $\vec{u_0}=(\displaystyle\frac{dt}{d\tau_{loc}},\frac{dr}{d\tau_{loc}},\frac{d\theta}{d\tau_{loc}},\frac{d\varphi}{d\tau_{loc}})
+=(\frac{c}{\sqrt{  g_{t,t} }},0,0,0)  $ and  the 4-speed of the particle $\vec{u}=(\displaystyle\frac{dt}{d\lambda},\frac{dr}{d\lambda},
+\frac{d\theta}{d\lambda},\frac{d\varphi}{d\lambda})$ ( parameters $\lambda$ for photons and $\tau$ for the proper time of other particles).
+
+With hypothesis $ \vec u\,=\,\Gamma(\vec {u_0}\,+\,\vec {V})$ and the scalar product $\vec {u_0} . \vec {V} = 0$ 
+ the square of the physical speed is equal to : $V_r^2\,+\,V_\theta^2\,+\,V_\varphi^2$ .
+
+Calculation for $\Gamma$ with $\vec u.\vec {u_0}=\Gamma(\vec {u_0}.\vec {u_0}+\vec {u_0}.\vec {V})$ so : 
+$$ g_{\alpha,\beta}u^\alpha u_0^\beta= g_{t,t}\displaystyle\frac{c}{\sqrt{  g_{t,t} }}\frac{dt}{d\lambda} +g_{t,\varphi}\displaystyle\frac{c}{\sqrt{  g_{t,t} }}\frac{d\varphi}{d\lambda}  = \Gamma g_{\alpha,\beta}u_0^\alpha u_0^\beta=\Gamma c^2 \ph 3mm\Longrightarrow \ph 3mm  \Gamma= \frac{1}{c} [ \sqrt{g_{t,t}}\frac{dt}{d\lambda} +\frac{g_{t,\varphi}}{\sqrt{g_{t,t} }}\frac{d\varphi}{d\lambda}  ]    $$
+
+On the other hand : 
+ $$ \Gamma V^r=\displaystyle \frac{dr}{d\lambda}\ \ et\ \  V_r^2=\frac{  g_{r,r}  }{\Gamma^2}({\frac{dr}{d\lambda}})^2 
+\ph 20mm \Gamma V^\theta=\displaystyle \frac{d\theta}{d\lambda}\ \ et\ \ V_\theta^2=\frac{  g_{\theta,\theta}   }{\Gamma^2}({\frac{d\theta}{d\lambda}})^2$$
+ $$ \Gamma V^\varphi=\displaystyle \frac{d\varphi}{d\lambda}\ \  et \ \ 
+ V_\varphi^2=\displaystyle\frac {(g_{t,t}\,g_{\varphi,\varphi}\,-\,g_{t,\varphi}\,g_{\varphi,t})}{\Gamma^2\,g_{t,t}}({\frac{d\varphi}{d\lambda}})^2$$
+
+So, expression for the \fcolorbox{black}{green}{physical speed squared} :
+
+$$\displaystyle\frac{c^2}{(\sqrt{g_{t,t}}\displaystyle\frac{dt}{d\lambda} +\frac{g_{t,\varphi}}{\sqrt{g_{t,t} }}\frac{d\varphi}{d\lambda})^2} \left[   g_{r,r}   (\frac{dr}{d\lambda})^2 \,+\,   g_{\theta,\theta}   (\frac{d\theta}{d\lambda})^2\,+\,\displaystyle\frac {(g_{t,t}\,g_{\varphi,\varphi}\,-\,g_{t,\varphi}\,g_{\varphi,t})}{g_{t,t}} (\frac{d\varphi}{d\lambda})^2 \right]  $$
+
+\centerline{ = \fcolorbox{black}{green}{$\,\displaystyle \frac{c^2}{(\sqrt{g_{t,t}}+\displaystyle\frac{g_{t,\varphi}}{\sqrt{g_{t,t} }}\frac{d\varphi}{dt})^2}   \left[   g_{r,r}   (\frac{dr}{dt})^2 \,+\,           g_{\theta,\theta}(\frac{d\theta}{dt})^2\,+\,\displaystyle\frac {(g_{t,t}\, g_{\varphi,\varphi}\,-\, g_{t,\varphi}\, g_{\varphi,t})}{g_{t,t}}   (\frac{d\varphi}{dt})^2 \right]     $}  }
+\pv 3mm
+This is an application of the written method in handwritten notes from {\bidon Eric Gougoulhon} (presented a conference in Montpellier in 2017).
+\pv 5mm
+{\bidon A - Kerr metric} 
+        \pv 3mm
+				Metric outside a centro-symmetric \underline{black hole}, of mass $M$, with constant rotation.
+\pv 2mm
+				The coefficients of the metric are : 
+				$$ \displaystyle g_{t,t}= -c^2(1-\frac{r_s\,r}{\rho^2})\ph 10mm g_{t,\varphi}=g_{\varphi,t}=-\frac{c\, r_s\, a\, r}{\rho^2}\sin^2(\theta)$$
+			\pv -3mm	$$ g_{r,r}= \frac{\rho^2}{\Delta}   \ph 6mm g_{\theta,\theta}=\rho^2  \ph 6mm g_{\varphi,\varphi}=\left[r^2+a^2+\displaystyle\frac{r_s\, a^2\, r}{\rho^2}\sin^2(\theta)\right]\sin^2(\theta) $$
+			\pv 2mm	$$\rho^2=r^2+a^2\cos^2\theta\ph 10mm\Delta=r^2-r_s\,r+a^2$$
+								\pv 3mm
+{\titre A.1  Photons - Particular case $\theta=\frac{\Pi}{2}$} 
+\pv 3mm
+First integrals :
+$$\displaystyle{dt\over d\lambda}={1\over\Delta}\,\left[\,(r^2+a^2+{r_s\over r}\,a^2)\,E-{r_s\,a\over r}\,L\,\right]
+\ph 20mm \displaystyle{d\varphi\over d\lambda} = {c\over\Delta}\,\left[\,{r_s\,a\over r}\,E+(1-{r_s\over r})\,L\,\right]$$
+
+ $$\displaystyle {d\varphi\over dt}\ =\ \displaystyle\frac{c\,\left[\,\displaystyle{r_s\,a\over r}\,E+(1-\displaystyle{r_s\over r})\,L\,\right]}{\left[\,(r^2+a^2+\displaystyle{r_s\over r}\,a^2)\,E-\displaystyle{r_s\,a\over r}\,L\,\right]}$$
+\pv 5mm
+$$({dr \over dt})^2 \ =\ c^2\ \frac{\left[E^2+\displaystyle\frac{(a^2\,E^2-L^2)}{r^2}+r_s\,\displaystyle\frac{(L-a\,E)^2}{r^3}\right](a^2+r^2-r\,r_s)^2}{\left[(r^2+a^2+\displaystyle\frac{r_s}{r}\,a^2)\,E-\frac{r_s\,a}{r}\,L\right]^2  }$$ 
+
+Calculation for the \fcolorbox{black}{green}{physical speed squared} :
+$$ \frac{(1-\displaystyle\frac{r_s}{r})}{\left[ (1-\displaystyle\frac{r_s}{r}) + \displaystyle\frac{r_s\,a}{c\,r}\,({d\varphi\over dt}) \right]^2} \left[ \frac{r^2}{\Delta}\,({dr \over dt})^2 \ + \ \displaystyle\frac{\Delta}{(1-\displaystyle\frac{r_s}{r})}\,({d\varphi\over dt})^2 \right]\ =\ \fcolorbox{black}{green}{$c^2$} $$
+
+\hypertarget{Kerrphoton}{\fcolorbox{black}{white}{\defi Initial values III.7-A.1}}\pv 3mm
+  $$V_r(r_0)=c\,cos(\phi_0) \ph 20mm  V_\varphi(r_0)=c\,sin(\phi_0)$$
+  d'o\`u
+  $$E=1   \ph 20mm L=\frac{1}{(r_0-r_s)}\left[r_0\,sin(\phi_0)\, \sqrt{\Delta(r_0)}\,-\,a\,r_s \right]   $$
+\pv 5mm
+{\titre A.2  Other particles - Particular case $\theta=\frac{\Pi}{2}$} 
+\pv 3mm
+First integrals :
+$$\displaystyle{dt\over d\tau}={1\over\Delta}\,\left[\,(r^2+a^2+{r_s\over r}\,a^2)\,E-{r_s\,a\over r}\,L\,\right]
+\ph 20mm \displaystyle{d\varphi\over d\tau} = {c\over\Delta}\,\left[\,{r_s\,a\over r}\,E+(1-{r_s\over r})\,L\,\right]$$
+
+ $$\displaystyle {d\varphi\over dt}\ =\ \displaystyle\frac{c\,\left[\,\displaystyle{r_s\,a\over r}\,E+(1-\displaystyle{r_s\over r})\,L\,\right]}{\left[\,(r^2+a^2+\displaystyle{r_s\over r}\,a^2)\,E-\displaystyle{r_s\,a\over r}\,L\,\right]}$$
+\pv 5mm
+$$({dr \over dt})^2 \ =\ c^2\ \frac{\left[E^2-1+\displaystyle\frac{r_s}{r}+\displaystyle\frac{(a^2(E^2-1)-L^2)}{r^2}+r_s\,\displaystyle\frac{(L-a\,E)^2}{r^3}\right](a^2+r^2-r\,r_s)^2}{\left[(r^2+a^2+\displaystyle\frac{r_s}{r}\,a^2)\,E-\frac{r_s\,a}{r}\,L\right]^2  }$$ 
+
+Calculation for the \fcolorbox{black}{green}{physical speed squared} :
+$$ \frac{(1-\displaystyle\frac{r_s}{r})}{\left[ (1-\displaystyle\frac{r_s}{r}) + \displaystyle\frac{r_s\,a}{c\,r}\,({d\varphi\over dt}) \right]^2} \left[ \frac{r^2}{\Delta}\,({dr \over dt})^2 \ + \ \displaystyle\frac{\Delta}{(1-\displaystyle\frac{r_s}{r})}\,({d\varphi\over dt})^2 \right]\ 
+\ =\ \fcolorbox{black}{green}{$\displaystyle\frac{c^2}{E^2}\,\left[E^2-(1-\displaystyle\frac{r_s}{r})\right]$} $$
+
+\hypertarget{Kerrmassif}{\fcolorbox{black}{white}{\defi Initial values III.7-A.2}}
+  $$V_r(r_0)=v_0\,cos(\phi_0) \ph 20mm  V_\varphi(r_0)=v_0\,sin(\phi_0)$$
+  so     
+$$E=c\,\sqrt{\frac{r_0-r_s}{r_0\,(c^2-v_0^2)}}  \ph 20mm L=\displaystyle\frac{-1}{\sqrt{(c^2-v_0^2)(r_0-r_s)}}\,\left[\frac{a\,c\,r_s}{\sqrt{r_0}}\,-\,v_0\,sin(\phi_0)\,\sqrt{r_0\,\Delta(r_0)} \right]$$
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		\end{document}

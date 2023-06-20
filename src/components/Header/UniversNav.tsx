@@ -1,6 +1,6 @@
 import React, { useState, SyntheticEvent } from "react";
 import { Link } from "react-router-dom";
-
+import theoryEN from "../theory/theorie_univers_EN.pdf";
 
 //importing language using i18next
 import { useTranslation } from "react-i18next";
@@ -48,7 +48,7 @@ export default function UniversNav(props:Props) {
         <a href="#" id="Univers">
           {t("page_menu.univers")}
         </a>
-        <ul style={universStyle}>
+        <ul style={universStyle} href={} target="_blank">
           <li>
             <a id="Univers_theorie">
               {t("page_menu.theorie")}

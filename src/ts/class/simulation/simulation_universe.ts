@@ -1248,7 +1248,7 @@ export class Simulation_universe extends Simulation {
 	  }  
 	  
 	  private reverse_monoWeinberg(a:number):number {
-		return Math.pow(a, 1 / 2) /(this.hubble_cst*2);
+		return Math.pow(a, 2) /(this.hubble_cst*2);
 	  }
 	
 	  
