@@ -1,3 +1,5 @@
+import {c,k,h,G, AU, parsec, k_parsec, M_parsec, ly}from "../../../constants";
+
 /**
  * @class Central_body
  * 

@@ -29,7 +29,7 @@ class Animation extends Graphic
     public main_trajectory(simulation: any, reference_frame: "A" | "DO"): void
     {
         let tau: number = 0;
-        let dtau: number;
+        let dtau: number = 0;
         let schwarzschild_metric: boolean = false;
         let kerr_metric: boolean = false;
         let rebound: boolean = false;
@@ -57,6 +57,7 @@ class Animation extends Graphic
         }
 
         simulation.mobile_initialization();
+
 
         for (let i=0; i<100; i++)
         {

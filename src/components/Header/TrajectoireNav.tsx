@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 
+import theorytEN from "../../theory/theorie_trajectoires_EN.pdf";
+import theorytFR from "../../theory/theorie_trajectoires_FR.pdf";
+
 //importing language using i18next
 import { useTranslation } from 'react-i18next';
 
@@ -37,7 +40,7 @@ export default function TrajectoireNav() {
         <ul style={{ display: isHovered.Trajectoire ? 'block' : 'none' }}>
            {/* above line is to display the links depending on if mouse is hovering or not */}
           <li>
-            <a href="#"  id="Trajectoire_theorie">
+            <a href={t("page_menu.theorie") === "theorie" ? theorytFR : theorytEN} target="_blank" rel="noopener noreferrer">
               {t('page_menu.theorie')}
             </a>
           </li>

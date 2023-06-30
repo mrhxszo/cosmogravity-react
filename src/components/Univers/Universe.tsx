@@ -124,7 +124,7 @@ function handleMonofluide(event: any) {
 		<>
 		  {/* Boutons Calculs annexes et params */}
 		  <div id="Boutons_top_right">
-			<input className="myButton" id="para" type="button" onClick={() => param()} value={t("page_univers_general.bouton_constantes")||""} />
+			<input className="myButton" id="para" type="button" value={t("page_univers_general.bouton_constantes")||""} />
 			{/* change the calculs Annexe based on which link is clicked */}
 			<AdjunctButton UniverseRef={UniverseRef} params={params} handleSelect={handleSelect} selectValue={selectValue}/>
 			<p id="txt_titre" style={{ fontSize: '20px', fontWeight: "bold", textAlign: "center" }}></p>

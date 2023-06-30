@@ -110,7 +110,6 @@ export default function Monofluide(props: Props) {
           {/* Bouton Tracer */}
           <div id="trace_box">
             <input id="trace" className="myButton" type="button" onClick={handleClick} defaultValue="Tracer" />
-            <input id="retour" className="myButton" type="button" onclick="retourSimulation();" defaultValue="Retour" />
             <div id="gif" style={{position: 'relative', display: 'inline-block', marginLeft: '13px'}} />
           </div>
         </div>

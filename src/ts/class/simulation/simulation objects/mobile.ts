@@ -1,3 +1,5 @@
+import {c,k,h,G, AU, parsec, k_parsec, M_parsec, ly}from "../../../constants";
+
 /**
  * @class Mobile
  * 
@@ -58,7 +60,10 @@ export class Mobile
         r: number,
         phi: number,
         v_r: number,
-        v_alpha: number
+        v_alpha: number,
+        u_r: number,
+        u_phi: number,
+        dtau: number
     ) {
         this._id = id;
         this._is_photon = is_photon;
@@ -72,6 +77,9 @@ export class Mobile
         this._v_norm = (v_r**2 + this.v_phi**2)**.5
         this._clock_a = 0;
         this._clock_do = 0;
+        this._U_r = u_r;
+        this._U_phi = u_phi;
+        this._dtau = dtau;
 
         if (is_photon) { this._v_r = c; this._v_norm = c; }
     }

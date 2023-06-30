@@ -31,7 +31,7 @@ export default function Output(props:Props){
         omegaK0: Universe?.calcul_omega_k() ?? 0,
         ageUniverse: Universe?.universe_age() ?? 0,
         checkSingularity: Universe?.check_singularity() ??{ 
-            bigBang: {isBigBang:false},
+            bigBang: {isBigBang:false, time: 0},
             bigCrunch: {isBigCrunch:false, time: 0},
             bigRip: {isBigRip:false, time: 0}
         },
@@ -47,6 +47,8 @@ export default function Output(props:Props){
             Universe.hubble_cst = props.params.H0;
             Universe.matter_parameter = props.params.omegam0;
             Universe.dark_energy.parameter_value = props.params.omegaDE0;
+            Universe.dark_energy.w_0 = props.params.omega0;
+            Universe.dark_energy.w_1 = props.params.omega1;
             Universe.is_flat = props.selectValue?.isFlat? true : false;
 
             switch (props.selectValue?.value) {
@@ -93,13 +95,30 @@ export default function Output(props:Props){
                 <br/>   
                 <span id="txt_tempsBB" style={{textDecoration: "underline"}}>{t('page_univers_general.tempsBigBang')}</span>
                 <br/>
-                <output id="resultat_ageunivers_ga">{output.checkSingularity.bigBang.time ?((output.checkSingularity.bigBang.time/gigaYear).toExponential(4)): t('calculs_univers.pasBB')}</output>
-                (Ga)&nbsp;= <span id="resultat_ageunivers_s">{output.checkSingularity.bigBang.time ? (output.checkSingularity.bigBang.time*3.154*1e7).toExponential(4): t('calculs_univers.pasBB')}</span>(s)
+                <output id="resultat_ageunivers_ga">{output.checkSingularity.bigBang.time !==0 ?((output.checkSingularity.bigBang.time/gigaYear).toExponential(4)): t('calculs_univers.pasBB')}</output>
+                (Ga)&nbsp;= <span id="resultat_ageunivers_s">{output.checkSingularity.bigBang.time !==0 ? (output.checkSingularity.bigBang.time*3.154*1e7).toExponential(4): t('calculs_univers.pasBB')}</span>(s)
                 <br/>
-                <span id="txt_tempsBB" style={{textDecoration: "underline"}}>{t('calculs_univers.tempsavtBC')}</span><br/>
-                <i><output id="resultat_bigcrunch">{output.checkSingularity.bigCrunch.isBigCrunch ? (output.ageUniverse).toExponential(4): t('calculs_univers.pasBC')}</output></i>
-                (Ga)&nbsp;= <span id="resultat_ageunivers_s">{output.checkSingularity.bigCrunch.time ? (output.checkSingularity.bigCrunch.time*3.154*1e7).toExponential(4): t('calculs_univers.pasBC')}</span>(s)
-                <br/>
+                
+                {/* check if there is a big rip and display accordingly*/}
+                {
+                    output.checkSingularity.bigRip.isBigRip ? 
+                    <>
+                    <span id="txt_tempsBB" style={{textDecoration: "underline"}}>{t('calculs_univers.temps_avt_BR')}</span><br/>
+                    <i><output id="resultat_bigcrunch">{(output.checkSingularity.bigRip.time/gigaYear).toExponential(4)}</output></i>
+                    (Ga)&nbsp;= <span id="resultat_ageunivers_s">{((output.checkSingularity.bigRip.time)*3.154*1e7).toExponential(4)}</span>(s)                   
+                    <br/>
+                    </>
+                    :
+                    <>
+                    <span id="txt_tempsBB" style={{textDecoration: "underline"}}>{t('calculs_univers.tempsavtBC')}</span><br/>
+                    <i><output id="resultat_bigcrunch">{output.checkSingularity.bigCrunch.isBigCrunch ? (output.checkSingularity.bigCrunch.time/gigaYear).toExponential(4): t('calculs_univers.pasBC')}</output></i>
+                    (Ga)&nbsp;= <span id="resultat_ageunivers_s">{output.checkSingularity.bigCrunch.time ? (output.checkSingularity.bigCrunch.time*3.154*1e7).toExponential(4): t('calculs_univers.pasBC')}</span>(s)
+                    <br/>
+                    </>
+
+                    
+                }
+
                 <span id="txt_dureeeUniv" style={{textDecoration: 'underline'}}>{t('page_univers_general.dureeUnivers')}</span><br/>
                 <i><output id="resultat_dureeUnivers">{output.checkSingularity.bigCrunch.isBigCrunch || output.checkSingularity.bigRip.isBigRip ? (output.ageUniverse/gigaYear).toExponential(4): <span>&infin;</span>}</output></i>
                 (Ga)&nbsp;= <span id="resultat_ageunivers_s">{output.checkSingularity.bigCrunch.time ? (output.ageUniverse*3.154*1e7).toExponential(4): <span>&infin;</span>}</span>(s)

@@ -89,7 +89,7 @@ export default function ConstantsAdjunct(props: Props) {
 
     //for inverse calculation
     else if (e.currentTarget.parentNode) {
-      const parentId = e.currentTarget.parentNode.id;
+      const parentId = (e.currentTarget.parentNode as HTMLElement).id;
   
       if (parentId === "inverse") {
         setInv((prevInv) => ({
@@ -431,7 +431,7 @@ export default function ConstantsAdjunct(props: Props) {
                     <label htmlFor="Okz1">Ω<sub>k</sub><span style={{fontSize: 'smaller'}}>(z<sub>1</sub>)</span> =</label>
                     <span id="Okz1" style={{color: 'blue'}}>{result.omega_k_z1.toExponential(4)}</span>
                   </div>
-                  <input style={{marginTop: '10px', marginLeft: '10px'}} type="button" onclick="transfert_simu(0);" id="ts-1" defaultValue="Tracer" />
+                  <input style={{marginTop: '10px', marginLeft: '10px'}} type="button" id="ts-1" defaultValue="Tracer" />
                 </div>
                 <div id="en_Z2">
                   <div>
@@ -458,7 +458,7 @@ export default function ConstantsAdjunct(props: Props) {
                     <label htmlFor="Okz2">Ω<sub>k</sub><span style={{fontSize: 'smaller'}}>(z<sub>2</sub>)</span> =</label>
                     <span id="Okz2" style={{color: 'blue'}}>{result.omega_k_z2.toExponential(4)}</span>
                   </div>
-                  <input style={{marginTop: '10px', marginLeft: '10px'}} type="button" onclick="transfert_simu(1);" id="ts-2" defaultValue="Tracer" />
+                  <input style={{marginTop: '10px', marginLeft: '10px'}} type="button" id="ts-2" defaultValue="Tracer" />
                 </div>
               </div>
             </div>
@@ -603,7 +603,7 @@ export default function ConstantsAdjunct(props: Props) {
         </div>
         {/* z1 et z2 pour le calcul de dm et t2,t1 */}
         <br />
-            <GraphGenerator Universe={Universe}/>
+          {Universe !== null && <GraphGenerator Universe={Universe} />}
         </div>
     </div>
         

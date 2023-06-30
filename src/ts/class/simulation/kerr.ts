@@ -1,5 +1,6 @@
 import { Mobile } from "./simulation objects/mobile";
 import { Simulation_trajectory } from "./simulation_trajectory";
+import {c,k,h,G, AU, parsec, k_parsec, M_parsec, ly}from "../../constants";
 
 /**
  * @class Kerr
@@ -154,7 +155,7 @@ export class Kerr extends Simulation_trajectory
     public mobile_trajectory( mobile: Mobile, step: number, reference_frame: "A" | "DO"): number[]
     {
         let dtau = step;
-        let tau: number;
+        let tau: number = 0;
         let r = mobile.r;
         let U_r = mobile.U_r;
 
@@ -202,6 +203,7 @@ export class Kerr extends Simulation_trajectory
 				this.KM_PH_trajectory_DO
 			);
 		}
+	return [tau, r, U_r];
     }
 
 

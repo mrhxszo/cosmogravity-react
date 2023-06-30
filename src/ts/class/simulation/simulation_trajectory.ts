@@ -1,6 +1,7 @@
 import { Simulation } from "./simulation";
 import { Central_body } from "./simulation objects/central_body";
 import { Mobile } from "./simulation objects/mobile";
+import {c,k,h,G, AU, parsec, k_parsec, M_parsec, ly}from "../../constants";
 
 /**
  * @class Simulation_trajectory

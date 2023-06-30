@@ -51,7 +51,7 @@ import {c,k,h,G, AU, parsec, k_parsec, M_parsec, ly}from "../../constants";
  * @method equa_diff_a
  * @method equa_diff_time
  * @method check_singularity //2023
- * @method calculate_energy_dens
+ * @method calculate_energy_density
  * MonoFluid
  * @method Monofluid //2023
  * @method monoEinsteinSitter //2023
@@ -780,7 +780,7 @@ export class Simulation_universe extends Simulation {
 
 		/**
 	 * Calculate the cosmological redshift `z` from the given age of the universe.
-	 * Newton's method is used to find the root of the function `emission_age(z) - age`.
+	 * Newton's method (instead of bisection method like in the V1) is used to find the root of the function `emission_age(z) - age`.
 	 * @param age The age of the universe.
 	 * @returns The cosmological redshift `z`.
 	 */
@@ -1054,7 +1054,7 @@ export class Simulation_universe extends Simulation {
 	 * note : this function should check for all three kinds of singularity namely big crunch, big rip and big bang
 	 * where big rip depends on the value of the dark energy parameter w
 	 * */
-	public check_singularity(): { bigBang: {isBigBang:boolean, time?: number}, bigCrunch: {isBigCrunch:boolean, time?: number}, bigRip: {isBigRip:boolean, time?: number}} {
+	public check_singularity(): { bigBang: {isBigBang:boolean, time: number}, bigCrunch: {isBigCrunch:boolean, time: number}, bigRip: {isBigRip:boolean, time: number}} {
 
 		let { x, y } = this.compute_scale_factor(0.001, [0, 10]);
 		let scale_factor = y;
@@ -1064,6 +1064,11 @@ export class Simulation_universe extends Simulation {
 		let thresold = 0.1;
 		let isolatedScaleFactor: Array<{ scale_factor: number[], time: number[] }> = [];
 		let currentSection: { scale_factor: number[], time: number[] } | null = null;
+
+		//intialize the object to be returned
+		let bigBang = {isBigBang:false, time: 0};
+		let bigCrunch = {isBigCrunch:false, time: 0};
+		let bigRip = {isBigRip:false, time: 0};
 		
 		//search bigbang and bigcrunch
 		scale_factor.forEach((element, index) => {
@@ -1097,20 +1102,35 @@ export class Simulation_universe extends Simulation {
 			//check for bigbang or bigcrunch
 			if (isolatedScaleFactor.length == 1) {
 				//console.log("bigbang detected");
-				return { bigBang: {isBigBang :true, time: presentTime}, bigCrunch: {isBigCrunch:false}, bigRip: {isBigRip:false} };
+				bigBang.isBigBang =true;
+				bigBang.time= presentTime;
 			}
 			else if (isolatedScaleFactor.length >= 2) {
 				//console.log("bigcrunch detected");
-				return { bigBang: {isBigBang :true, time: presentTime}, bigCrunch: {isBigCrunch:true, time: isolatedScaleFactor[1].time[0]-presentTime}, bigRip: {isBigRip:false} };
+				bigBang.isBigBang =true;
+				bigBang.time= presentTime;
+				bigCrunch.isBigCrunch = true;
+				bigCrunch.time = isolatedScaleFactor[1].time[0]-presentTime;
+			}
+			// (scale_factor[scale_factor.length] <= 0 || scale_factor[scale_factor.length]) && 
+			else if((this.dark_energy.w_1 > 0 || (this.dark_energy.w_1 === 0 && this.dark_energy.w_0 < -1))){
+				bigBang.isBigBang =true;
+				bigBang.time= presentTime;
+
+				bigRip.isBigRip =true;
+				bigRip.time = this.emission_age(-0.999) - presentTime;
+				console.log(this.emission_age(-0.999) - presentTime);
 			}
 		}
+
+
 
 
 	//to detect if there is big rip need to look at value of z, w_0 et w_1 (see universe theory)
 	//(to be written)if there is big rip then return { bigBang: true, bigCrunch: false, bigRip: true };
 
 	//if there is no singularity
-	return { bigBang: {isBigBang :false}, bigCrunch: {isBigCrunch:false}, bigRip: {isBigRip:false} };
+	return { bigBang: bigBang, bigCrunch: bigCrunch, bigRip: bigRip };
 
 		
 	}
@@ -1150,89 +1170,103 @@ export class Simulation_universe extends Simulation {
 
 	public Monofluid(interval: [number, number], modele: string): [number[], number[]] { //
 		const data_x: number[] = [];
-		const data_y: number[] = [];
-		let temps:number = 0;
-		let fy : number=0;
-		this.temperature=0;
-		var agedebut:number=0, agefinal:number=0,pas;
-		
-	
-		let facteur_pas=  1e-5  
-		if (Math.abs(this.hubble_cst)>=100) {
-		  let exposant=Math.round(Math.log10(Math.abs(this.hubble_cst)));
-		  facteur_pas= 1e-7*Math.pow(10,exposant);}
-	
-		switch (modele) {
-		  case "Matter":
-			  agedebut = this.reverse_monoEinsteinSitter(interval[0]); 
-			  agefinal = this.reverse_monoEinsteinSitter(interval[1]);
-			  this.matter_parameter = 1;
-			  this.has_cmb = false;
-			  this.dark_energy.parameter_value = 0;
-			  this.is_flat = true;
-			  pas =  Math.abs(agefinal-agedebut)*facteur_pas;
-			  while (fy >= agedebut && fy <= agefinal) {
-					fy = this.monoEinsteinSitter(temps);
-					data_x.push(temps);
-					data_y.push(fy);
-					temps = temps + pas;
-					}
-			  break;
-		  case "Radiation":
-			  agedebut = this.reverse_monoWeinberg(interval[0]);
-			  agefinal = this.reverse_monoWeinberg(interval[1]);
-			  this.matter_parameter = 0;
-			  this.dark_energy.parameter_value = 0;
-			  this.is_flat = true;
-			  this.temperature = this.calcul_Tr();
-			  pas =  Math.abs(agefinal-agedebut)*facteur_pas;
-			  while (fy >= agedebut && fy <= agefinal) {
-				fy = this.monoWeinberg(temps);
-				data_x.push(temps);
-				data_y.push(fy);
-				temps = temps + pas;
-			  }  
-			  break;
-		  case "Cosmological_constant":
-			  agedebut = this.reverse_monoSitter(interval[0]);
-			  agefinal = this.reverse_monoSitter(interval[1]);
-			  temps = -30;
-			  this.matter_parameter = 0;
-			  this.has_cmb = false;
-			  this.dark_energy.parameter_value = 1;
-			  this.is_flat = true;
-			  pas =  Math.abs(agefinal-agedebut)*facteur_pas
-			  while (fy >= agedebut && fy <= agefinal) {
-				fy = this.monoSitter( temps);
-				data_x.push(temps);
-				data_y.push(fy);
-				temps = temps + pas;
-			  }  
-			  break;
-		  case "Curvature":
-			  agedebut = this.reverse_monoCourbure( interval[0]);
-			  agefinal = this.reverse_monoCourbure( interval[1]);
-			  this.matter_parameter = 0;
-			  this.has_cmb = false;
-			  this.dark_energy.parameter_value = 0;
-			  this.is_flat = false;
-			  pas =  Math.abs(agefinal-agedebut)*facteur_pas
-			  while (fy >= agedebut && fy <= agefinal) {
-				fy = this.monoCourbure(temps);
-				data_x.push(temps);
-				data_y.push(fy);
-				temps = temps + pas;
-				}   
-				break;
-			default:
-				data_x.push(temps);
-				data_y.push(fy);
-				break;
-	
-			  }
-		  
-	
-		return [data_x, data_y] ;
+    const data_y: number[] = [];
+    let temps:number = 0;
+    let fy : number=0;
+    this.temperature=0;
+    var agedebut:number=0, agefinal:number=0,pas;
+    
+
+    let facteur_pas=  1e-5  
+    if (Math.abs(this.hubble_cst)>=100) {
+      let exposant=Math.round(Math.log10(Math.abs(this.hubble_cst)));
+      facteur_pas= 1e-7*Math.pow(10,exposant);}
+
+    switch (modele) {
+      case "Matter":
+          agedebut = this.reverse_monoEinsteinSitter(interval[0]); 
+          agefinal = this.reverse_monoEinsteinSitter(interval[1]);
+          this.matter_parameter = 1;
+          this.has_cmb = false;
+          this.dark_energy.parameter_value = 0;
+          this.is_flat = true;
+          pas =  Math.abs(agefinal-agedebut)*facteur_pas;
+          while (fy <= interval[1]) {
+                fy = this.monoEinsteinSitter(temps);
+
+                if (fy >= interval[0]) {
+                  data_x.push(temps);
+                  data_y.push(fy);
+                }
+
+
+                temps = temps + pas;
+                }
+          break;
+      case "Radiation":
+          agedebut = this.reverse_monoWeinberg(interval[0]);
+          agefinal = this.reverse_monoWeinberg(interval[1]);
+          this.matter_parameter = 0;
+          this.dark_energy.parameter_value = 0;
+          this.is_flat = true;
+          this.temperature = this.calcul_Tr();
+          pas =  Math.abs(agefinal-agedebut)*facteur_pas;
+          while (fy <= interval[1]) {
+            fy = this.monoWeinberg(temps);
+
+            if (fy >= interval[0]) {
+              data_x.push(temps);
+              data_y.push(fy);
+            }
+
+            temps = temps + pas;
+          }  
+          break;
+      case "Cosmological_constant":
+          agedebut = this.reverse_monoSitter(interval[0]);
+          agefinal = this.reverse_monoSitter(interval[1]);
+          temps = -30;
+          this.matter_parameter = 0;
+          this.has_cmb = false;
+          this.dark_energy.parameter_value = 1;
+          this.is_flat = true;
+          pas =  Math.abs(agefinal-agedebut)*facteur_pas
+          while (fy <= interval[1]) {
+            fy = this.monoSitter( temps);
+            
+            
+            if (fy >= interval[0]) {
+              data_x.push(temps);
+              data_y.push(fy);
+            }
+
+            temps = temps + pas;
+          }  
+          break;
+      case "Curvature":
+          agedebut = this.reverse_monoCourbure( interval[0]);
+          agefinal = this.reverse_monoCourbure( interval[1]);
+          this.matter_parameter = 0;
+          this.has_cmb = false;
+          this.dark_energy.parameter_value = 0;
+          this.is_flat = false;
+          pas =  Math.abs(agefinal-agedebut)*facteur_pas
+          while (fy <= interval[1]) {
+            fy = this.monoCourbure(temps);
+            
+            
+            if (fy >= interval[0]) {
+                      data_x.push(temps);
+                      data_y.push(fy);
+            }
+            temps = temps + pas;
+            }   
+            break;
+
+          }
+      
+
+    return [data_x, data_y] ;
 	  }
 	
 	  private monoEinsteinSitter(temps:number):number {
