@@ -4,6 +4,7 @@ import LinkContext from "./components/Header/LinkContext";
 import Header from "./components/Header/Header";
 import Home from "./components/Home";
 import Univers from "./components/Univers/Universe";
+import UnderConstruction from "./components/UnderConstruction";
   
 
 function App() {
@@ -17,6 +18,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home/>}></Route>
           <Route path="/Univers" element={<Univers/>}></Route>
+
+          {/* Handle underConstruction page */}
+          <Route path="*" element={<UnderConstruction />} />
         </Routes>
       </Router>
     </LinkContext.Provider>
