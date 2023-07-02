@@ -1,0 +1,36 @@
+{
+  "files": {
+    "main.css": "/static/css/main.126c57c2.css",
+    "main.js": "/static/js/main.bd30242b.js",
+    "static/js/787.c5adaa1a.chunk.js": "/static/js/787.c5adaa1a.chunk.js",
+    "static/media/Tuto-Traj-FR.pdf": "/static/media/Tuto-Traj-FR.c6ab42ce18e0bc049f6d.pdf",
+    "static/media/Tuto-Traj-EN.pdf": "/static/media/Tuto-Traj-EN.d553067f392f85129dc5.pdf",
+    "static/media/Tuto-Univ-FR.pdf": "/static/media/Tuto-Univ-FR.dfcdd4561c76c8c8cbe0.pdf",
+    "static/media/Tuto-Univ-EN.pdf": "/static/media/Tuto-Univ-EN.8fc00d36619338758424.pdf",
+    "static/media/theorie_univers_EN.pdf": "/static/media/theorie_univers_EN.c0c511487890d0f54a7d.pdf",
+    "static/media/theorie_univers-FR.pdf": "/static/media/theorie_univers-FR.3eca4404d33df3768523.pdf",
+    "static/media/image0.png": "/static/media/image0.5fb0b5c2d63a5ab91c6c.png",
+    "static/media/theorie_trajectoires_FR.pdf": "/static/media/theorie_trajectoires_FR.d927973b2353a60b94e4.pdf",
+    "static/media/theorie_trajectoires_EN.pdf": "/static/media/theorie_trajectoires_EN.8b980c5828b711fc064f.pdf",
+    "static/media/logo.png": "/static/media/logo.6d20f23cfab3cbddb95f.png",
+    "static/media/image1_fr.png": "/static/media/image1_fr.6c3a5510d39c31e1f055.png",
+    "static/media/image2_en.png": "/static/media/image2_en.e636297e91956f9590ce.png",
+    "static/media/image2_fr.png": "/static/media/image2_fr.36fa9342f3c6dcc3d26a.png",
+    "static/media/image4_en.png": "/static/media/image4_en.372cc74358862823ba85.png",
+    "static/media/image4_fr.png": "/static/media/image4_fr.929ac48ff08a052ac21f.png",
+    "static/media/image3_en.png": "/static/media/image3_en.a416f97faca10b7999e1.png",
+    "static/media/image3_fr.png": "/static/media/image3_fr.d6e9e0f2439976e34f9a.png",
+    "static/media/image1_en.png": "/static/media/image1_en.5a3d031c389be703dd36.png",
+    "static/media/work-in-progress.jpg": "/static/media/work-in-progress.395f2b2e056cb2961d99.jpg",
+    "static/media/warning.png": "/static/media/warning.8e0fca029c97b11471e0.png",
+    "static/media/Cosmogravity.png": "/static/media/Cosmogravity.1f7f87ae0217daceecda.png",
+    "index.html": "/index.html",
+    "main.126c57c2.css.map": "/static/css/main.126c57c2.css.map",
+    "main.bd30242b.js.map": "/static/js/main.bd30242b.js.map",
+    "787.c5adaa1a.chunk.js.map": "/static/js/787.c5adaa1a.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.126c57c2.css",
+    "static/js/main.bd30242b.js"
+  ]
+}
