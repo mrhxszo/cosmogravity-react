@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import theorytEN from "../../theory/theorie_trajectoires_EN.pdf";
 import theorytFR from "../../theory/theorie_trajectoires_FR.pdf";
@@ -34,9 +35,9 @@ export default function TrajectoireNav() {
       <li onMouseEnter={() => handleMouseEnter('Trajectoire')}
           onMouseLeave={() => handleMouseLeave('Trajectoire')}
           className="nav-submenu">
-        <a href="#" id="Trajectoire">
+        <Link to="/underconstruction" id="Trajectoire">
           {t('page_menu.trajectoire')}
-        </a>
+        </Link>
         <ul style={{ display: isHovered.Trajectoire ? 'block' : 'none' }}>
            {/* above line is to display the links depending on if mouse is hovering or not */}
           <li>
@@ -47,48 +48,48 @@ export default function TrajectoireNav() {
           <li  onMouseEnter={() => handleMouseEnter('Schwarzschild')}
               onMouseLeave={() => handleMouseLeave('Schwarzschild')}
               className="nav-submenu">
-            <a href="#" id="Schwarzschild">
+            <Link to="/Schwarzschild" id="Schwarzschild">
               {t('page_menu.schwarzschild')}
-            </a>
+            </Link>
             <ul style={{ display: isHovered.Schwarzschild ? 'block' : 'none' }}>
                {/* above line is to display the links depending on if mouse is hovering or not */}
               <li>
-                <a href="Simulation_trajectoire.html" id="Metmbaryonique">
+                <Link to="/Simulation_trajectoire" id="Metmbaryonique">
                   {t('page_menu.metmbaryonique')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="Simulation_trajectoire_photons.html" id="Metpbaryonique">
+                <Link to="/Simulation_trajectoire_photons" id="Metpbaryonique">
                   {t('page_menu.metpbaryonique')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="Simulation_trajectoire_inter.html" id="Metmnonbaryonique">
+                <Link to="/Simulation_trajectoire_inter" id="Metmnonbaryonique">
                   {t('page_menu.metmnonbaryonique')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="Simulation_trajectoire_inter_photons.html" id="Metpnonbaryonique">
+                <Link to="/Simulation_trajectoire_inter_photons" id="Metpnonbaryonique">
                   {t('page_menu.metpnonbaryonique')}
-                </a>
+                </Link>
               </li>
             </ul>
           </li>
           <li onMouseEnter={() => handleMouseEnter('Kerr')}
               onMouseLeave={() => handleMouseLeave('Kerr')} className="nav-submenu">
-            <a href="#" id="Kerr">
+            <Link to="/underconstruction" id="Kerr">
               {t('page_menu.kerr')}
-            </a>
+            </Link>
             <ul style={{ display: isHovered.Kerr ? 'block' : 'none' }}>
               <li>
-                <a href="Simulation_trajectoire_kerr.html" id="Particule_massive_kerr">
+                <Link to="/Simulation_trajectoire_kerr" id="Particule_massive_kerr">
                   {t('page_menu.part_massive')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="Simulation_trajectoire_kerr_photons.html" id="Photon_kerr">
+                <Link to="Simulation_trajectoire_kerr_photons" id="Photon_kerr">
                   {t('page_menu.part_photon')}
-                </a>
+                </Link>
               </li>
             </ul>
           </li>

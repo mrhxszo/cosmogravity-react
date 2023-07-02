@@ -78,7 +78,7 @@ export default function Header(){
 		<ul>
 		<li>
 			{/*Link to the home page */}
-        	<Link to="/" id="Accueil">{t("page_menu.accueil") }</Link>
+        	<Link to="/home" id="Accueil">{t("page_menu.accueil") }</Link>
 
 		</li>
 			{/* link to navigational pages */}
