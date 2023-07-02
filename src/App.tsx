@@ -16,7 +16,7 @@ function App() {
       <Router>
         <Header></Header>
         <Routes>
-          <Route path="/" element={<Home/>}></Route>
+          <Route path="/Home" element={<Home/>}></Route>
           <Route path="/Univers" element={<Univers/>}></Route>
 
           {/* Handle underConstruction page */}
